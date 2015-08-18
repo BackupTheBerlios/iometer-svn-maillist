@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r345 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-October/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r345%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200810191829.m9JITxKb032111%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r345 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r345%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200810191829.m9JITxKb032111%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r345 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Sun Oct 19 20:29:59 CEST 2008</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2008-10-19 20:29:58 +0200 (Sun, 19 Oct 2008)
+New Revision: 345
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.h
+Log:
+fixed compile warnings with gcc 4.2.3 in Ubuntu Linux 8.04
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2008-10-19 18:29:58 UTC (rev 345)
+@@ -101,8 +101,6 @@
+ #include &lt;arpa/inet.h&gt;
+ #include &lt;assert.h&gt;
+ 
+-static char *mnttab;
+-
+ #define USED_DEVS_MAX_SIZE (4 * 1024)
+ 
+ /**********************************************************************
+@@ -120,6 +118,7 @@
+ 	TargetDisk d;
+ 	int count = 0;
+ 	char usedDevs[USED_DEVS_MAX_SIZE + 1];
++	const char *mnttab;
+ 
+ 	usedDevs[0] = '\0';
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2008-10-19 18:29:58 UTC (rev 345)
+@@ -158,7 +158,7 @@
+ int Performance::Get_Processor_Count(void)
+ {
+ 	char buf[4096];
+-	char *p = &quot;processor\t:&quot;;
++	const char *p = &quot;processor\t:&quot;;
+ 	int i = 0;
+ 	size_t res, j;
+ 	FILE *cpuinfo;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2008-10-19 18:29:58 UTC (rev 345)
+@@ -934,7 +934,7 @@
+ //
+ // Utility function to close a socket.  socket_name parameter is used only for debugging outputs.
+ //
+-BOOL PortTCP::CloseSocket(SOCKET * s, char *socket_name)
++BOOL PortTCP::CloseSocket(SOCKET * s, const char *socket_name)
+ {
+ 	if (*s == (int)INVALID_SOCKET) {
+ #if PORT_DETAILS || _DETAILS
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.h	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.h	2008-10-19 18:29:58 UTC (rev 345)
+@@ -154,7 +154,7 @@
+ 	static unsigned int sockets_in_use;
+ 
+ 	// private functions used only by PortTCP
+-	BOOL CloseSocket(SOCKET * s, char *socket_name);	// utility function
++	BOOL CloseSocket(SOCKET * s, const char *socket_name);	// utility function
+ 	DWORDLONG SynchReceive(LPVOID data, DWORD size = MESSAGE_SIZE);
+ 	DWORDLONG SynchSend(LPVOID data, DWORD size = MESSAGE_SIZE);
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#109">[ date ]</a>
+              <a href="thread.html#109">[ thread ]</a>
+              <a href="subject.html#109">[ subject ]</a>
+              <a href="author.html#109">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

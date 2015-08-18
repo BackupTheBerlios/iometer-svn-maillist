@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r295 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r295%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608221828.k7MISaFW015096%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000063.html">
+   <LINK REL="Next"  HREF="000065.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r295 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r295%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608221828.k7MISaFW015096%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r295 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 22 20:28:36 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000063.html">[Iometer-svn] r294 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000065.html">[Iometer-svn] r296 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-22 20:28:11 +0200 (Tue, 22 Aug 2006)
+New Revision: 295
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+   branches/IOMETER-restruct/iometer/src/PageDisk.cpp
+   branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+Log:
+changed from double to float in some place. also some cosmetic fixes.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -1539,7 +1539,7 @@
+ 		targets_to_run += m_pPageSetup-&gt;target_cycling.step;
+ 	} else {
+ 		targets_to_run = m_pPageSetup-&gt;target_cycling.start *
+-		    (int)pow((double)m_pPageSetup-&gt;target_cycling.step, (double)target_exponent++);
++		    (int)powf((float)m_pPageSetup-&gt;target_cycling.step, (float)target_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1593,7 +1593,7 @@
+ 		workers_to_run += m_pPageSetup-&gt;worker_cycling.step;
+ 	} else {
+ 		workers_to_run = m_pPageSetup-&gt;worker_cycling.start *
+-		    (int)pow((double)m_pPageSetup-&gt;worker_cycling.step, (double)worker_exponent++);
++		    (int)powf((float)m_pPageSetup-&gt;worker_cycling.step, (float)worker_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1654,7 +1654,7 @@
+ 			targets_to_run += m_pPageSetup-&gt;target_cycling.step;
+ 		else
+ 			targets_to_run = m_pPageSetup-&gt;target_cycling.start *
+-			    (int)pow((double)m_pPageSetup-&gt;target_cycling.step, (double)target_exponent++);
++			    (int)powf((float)m_pPageSetup-&gt;target_cycling.step, (float)target_exponent++);
+ 		return worker_count;
+ 	}
+ 	// Reset the number of targets to run and add additional workers.
+@@ -1665,7 +1665,7 @@
+ 		workers_to_run += m_pPageSetup-&gt;worker_cycling.step;
+ 	else
+ 		workers_to_run = m_pPageSetup-&gt;worker_cycling.start *
+-		    (int)pow((double)m_pPageSetup-&gt;worker_cycling.step, (double)worker_exponent++);
++		    (int)powf((float)m_pPageSetup-&gt;worker_cycling.step, (float)worker_exponent++);
+ 
+ 	// Try running with the next set of workers.  If no new workers were set
+ 	// running, we're done.
+@@ -1715,7 +1715,7 @@
+ 		targets_to_run += m_pPageSetup-&gt;target_cycling.step;
+ 	} else {
+ 		targets_to_run = m_pPageSetup-&gt;target_cycling.start *
+-		    (int)pow((double)m_pPageSetup-&gt;target_cycling.step, (double)target_exponent++);
++		    (int)powf((float)m_pPageSetup-&gt;target_cycling.step, (float)target_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1765,7 +1765,7 @@
+ 		targets_to_run += m_pPageSetup-&gt;target_cycling.step;
+ 	} else {
+ 		targets_to_run = m_pPageSetup-&gt;target_cycling.start *
+-		    (int)pow((double)m_pPageSetup-&gt;target_cycling.step, (double)target_exponent++);
++		    (int)powf((float)m_pPageSetup-&gt;target_cycling.step, (float)target_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1823,7 +1823,7 @@
+ 		queue_depth_to_run += m_pPageSetup-&gt;queue_cycling.step;
+ 	else
+ 		queue_depth_to_run = m_pPageSetup-&gt;queue_cycling.start *
+-		    (int)pow((double)m_pPageSetup-&gt;queue_cycling.step, (double)queue_exponent++);
++		    (int)powf((float)m_pPageSetup-&gt;queue_cycling.step, (float)queue_exponent++);
+ 
+ 	// Continue to cycle queue depth as long as all workers are not idle.
+ 	return workers_running;
+
+Modified: branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -51,7 +51,7 @@
+ /* ## ------------------------------------------------------------------- ## */
+ /* ##                                                                     ## */
+ /* ##  Changes ...: 2006-08-04 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">vedrand at yahoo.com</A>)                        ## */
+-/* ##               -misc syntactical -- explicit pow() arg typecasts     ## */
++/* ##               - misc syntactical -- explicit pow() arg typecasts    ## */
+ /* ##               2004-09-01 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">henryx.w.tieman at intel.com</A>)                ## */
+ /* ##               - Needed to cast parameters to some functions         ## */
+ /* ##                 because latest Visual Studio C++ library has        ## */
+@@ -248,9 +248,9 @@
+ 		return;
+ 	}
+ 	// Calculate the new scale.
+-	scale = (int)powf(10.0, floor(log10((float)max_range)));
++	scale = (int)powf(10.0, floorf(log10f((float)max_range)));
+ 
+-	if ((max_range == (int)powf(10.0, floor(log10((float)max_range))))) {
++	if ((max_range == (int)powf(10.0, floorf(log10f((float)max_range))))) {
+ 		// max_range is a power of 10
+ 		scale /= 10;
+ 	}
+@@ -280,11 +280,11 @@
+ 
+ 	// Sets the range that the marker labels will span.
+ 	range_diff = (float) (max_range - min_range);
+-	if ((range_diff == powf(10.0, floor(log10(range_diff)))) &amp;&amp; (range_diff != 1)) {
++	if ((range_diff == powf(10.0, floorf(log10f(range_diff)))) &amp;&amp; (range_diff != 1)) {
+ 		// range_diff is a power of 10, but is not exactly 1
+ 		display_range = 10;
+ 	} else {
+-		display_range = range_diff / powf(10.0, floor(log10(range_diff)));
++		display_range = range_diff / powf(10.0, floorf(log10f(range_diff)));
+ 	}
+ 
+ 	// Set the increment from one label to the next.
+
+Modified: branches/IOMETER-restruct/iometer/src/PageDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageDisk.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/PageDisk.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -691,7 +691,7 @@
+ 	// If the disk size was left blank, use the previous value.
+ 	if (!m_EDiskSize.LineLength())
+ 		ShowSettings();
+-	else
++	else {
+ 		// Seeing what kind of item is selected.
+ 		switch (theApp.pView-&gt;m_pWorkerView-&gt;GetSelectedType()) {
+ 		case WORKER:
+@@ -707,6 +707,7 @@
+ 			theApp.manager_list.SetDiskSize(GetDlgItemInt(EDiskSize));
+ 			break;
+ 		}
++	}
+ 
+ 	EnableWindow();
+ }
+@@ -895,16 +896,14 @@
+ 			// Extend the selection. Clear any other items if the control
+ 			// key is not pressed.
+ 			SelectRange(selected, highlighted, !control, TargetChecked);
+-		} else if (control)	// toggle.
+-		{
++		} else if (control) {	// toggle.
+ 			// Toggle the selection, but do not clear any other items.
+ 			if (GetSelectionCheck(highlighted) == TargetChecked) {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetUnChecked);
+ 			} else {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetChecked);
+ 			}
+-		} else		// normal
+-		{
++		} else {	// normal
+ 			// Select only the highlighted item and clear any other.
+ 			SelectRange(highlighted, highlighted, TRUE, TargetChecked);
+ 		}
+
+Modified: branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -1220,16 +1220,14 @@
+ 			// Extend the selection. Clear any other items if the control
+ 			// key is not pressed.
+ 			SelectRange(selected, highlighted, !control, TargetChecked);
+-		} else if (control)	// toggle.
+-		{
++		} else if (control) {	// toggle.
+ 			// Toggle the selection, but do not clear any other items.
+ 			if (GetSelectionCheck(highlighted) == TargetChecked) {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetUnChecked);
+ 			} else {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetChecked);
+ 			}
+-		} else		// normal
+-		{
++		} else {	// normal
+ 			// Uniquely select the item with the focus.
+ 			SelectRange(highlighted, highlighted, TRUE, TargetChecked);
+ 		}
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000063.html">[Iometer-svn] r294 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000065.html">[Iometer-svn] r296 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#64">[ date ]</a>
+              <a href="thread.html#64">[ thread ]</a>
+              <a href="subject.html#64">[ subject ]</a>
+              <a href="author.html#64">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

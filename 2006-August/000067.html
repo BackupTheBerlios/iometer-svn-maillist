@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r298 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r298%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608231955.k7NJtId5005969%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000066.html">
+   <LINK REL="Next"  HREF="000068.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r298 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r298%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608231955.k7NJtId5005969%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r298 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug 23 21:55:18 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000066.html">[Iometer-svn] r297 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000068.html">[Iometer-svn] r299 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-23 21:55:16 +0200 (Wed, 23 Aug 2006)
+New Revision: 298
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPort.h
+   branches/IOMETER-restruct/iometer/src/Network.h
+Log:
+fixed to allow compile and run under NW.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPort.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPort.h	2006-08-22 19:13:08 UTC (rev 297)
++++ branches/IOMETER-restruct/iometer/src/IOPort.h	2006-08-23 19:55:16 UTC (rev 298)
+@@ -74,7 +74,7 @@
+ #ifndef PORT_DEFINED
+ #define PORT_DEFINED
+ 
+-#ifdef IOMTR_OSFAMILY_WINDOWS
++#if defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_NETWARE)
+ namespace std {
+ }
+ #endif
+
+Modified: branches/IOMETER-restruct/iometer/src/Network.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Network.h	2006-08-22 19:13:08 UTC (rev 297)
++++ branches/IOMETER-restruct/iometer/src/Network.h	2006-08-23 19:55:16 UTC (rev 298)
+@@ -72,7 +72,7 @@
+ #ifndef NETWORK_DEFINED
+ #define NETWORK_DEFINED
+ 
+-#ifdef IOMTR_OSFAMILY_WINDOWS
++#if defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_NETWARE)
+ namespace std {
+ }
+ #endif
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000066.html">[Iometer-svn] r297 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000068.html">[Iometer-svn] r299 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#67">[ date ]</a>
+              <a href="thread.html#67">[ thread ]</a>
+              <a href="subject.html#67">[ subject ]</a>
+              <a href="author.html#67">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

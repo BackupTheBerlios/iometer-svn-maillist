@@ -1,0 +1,4364 @@
+From cheungming at mail.berlios.de  Wed Aug  2 16:49:48 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 2 Aug 2006 16:49:48 +0200
+Subject: [Iometer-svn] r270 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608021449.k72EnmIw024665@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-02 16:49:47 +0200 (Wed, 02 Aug 2006)
+New Revision: 270
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/ICFOpenDialog.cpp
+   branches/IOMETER-restruct/iometer/src/ICFOpenDialog.h
+   branches/IOMETER-restruct/iometer/src/ICFSaveDialog.cpp
+   branches/IOMETER-restruct/iometer/src/ICFSaveDialog.h
+Log:
+fixed 2 memory leaks.
+
+Modified: branches/IOMETER-restruct/iometer/src/ICFOpenDialog.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICFOpenDialog.cpp	2006-07-29 11:52:23 UTC (rev 269)
++++ branches/IOMETER-restruct/iometer/src/ICFOpenDialog.cpp	2006-08-02 14:49:47 UTC (rev 270)
+@@ -118,6 +118,12 @@
+ 	wasCkAssignTargets = TRUE;
+ }
+ 
++CICFOpenDialog::~CICFOpenDialog()
++{
++	if (m_ofn.lpstrTitle)
++		delete m_ofn.lpstrTitle;
++}
++
+ void CICFOpenDialog::DoDataExchange(CDataExchange * pDX)
+ {
+ 	CFileDialog::DoDataExchange(pDX);
+
+Modified: branches/IOMETER-restruct/iometer/src/ICFOpenDialog.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICFOpenDialog.h	2006-07-29 11:52:23 UTC (rev 269)
++++ branches/IOMETER-restruct/iometer/src/ICFOpenDialog.h	2006-08-02 14:49:47 UTC (rev 270)
+@@ -69,6 +69,7 @@
+ // Construction
+       public:
+ 	CICFOpenDialog();
++	~CICFOpenDialog();
+ 
+ // Dialog Data
+ 	//{{AFX_DATA(CICFOpenDialog)
+
+Modified: branches/IOMETER-restruct/iometer/src/ICFSaveDialog.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICFSaveDialog.cpp	2006-07-29 11:52:23 UTC (rev 269)
++++ branches/IOMETER-restruct/iometer/src/ICFSaveDialog.cpp	2006-08-02 14:49:47 UTC (rev 270)
+@@ -116,6 +116,12 @@
+ 	wasCkAssignTargets = TRUE;
+ }
+ 
++CICFSaveDialog::~CICFSaveDialog()
++{
++	if (m_ofn.lpstrTitle)
++		delete m_ofn.lpstrTitle;
++}
++
+ void CICFSaveDialog::DoDataExchange(CDataExchange * pDX)
+ {
+ 	CDialog::DoDataExchange(pDX);
+
+Modified: branches/IOMETER-restruct/iometer/src/ICFSaveDialog.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICFSaveDialog.h	2006-07-29 11:52:23 UTC (rev 269)
++++ branches/IOMETER-restruct/iometer/src/ICFSaveDialog.h	2006-08-02 14:49:47 UTC (rev 270)
+@@ -69,6 +69,7 @@
+ // Construction
+       public:
+ 	CICFSaveDialog();
++	~CICFSaveDialog();
+ 
+ // Dialog Data
+ 	//{{AFX_DATA(CICFSaveDialog)
+
+
+
+From cheungming at mail.berlios.de  Fri Aug  4 01:05:48 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 4 Aug 2006 01:05:48 +0200
+Subject: [Iometer-svn] r271 - branches/IOMETER-restruct/iometer
+Message-ID: <200608032305.k73N5mZt007414@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-04 01:05:18 +0200 (Fri, 04 Aug 2006)
+New Revision: 271
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+forgot to update the CHANGELOG for last patch.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-02 14:49:47 UTC (rev 270)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-03 23:05:18 UTC (rev 271)
+@@ -8,6 +8,8 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to fix 2 memory leaks in ICFOpenDialog and ICFSaveDialog
++     class.
+    - Patch by Ming Zhang to exclude the disk if can not detect the disk size
+      information under Linux.
+    - Patch by Fabian Tillier to fix DDK path.
+
+
+
+From cheungming at mail.berlios.de  Tue Aug  8 02:19:31 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 8 Aug 2006 02:19:31 +0200
+Subject: [Iometer-svn] r272 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608080019.k780JVEu032180@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-08 02:19:18 +0200 (Tue, 08 Aug 2006)
+New Revision: 272
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+   branches/IOMETER-restruct/iometer/src/PageDisplay.cpp
+   branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+Log:
+minor code style fix. avoid to define local variables in loop and reuse outside of loop.
+
+by Vedran Degoricija(vedrand at yahoo.com)
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-03 23:05:18 UTC (rev 271)
++++ branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-08 00:19:18 UTC (rev 272)
+@@ -1175,6 +1175,7 @@
+ char *ManagerList::GetCommonAccessSpec(int spec_index, char *const specname)
+ {
+ 	char compare_string[MAX_WORKER_NAME];
++	int manager_index;
+ 
+ 	// Return null string if there are no managers.
+ 	if (ManagerCount() == 0) {
+@@ -1182,7 +1183,7 @@
+ 		return specname;
+ 	}
+ 	// Find the first manager with workers.
+-	for (int manager_index = 0; manager_index < ManagerCount(); manager_index++) {
++	for (manager_index = 0; manager_index < ManagerCount(); manager_index++) {
+ 		if (GetManager(manager_index)->WorkerCount()) {
+ 			// Store that manager's access spec name.
+ 			GetManager(manager_index)->GetCommonAccessSpec(spec_index, specname);
+
+Modified: branches/IOMETER-restruct/iometer/src/PageDisplay.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageDisplay.cpp	2006-08-03 23:05:18 UTC (rev 271)
++++ branches/IOMETER-restruct/iometer/src/PageDisplay.cpp	2006-08-08 00:19:18 UTC (rev 272)
+@@ -302,18 +302,19 @@
+ void CPageDisplay::Update()
+ {
+ 	int max_rate[NUM_STATUS_BARS];
++	int i, j;
+ 	CString max_range_text;
+ 	double stat_double;
+ 	CString stat_string;
+ 
+ 	// Setting ranges on status bar display based on selections.
+-	for (int i = 0; i < NUM_STATUS_BARS; i++) {
++	for (i = 0; i < NUM_STATUS_BARS; i++) {
+ 		max_rate[i] = GetMaxRange(&(barcharts[i].results[GetWhichPerf()]), barcharts[i].result_to_display);
+ 	}
+ 
+ 	// If the results to display are the same, giving them the same ranges for easier comparisons.
+ 	for (i = 0; i < NUM_STATUS_BARS - 1; i++) {
+-		for (int j = i; j < NUM_STATUS_BARS; j++) {
++		for (j = i; j < NUM_STATUS_BARS; j++) {
+ 			if (barcharts[i].result_to_display == barcharts[j].result_to_display) {
+ 				if (max_rate[i] > max_rate[j])
+ 					max_rate[j] = max_rate[i];
+
+Modified: branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-03 23:05:18 UTC (rev 271)
++++ branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-08 00:19:18 UTC (rev 272)
+@@ -263,6 +263,7 @@
+ 	TV_INSERTSTRUCT tvstruct;
+ 	HTREEITEM hmgr, hifc;
+ 	Manager *sel_mgr;
++	int n;
+ 
+ 	// Do not add the manager if it doesn't have any interfaces that are
+ 	// accessible from the selected manager.
+@@ -328,7 +329,7 @@
+ 	tvstruct.item.state = INDEXTOSTATEIMAGEMASK(TARGET_STATE_UNCHECKED);
+ 
+ 	// insert the manager's network interfaces as its children in the tree
+-	for (int n = 0; n < manager->InterfaceCount(GenericNetType); n++) {
++	for (n = 0; n < manager->InterfaceCount(GenericNetType); n++) {
+ 		// Only add interfaces that are accessible.
+ 		if (!sel_mgr->InterfaceCount(manager->GetInterface(n, GenericNetType)->type)) {
+ 			continue;
+
+
+
+From cheungming at mail.berlios.de  Tue Aug  8 02:25:58 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 8 Aug 2006 02:25:58 +0200
+Subject: [Iometer-svn] r273 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608080025.k780PwOw000599@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-08 02:25:45 +0200 (Tue, 08 Aug 2006)
+New Revision: 273
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoView.h
+   branches/IOMETER-restruct/iometer/src/WaitingForManagers.cpp
+   branches/IOMETER-restruct/iometer/src/WaitingForManagers.h
+Log:
+OnTimer() should take a UINT_PTR argument.
+
+By Vedran Degoricija
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-08 00:19:18 UTC (rev 272)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-08 00:25:45 UTC (rev 273)
+@@ -873,7 +873,7 @@
+ 	return FALSE;		// all drives prepared
+ }
+ 
+-void CGalileoView::OnTimer(UINT nIDEvent)
++void CGalileoView::OnTimer(UINT_PTR nIDEvent)
+ {
+ 	int timer_delay;
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.h	2006-08-08 00:19:18 UTC (rev 272)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.h	2006-08-08 00:25:45 UTC (rev 273)
+@@ -263,7 +263,7 @@
+       protected:
+ 	//{{AFX_MSG(CGalileoView)
+ 	 afx_msg BOOL OnEraseBkgnd(CDC * pDC);
+-	afx_msg void OnTimer(UINT nIDEvent);
++	afx_msg void OnTimer(UINT_PTR nIDEvent);
+ 	afx_msg void OnBReset();
+ 	afx_msg void OnFileOpen();
+ 	afx_msg void OnFileSave();
+
+Modified: branches/IOMETER-restruct/iometer/src/WaitingForManagers.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/WaitingForManagers.cpp	2006-08-08 00:19:18 UTC (rev 272)
++++ branches/IOMETER-restruct/iometer/src/WaitingForManagers.cpp	2006-08-08 00:25:45 UTC (rev 273)
+@@ -241,7 +241,7 @@
+ //
+ // Timer handler -- decrements countdown every second.
+ //
+-void CWaitingForManagers::OnTimer(UINT nIDEvent)
++void CWaitingForManagers::OnTimer(UINT_PTR nIDEvent)
+ {
+ 	static int accumulator = 0;
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/WaitingForManagers.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/WaitingForManagers.h	2006-08-08 00:19:18 UTC (rev 272)
++++ branches/IOMETER-restruct/iometer/src/WaitingForManagers.h	2006-08-08 00:25:45 UTC (rev 273)
+@@ -117,7 +117,7 @@
+ 	// Generated message map functions
+ 	//{{AFX_MSG(CWaitingForManagers)
+ 	virtual void OnCancel();
+-	afx_msg void OnTimer(UINT nIDEvent);
++	afx_msg void OnTimer(UINT_PTR nIDEvent);
+ 	virtual BOOL OnInitDialog();
+ 	//}}AFX_MSG
+ 	 DECLARE_MESSAGE_MAP()
+
+
+
+From cheungming at mail.berlios.de  Tue Aug  8 02:43:42 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 8 Aug 2006 02:43:42 +0200
+Subject: [Iometer-svn] r274 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608080043.k780hgSK004653@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-08 02:43:38 +0200 (Tue, 08 Aug 2006)
+New Revision: 274
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/AccessDialog.cpp
+Log:
+used another way to get function pointer. make compiler happier.
+
+By  Vedran Degoricija
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/AccessDialog.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/AccessDialog.cpp	2006-08-08 00:25:45 UTC (rev 273)
++++ branches/IOMETER-restruct/iometer/src/AccessDialog.cpp	2006-08-08 00:43:38 UTC (rev 274)
+@@ -223,8 +223,8 @@
+ 	//  since it really isn't needed anyway...
+ 	//size_controls.GetFunc                 = this->GetSize;
+ 	//size_controls.SetFunc                 = this->SetSize;
+-	size_controls.GetFunc = GetSize;
+-	size_controls.SetFunc = SetSize;
++	size_controls.GetFunc = &CAccessDialog::GetSize;
++	size_controls.SetFunc = &CAccessDialog::SetSize;
+ 
+ 	align_controls.EBytesCtrl = &m_EAlignBytes;
+ 	align_controls.EKilobytesCtrl = &m_EAlignKilobytes;
+@@ -245,8 +245,8 @@
+ 	//  since it really isn't needed anyway...
+ 	//align_controls.GetFunc                        = this->GetAlign;
+ 	//align_controls.SetFunc                        = this->SetAlign;
+-	align_controls.GetFunc = GetAlign;
+-	align_controls.SetFunc = SetAlign;
++	align_controls.GetFunc = &CAccessDialog::GetAlign;
++	align_controls.SetFunc = &CAccessDialog::SetAlign;
+ 
+ // RSelectedID MUST be greater than RNotSelectedID, for the sake of GetCheckedRadioButton().
+ #if !(RAlignBytes > RAlignSector)
+@@ -272,8 +272,8 @@
+ 	//  since it really isn't needed anyway...
+ 	//reply_controls.GetFunc                        = this->GetReply;
+ 	//reply_controls.SetFunc                        = this->SetReply;
+-	reply_controls.GetFunc = GetReply;
+-	reply_controls.SetFunc = SetReply;
++	reply_controls.GetFunc = &CAccessDialog::GetReply;
++	reply_controls.SetFunc = &CAccessDialog::SetReply;
+ 
+ // RSelectedID MUST be greater than RNotSelectedID, for the sake of GetCheckedRadioButton().
+ #if !(RReplySize > RNoReply)
+
+
+
+From cheungming at mail.berlios.de  Tue Aug  8 03:04:00 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 8 Aug 2006 03:04:00 +0200
+Subject: [Iometer-svn] r275 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608080104.k781403F009473@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-08 03:03:54 +0200 (Tue, 08 Aug 2006)
+New Revision: 275
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+   branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+Log:
+Used size_t in place of int for 64bit purpose.
+
+By Vedran Degoricija <vedrand at yahoo.com>
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-08 00:43:38 UTC (rev 274)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-08 01:03:54 UTC (rev 275)
+@@ -757,30 +757,31 @@
+ inline void reorder(Net_Results&, int);
+ inline void reorder(Raw_Result&);
+ 
+-inline char *Strip( char *pcString )
++inline char *Strip(char *pcString)
+ {
+- unsigned int uiLength = strlen(pcString);
+- int          I;
+- int          iIndex = 0;
+- int          iPos1, iPos2; 
+- 
+- for( iPos1 = 0;            ( (iPos1<(int)uiLength) && (pcString[iPos1]==(int)' ') ); iPos1++ ) { /* NOP */ }
+- for( iPos2 = uiLength - 1; ( (iPos2>=0)            && (pcString[iPos2]==(int)' ') ); iPos2-- ) { /* NOP */ }
+- 
+- if( (iPos1 != 0) || (iPos2 != ((int)uiLength - 1)) )
+- {    
+-  for( I = iPos1; I <= iPos2; I++ )
+-  {
+-   pcString[iIndex] = pcString[I];
+-   iIndex++;
+-  }
+-  pcString[iIndex] = '\0';
+- }
+- 
+- return(pcString);
++	size_t uiLength = strlen(pcString); // 64bit version now return qword values!
++	size_t I;
++	size_t iIndex = 0;
++	size_t iPos1, iPos2;
++
++	for (iPos1 = 0; ((iPos1 < (int)uiLength) && (pcString[iPos1] == (int)' ')); iPos1++) {
++		/* NOP */
++	}
++	for (iPos2 = uiLength - 1; ((iPos2 >= 0) && (pcString[iPos2] == (int)' ')); iPos2--) {
++		/* NOP */
++	}
++
++	if ((iPos1 != 0) || (iPos2 != ((int)uiLength - 1))) {
++		for (I = iPos1; I <= iPos2; I++) {
++			pcString[iIndex] = pcString[I];
++			iIndex++;
++		}
++		pcString[iIndex] = '\0';
++ 	}
++	return(pcString);
+ }
+ 
+-inline int IsBigEndian( void )
++inline int IsBigEndian(void)
+ {
+  union EndianUnion
+  {
+
+Modified: branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-08 00:43:38 UTC (rev 274)
++++ branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-08 01:03:54 UTC (rev 275)
+@@ -246,9 +246,9 @@
+ 		return;
+ 	}
+ 	// Calculate the new scale.
+-	scale = (int)pow(10, (int)floor(log10((double)max_range)));
++	scale = (int)pow((double)10, (int)floor(log10((double)max_range)));
+ 
+-	if ((max_range == pow(10, (int)floor(log10((double)max_range))))) {
++	if ((max_range == (int)pow((double)10, (int)floor(log10((double)max_range))))) {
+ 		// max_range is a power of 10
+ 		scale /= 10;
+ 	}
+@@ -278,11 +278,11 @@
+ 
+ 	// Sets the range that the marker labels will span.
+ 	range_diff = max_range - min_range;
+-	if ((range_diff == pow(10, (int)floor(log10(range_diff)))) && (range_diff != 1)) {
++	if ((range_diff == pow((double)10, (int)floor(log10(range_diff)))) && (range_diff != 1)) {
+ 		// range_diff is a power of 10, but is not exactly 1
+ 		display_range = 10;
+ 	} else {
+-		display_range = range_diff / pow(10, (int)floor(log10(range_diff)));
++		display_range = range_diff / pow((double)10, (int)floor(log10(range_diff)));
+ 	}
+ 
+ 	// Set the increment from one label to the next.
+
+
+
+From cheungming at mail.berlios.de  Tue Aug  8 03:07:31 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 8 Aug 2006 03:07:31 +0200
+Subject: [Iometer-svn] r276 - branches/IOMETER-restruct/iometer
+Message-ID: <200608080107.k7817Vpv009861@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-08 03:07:18 +0200 (Tue, 08 Aug 2006)
+New Revision: 276
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+updated CHANGELOG
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-08 01:03:54 UTC (rev 275)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-08 01:07:18 UTC (rev 276)
+@@ -112,6 +112,7 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
++   - Adjusted some variable types to fit 64bit OS and compiler.
+    - Recovered all corrupted binary files.
+    - Added new VS project management file for VS.net.
+    - Various cleanup to remove compile warning with new version GCC.
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 15 02:19:08 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 15 Aug 2006 02:19:08 +0200
+Subject: [Iometer-svn] r277 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608150019.k7F0J8LH004102@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-15 02:19:01 +0200 (Tue, 15 Aug 2006)
+New Revision: 277
+
+Added:
+   branches/IOMETER-restruct/iometer/src/Makefile-OSX.all
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp
+Log:
+minor fix to get Mac OSX port compiled and ran ok. It support both PPC and Intel architectures.
+
+Contributed by Julio Ng.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp	2006-08-08 01:07:18 UTC (rev 276)
++++ branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp	2006-08-15 00:19:01 UTC (rev 277)
+@@ -179,7 +179,7 @@
+ 		if (KERN_SUCCESS != kernResult) {
+ 			// If anything fails, we play it safe and just claim it has partitions
+ 			result = TRUE;
+-		} else if (NULL == iter) {
++		} else if (!iter) {
+ 			result = true;
+ 		} else {
+ 			service = IOIteratorNext(iter);
+@@ -188,7 +188,7 @@
+ 			// a single io_service_t
+ 			IOObjectRelease(iter);
+ 
+-			if (NULL == service) {
++			if (!service) {
+ 				result = TRUE;
+ 			} else {
+ 				// retrieve the Whole property
+
+Copied: branches/IOMETER-restruct/iometer/src/Makefile-OSX.all (from rev 276, branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc)
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc	2006-08-08 01:07:18 UTC (rev 276)
++++ branches/IOMETER-restruct/iometer/src/Makefile-OSX.all	2006-08-15 00:19:01 UTC (rev 277)
+@@ -0,0 +1,138 @@
++###############################################################################
++##                                                                           ##
++##  Dynamo / Makefile-OSX.ppc                                                ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Job .......: The Makefile for the Mac OS X on PowerPC variant.           ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Intel Open Source License                                                ##
++##                                                                           ##
++##  Copyright (c) 2005 Apple Computer, Inc.                                  ##
++##  All rights reserved.                                                     ##
++##  Redistribution and use in source and binary forms, with or without       ##
++##  modification, are permitted provided that the following conditions       ##
++##  are met:                                                                 ##
++##                                                                           ##
++##     Redistributions of source code must retain the above copyright        ##
++##     notice, this list of conditions and the following disclaimer.         ##
++##                                                                           ##
++##     Redistributions in binary form must reproduce the above               ##
++##     copyright notice, this list of conditions and the following           ##
++##     disclaimer in the documentation and/or other materials provided       ##
++##     with the distribution.                                                ##
++##                                                                           ##
++##     Neither the name of Apple Computer nor the names of its               ##
++##     contributors may be used to endorse or promote products derived       ##
++##     from this software without specific prior written permission.         ##
++##                                                                           ##
++##  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS      ##
++##  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT        ##
++##  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS        ##
++##  FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE        ##
++##  OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,      ##
++##  SPECIAL, EXEPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT          ##
++##  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF         ##
++##  USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED          ##
++##  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT              ##
++##  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING           ##
++##  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       ##
++##  POSSIBILITY OF SUCH DAMAGE.                                              ##
++##                                                                           ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Remarks ...: <none>                                                      ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Changes ...: 2003-08-04 (raltherr at apple.com)                             ##
++##               - File created                                              ##
++##                                                                           ##
++###############################################################################
++.MAKE_VERSION: VERSION-1.0
++
++# un-comment out .IGNORE to suppress error messages and not stop make on errors.
++#.IGNORE:
++.SUFFIXES: .cpp .c .o
++
++CC=gcc
++CXX=g++
++RM=/bin/rm -f
++MV=/bin/mv
++TOUCH=/usr/bin/touch
++STRIP=/usr/ccs/bin/strip
++
++
++
++# Some common definitions used.
++# Note 1) -DWORKAROUND_MOD_BUG can be dropped if -O is used in place of -g in CFLAGS
++# Note 2) -DIOMTR_SETTING_OVERRIDE_FS controls inclusion of destructive dynamo code.
++# Note 3) -D_DETAILS=1 -D_DEBUG=1 enables maximum debug information
++#
++CFLAGS= -O \
++        -Wall \
++	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_OSX \
++	-DIOMTR_CPU_PPC \
++	-DNO_DYNAMO_VI \
++        -D_REENTRANT \
++        -DNOMINMAX
++
++
++
++# LIBS GO HERE
++LIBS= -lpthread -framework Carbon -framework IOKit
++
++# OBJECTS GO HERE
++OBJECTS= IOGlobals.o \
++         Pulsar.o \
++         IOManager.o IOManagerLinux.o IOManagerSolaris.o IOManagerOSX.o \
++         IOGrunt.o \
++         IOTarget.o IOTargetDisk.o IOTargetTCP.o \
++         IOPort.o IOPortTCP.o \
++         Network.o NetTCP.o \
++         ByteOrder.o \
++         IOPerformance.o IOPerformanceOSX.o \
++         IOTime.o \
++         IOCQAIO.o IOCompletionQ.o \
++         IOAccess.o
++
++
++
++# Make Rules
++help:
++	@echo
++	@echo "Please pick one of the listed targets:"
++	@echo                                                              
++	@echo "   all       Build the binaries"
++	@echo "   dynamo    Build the dynamo binary"
++	@echo "   iometer   Build the iometer binary (not supported) *"
++	@echo "   clean     Remove old binaries and object files"
++	@echo                                                              
++	@echo "   * = The Iometer GUI is so far only available for MS Windows," 
++	@echo "       but you can use it to control dynamo's running on Linux." 
++	@echo                                                              
++
++all: dynamo
++
++dynamo: $(OBJECTS)
++	$(CXX) $(CFLAGS) -o dynamo $(OBJECTS) $(LIBS)
++
++clean:
++	$(RM) $(OBJECTS) dynamo
++
++install:
++	echo "Not Supported."
++
++iometer:
++	echo "Not Supported."
++
++.cpp.o:
++	$(CXX) $(CFLAGS) -c $<
++
++.c.o:
++	$(CC) $(CFLAGS) -c $<
++
++
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 15 02:20:54 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 15 Aug 2006 02:20:54 +0200
+Subject: [Iometer-svn] r278 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608150020.k7F0Ks9K004745@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-15 02:20:48 +0200 (Tue, 15 Aug 2006)
+New Revision: 278
+
+Added:
+   branches/IOMETER-restruct/iometer/src/Galileo/
+   branches/IOMETER-restruct/iometer/src/Pulsar/
+Removed:
+   branches/IOMETER-restruct/iometer/src/Dynamo/
+   branches/IOMETER-restruct/iometer/src/Iometer/
+   branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc
+Log:
+renamed Dynamo and Iometer subdirectories. For case insensitive file system, these 2 will conflict with dynamo binary.
+
+Suggested by Vedran Degoricija <vedrand at yahoo.com>
+
+
+
+Copied: branches/IOMETER-restruct/iometer/src/Galileo (from rev 276, branches/IOMETER-restruct/iometer/src/Iometer)
+
+Deleted: branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc	2006-08-15 00:19:01 UTC (rev 277)
++++ branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc	2006-08-15 00:20:48 UTC (rev 278)
+@@ -1,137 +0,0 @@
+-###############################################################################
+-##                                                                           ##
+-##  Dynamo / Makefile-OSX.ppc                                                ##
+-##                                                                           ##
+-## ------------------------------------------------------------------------- ##
+-##                                                                           ##
+-##  Job .......: The Makefile for the Mac OS X on PowerPC variant.           ##
+-##                                                                           ##
+-## ------------------------------------------------------------------------- ##
+-##                                                                           ##
+-##  Intel Open Source License                                                ##
+-##                                                                           ##
+-##  Copyright (c) 2005 Apple Computer, Inc.                                  ##
+-##  All rights reserved.                                                     ##
+-##  Redistribution and use in source and binary forms, with or without       ##
+-##  modification, are permitted provided that the following conditions       ##
+-##  are met:                                                                 ##
+-##                                                                           ##
+-##     Redistributions of source code must retain the above copyright        ##
+-##     notice, this list of conditions and the following disclaimer.         ##
+-##                                                                           ##
+-##     Redistributions in binary form must reproduce the above               ##
+-##     copyright notice, this list of conditions and the following           ##
+-##     disclaimer in the documentation and/or other materials provided       ##
+-##     with the distribution.                                                ##
+-##                                                                           ##
+-##     Neither the name of Apple Computer nor the names of its               ##
+-##     contributors may be used to endorse or promote products derived       ##
+-##     from this software without specific prior written permission.         ##
+-##                                                                           ##
+-##  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS      ##
+-##  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT        ##
+-##  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS        ##
+-##  FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE        ##
+-##  OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,      ##
+-##  SPECIAL, EXEPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT          ##
+-##  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF         ##
+-##  USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED          ##
+-##  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT              ##
+-##  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING           ##
+-##  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       ##
+-##  POSSIBILITY OF SUCH DAMAGE.                                              ##
+-##                                                                           ##
+-##                                                                           ##
+-## ------------------------------------------------------------------------- ##
+-##                                                                           ##
+-##  Remarks ...: <none>                                                      ##
+-##                                                                           ##
+-## ------------------------------------------------------------------------- ##
+-##                                                                           ##
+-##  Changes ...: 2003-08-04 (raltherr at apple.com)                             ##
+-##               - File created                                              ##
+-##                                                                           ##
+-###############################################################################
+-.MAKE_VERSION: VERSION-1.0
+-
+-# un-comment out .IGNORE to suppress error messages and not stop make on errors.
+-#.IGNORE:
+-.SUFFIXES: .cpp .c .o
+-
+-CC=gcc
+-CXX=g++
+-RM=/bin/rm -f
+-MV=/bin/mv
+-TOUCH=/usr/bin/touch
+-STRIP=/usr/ccs/bin/strip
+-
+-
+-
+-# Some common definitions used.
+-# Note 1) -DWORKAROUND_MOD_BUG can be dropped if -O is used in place of -g in CFLAGS
+-# Note 2) -DIOMTR_SETTING_OVERRIDE_FS controls inclusion of destructive dynamo code.
+-# Note 3) -D_DETAILS=1 -D_DEBUG=1 enables maximum debug information
+-#
+-CFLAGS= -O \
+-        -Wall \
+-	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_OSX \
+-	-DIOMTR_CPU_PPC \
+-	-DNO_DYNAMO_VI \
+-        -D_REENTRANT
+-
+-
+-
+-# LIBS GO HERE
+-LIBS= -lpthread -framework Carbon -framework IOKit
+-
+-# OBJECTS GO HERE
+-OBJECTS= IOGlobals.o \
+-         Pulsar.o \
+-         IOManager.o IOManagerLinux.o IOManagerSolaris.o IOManagerOSX.o \
+-         IOGrunt.o \
+-         IOTarget.o IOTargetDisk.o IOTargetTCP.o \
+-         IOPort.o IOPortTCP.o \
+-         Network.o NetTCP.o \
+-         ByteOrder.o \
+-         IOPerformance.o IOPerformanceOSX.o \
+-         IOTime.o \
+-         IOCQAIO.o IOCompletionQ.o \
+-         IOAccess.o
+-
+-
+-
+-# Make Rules
+-help:
+-	@echo
+-	@echo "Please pick one of the listed targets:"
+-	@echo                                                              
+-	@echo "   all       Build the binaries"
+-	@echo "   dynamo    Build the dynamo binary"
+-	@echo "   iometer   Build the iometer binary (not supported) *"
+-	@echo "   clean     Remove old binaries and object files"
+-	@echo                                                              
+-	@echo "   * = The Iometer GUI is so far only available for MS Windows," 
+-	@echo "       but you can use it to control dynamo's running on Linux." 
+-	@echo                                                              
+-
+-all: dynamo
+-
+-dynamo: $(OBJECTS)
+-	$(CXX) $(CFLAGS) -o dynamo $(OBJECTS) $(LIBS)
+-
+-clean:
+-	$(RM) $(OBJECTS) dynamo
+-
+-install:
+-	echo "Not Supported."
+-
+-iometer:
+-	echo "Not Supported."
+-
+-.cpp.o:
+-	$(CXX) $(CFLAGS) -c $<
+-
+-.c.o:
+-	$(CC) $(CFLAGS) -c $<
+-
+-
+
+Copied: branches/IOMETER-restruct/iometer/src/Pulsar (from rev 276, branches/IOMETER-restruct/iometer/src/Dynamo)
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 16 02:57:34 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 16 Aug 2006 02:57:34 +0200
+Subject: [Iometer-svn] r279 - in branches/IOMETER-restruct/iometer/src:
+	Galileo Pulsar
+Message-ID: <200608160057.k7G0vYFF002201@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-16 02:57:29 +0200 (Wed, 16 Aug 2006)
+New Revision: 279
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo/makefile
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+   branches/IOMETER-restruct/iometer/src/Pulsar/makefile
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+Log:
+minor fixes on windows ddk compile.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/makefile
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/makefile	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Galileo/makefile	2006-08-16 00:57:29 UTC (rev 279)
+@@ -19,5 +19,5 @@
+ !elseif "$(_BUILDARCH)" == "AMD64"
+ C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN64 -DIOMTR_CPU_X86_64
+ !else
+-C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386 
++C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386
+ !endif
+\ No newline at end of file
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2006-08-16 00:57:29 UTC (rev 279)
+@@ -4,24 +4,26 @@
+ 
+ MSC_WARNING_LEVEL=/W3 /WX
+ USE_MFC=1
+-USE_CRTDLL=1
++USE_NATIVE_EH=1
+ BROWSER_INFO=1
+ 
++UMTYPE=windows
++
+ INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSING_DDK
+-LINKER_OPTIDATA=$(LINKER_OPTIDATA) /STACK:0xc0000,0x2000
++C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS  
++#-D_DETAILS -DDEBUG -D_DEBUG
++ 
+ 
+ TARGETLIBS= $(SDK_LIB_PATH)\KERNEL32.LIB \
+     $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\ADVAPI32.LIB	\
+     $(SDK_LIB_PATH)\WSOCK32.LIB		\
+     $(SDK_LIB_PATH)\WS2_32.LIB		\
+     $(SDK_LIB_PATH)\COMCTL32.LIB	\
+-    $(SDK_LIB_PATH)\GDI32.LIB		\
+-    $(SDK_LIB_PATH)\WINSPOOL.LIB	\
+-    $(SDK_LIB_PATH)\SHELL32.LIB		\
+     $(SDK_LIB_PATH)\VERSION.LIB		\
+-    $(CRT_LIB_PATH)\MSVCPRT.LIB
++#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
++#	$(SDK_LIB_PATH)\MFC42D.LIB		\
++    $(CRT_LIB_PATH)\MSVCPRT.LIB		\
++	$(MFC_LIB_PATH)\MFCS42.LIB
+ 
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+@@ -36,7 +38,6 @@
+ 	..\ICFSaveDialog.cpp		\
+ 	..\IOGlobals.cpp		\
+ 	..\IOPort.cpp			\
+-#	..\IOPortPipe.cpp		\
+ 	..\IOPortTCP.cpp		\
+ 	..\Iotime.cpp			\
+ 	..\LegalBox.cpp			\
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/makefile
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/makefile	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/makefile	2006-08-16 00:57:29 UTC (rev 279)
+@@ -19,5 +19,5 @@
+ !elseif "$(_BUILDARCH)" == "AMD64"
+ C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN64 -DIOMTR_CPU_X86_64
+ !else
+-C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386 
++C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386
+ !endif
+\ No newline at end of file
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2006-08-16 00:57:29 UTC (rev 279)
+@@ -2,46 +2,45 @@
+ TARGETPATH=OBJ
+ TARGETTYPE=PROGRAM
+ 
+-MSC_WARNING_LEVEL=/W3 /WX
+ USE_MFC=1
+-USE_CRTDLL=1
++USE_NATIVE_EH=1
++
+ BROWSER_INFO=1
+ 
+-INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSING_DDK -D_AFX_NO_RICHEDIT_SUPPORT
+-LINKER_OPTIDATA=$(LINKER_OPTIDATA) /STACK:0xc0000,0x2000
+-
+ UMTYPE=console
+ UMENTRY=main
+ 
++MSC_WARNING_LEVEL=/W3 /WX
++
++INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
++C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS -DIMPORT_NEW_FUNCS 
++#-D_DETAILS
++  
++
+ TARGETLIBS=$(SDK_LIB_PATH)\KERNEL32.LIB \
+-   $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\ADVAPI32.LIB	\
++    $(SDK_LIB_PATH)\USER32.LIB		\
+     $(SDK_LIB_PATH)\WSOCK32.LIB		\
+     $(SDK_LIB_PATH)\WS2_32.LIB		\
+-    $(SDK_LIB_PATH)\COMCTL32.LIB	\
+-    $(SDK_LIB_PATH)\GDI32.LIB		\
+-    $(SDK_LIB_PATH)\WINSPOOL.LIB	\
+-    $(SDK_LIB_PATH)\COMDLG32.LIB	\
+-    $(SDK_LIB_PATH)\SHELL32.LIB		\
+     $(SDK_LIB_PATH)\VERSION.LIB		\
+     $(CRT_LIB_PATH)\MSVCPRT.LIB		\
+-    $(SDK_LIB_PATH)\SETUPAPI.LIB
++	$(MFC_LIB_PATH)\MFCS42.LIB		\
++#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
++#	$(SDK_LIB_PATH)\MFC42D.LIB		\
++    $(SDK_LIB_PATH)\SETUPAPI.LIB	\
++	$(SDK_LIB_PATH)\NETAPI32.LIB
+ 
+ 
+-SOURCES= ..\ByteOrder.cpp		\
++SOURCES= ..\ByteOrder.cpp	\
+ 	..\IOAccess.cpp			\
+-	..\IOCompletionQ.cpp		\
+-#	..\IOCq.cpp			\
++	..\IOCompletionQ.cpp	\
+ 	..\IOCQAIO.cpp			\
+ 	..\IOCQVI.cpp			\
+ 	..\IOGlobals.cpp		\
+ 	..\IOGrunt.cpp			\
+ 	..\IOManager.cpp		\
+ 	..\IOManagerWin.cpp		\
+-	..\IOPerformance.cpp		\
++	..\IOPerformance.cpp	\
+ 	..\IOPort.cpp			\
+-#	..\IOPortPipe.cpp		\
+ 	..\IOPortTCP.cpp		\
+ 	..\IOTarget.cpp			\
+ 	..\IOTargetDisk.cpp		\
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 16 03:02:04 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 16 Aug 2006 03:02:04 +0200
+Subject: [Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608160102.k7G124fe003205@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-16 03:01:52 +0200 (Wed, 16 Aug 2006)
+New Revision: 280
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+Log:
+cosmetic fixes to reduce some warnings.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-16 00:57:29 UTC (rev 279)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-16 01:01:52 UTC (rev 280)
+@@ -112,6 +112,8 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
++   - Renamed Dynamo and Iometer subdirectories to solve the name conflict
++     under case insensitive file system.
+    - Adjusted some variable types to fit 64bit OS and compiler.
+    - Recovered all corrupted binary files.
+    - Added new VS project management file for VS.net.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-16 00:57:29 UTC (rev 279)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-16 01:01:52 UTC (rev 280)
+@@ -764,14 +764,14 @@
+ 	size_t iIndex = 0;
+ 	size_t iPos1, iPos2;
+ 
+-	for (iPos1 = 0; ((iPos1 < (int)uiLength) && (pcString[iPos1] == (int)' ')); iPos1++) {
++	for (iPos1 = 0; ((iPos1 < uiLength) && (pcString[iPos1] == (int)' ')); iPos1++) {
+ 		/* NOP */
+ 	}
+ 	for (iPos2 = uiLength - 1; ((iPos2 >= 0) && (pcString[iPos2] == (int)' ')); iPos2--) {
+ 		/* NOP */
+ 	}
+ 
+-	if ((iPos1 != 0) || (iPos2 != ((int)uiLength - 1))) {
++	if ((iPos1 != 0) || (iPos2 != (uiLength - 1))) {
+ 		for (I = iPos1; I <= iPos2; I++) {
+ 			pcString[iIndex] = pcString[I];
+ 			iIndex++;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-16 00:57:29 UTC (rev 279)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-16 01:01:52 UTC (rev 280)
+@@ -605,7 +605,7 @@
+ 	 * rate at which the processor can do crc calculations
+ 	 */
+ 	write_ptr = (char *)write_data;
+-	while ((unsigned long)write_ptr < ((unsigned long)write_data + data_size)) {
++	while ((ULONG_PTR)write_ptr < ((ULONG_PTR)write_data + data_size)) {
+ 		*write_ptr++ = (char)Rand(0xff);
+ 	}
+ 
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 16 03:05:19 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 16 Aug 2006 03:05:19 +0200
+Subject: [Iometer-svn] r281 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608160105.k7G15JD3004055@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-16 03:05:06 +0200 (Wed, 16 Aug 2006)
+New Revision: 281
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+Log:
+used powf() to replace pow(). double is overkilled for us, float is enough.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-16 01:01:52 UTC (rev 280)
++++ branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-16 01:05:06 UTC (rev 281)
+@@ -50,7 +50,9 @@
+ /* ##                                                                     ## */
+ /* ## ------------------------------------------------------------------- ## */
+ /* ##                                                                     ## */
+-/* ##  Changes ...: 2004-09-01 (henryx.w.tieman at intel.com)                ## */
++/* ##  Changes ...: 2006-08-04 (vedrand at yahoo.com)                        ## */
++/* ##               -misc syntactical -- explicit pow() arg typecasts     ## */
++/* ##               2004-09-01 (henryx.w.tieman at intel.com)                ## */
+ /* ##               - Needed to cast parameters to some functions         ## */
+ /* ##                 because latest Visual Studio C++ library has        ## */
+ /* ##                 multiple entry points for those functions.          ## */
+@@ -246,9 +248,9 @@
+ 		return;
+ 	}
+ 	// Calculate the new scale.
+-	scale = (int)pow((double)10, (int)floor(log10((double)max_range)));
++	scale = (int)powf(10.0, floor(log10((float)max_range)));
+ 
+-	if ((max_range == (int)pow((double)10, (int)floor(log10((double)max_range))))) {
++	if ((max_range == (int)powf(10.0, floor(log10((float)max_range))))) {
+ 		// max_range is a power of 10
+ 		scale /= 10;
+ 	}
+@@ -269,35 +271,35 @@
+ //
+ void CMeterCtrl::UpdateLabelInfo()
+ {
+-	double range_diff;
+-	double display_range;	// range normalized to ##.##### for ranges > 10
+-	double label_increment;
+-	double display_value;
++	float range_diff;
++	float display_range;	// range normalized to ##.##### for ranges > 10
++	float label_increment;
++	float display_value;
+ 	int label_angle;
+ 	LONG x, y;		// temporary point coordinates
+ 
+ 	// Sets the range that the marker labels will span.
+-	range_diff = max_range - min_range;
+-	if ((range_diff == pow((double)10, (int)floor(log10(range_diff)))) && (range_diff != 1)) {
++	range_diff = (float) (max_range - min_range);
++	if ((range_diff == powf(10.0, floor(log10(range_diff)))) && (range_diff != 1)) {
+ 		// range_diff is a power of 10, but is not exactly 1
+ 		display_range = 10;
+ 	} else {
+-		display_range = range_diff / pow((double)10, (int)floor(log10(range_diff)));
++		display_range = range_diff / powf(10.0, floor(log10(range_diff)));
+ 	}
+ 
+ 	// Set the increment from one label to the next.
+ 	if (display_range <= 1)
+-		label_increment = .1;
++		label_increment = (float) .1;
+ 	else if (display_range <= 2)
+-		label_increment = .2;
++		label_increment = (float) .2;
+ 	else if (display_range <= 5)
+-		label_increment = .5;
++		label_increment = (float) .5;
+ 	else if (display_range <= 10)
+ 		label_increment = 1;
+ 
+ 	// Update the marker label text boxes.
+ 	label_count = 0;
+-	display_value = min_range;
++	display_value = (float) min_range;
+ 	while (display_value <= display_range) {
+ 		// Set the position of the text boxes.
+ 		label_angle = (int)(display_value / display_range * NEEDLE_SWEEP);
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 16 03:09:09 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 16 Aug 2006 03:09:09 +0200
+Subject: [Iometer-svn] r282 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608160109.k7G199d9005033@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-16 03:09:04 +0200 (Wed, 16 Aug 2006)
+New Revision: 282
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+Log:
+updated version tag for RC2.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-08-16 01:05:06 UTC (rev 281)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-08-16 01:09:04 UTC (rev 282)
+@@ -117,7 +117,7 @@
+ //#define IOVER_FILEVERSION				"2003.12.16-post\0"
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				"2004.07.30-post\0"
+-#define IOVER_FILEVERSION				"2006.07.27-RC1\0"
++#define IOVER_FILEVERSION				"2006.07.27-RC2\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 16 03:13:35 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 16 Aug 2006 03:13:35 +0200
+Subject: [Iometer-svn] r283 - tags
+Message-ID: <200608160113.k7G1DZQ6005468@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-16 03:12:39 +0200 (Wed, 16 Aug 2006)
+New Revision: 283
+
+Added:
+   tags/iometer-2006_07_27-RC2/
+Log:
+tagged for 2006-07-27RC2
+
+
+
+Copied: tags/iometer-2006_07_27-RC2 (from rev 282, branches/IOMETER-restruct)
+
+
+
+From cheungming at mail.berlios.de  Fri Aug 18 22:41:01 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 18 Aug 2006 22:41:01 +0200
+Subject: [Iometer-svn] r284 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608182041.k7IKf12Q025543@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-18 22:41:00 +0200 (Fri, 18 Aug 2006)
+New Revision: 284
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+Log:
+fixed the debug version assertion error on exit. the m_wndToolBar is NULL on exit. anyway do reset in OnDestroy looks weired.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-16 01:12:39 UTC (rev 283)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-18 20:41:00 UTC (rev 284)
+@@ -1894,22 +1894,24 @@
+ 
+ void CGalileoView::ButtonReset()
+ {
+-	SetButton(ID_FILE_OPEN, TRUE);
+-	SetButton(ID_FILE_SAVE, TRUE);
+-	SetButton(BNewDynamo, TRUE);
+-	SetButton(BNewDiskWorker, FALSE);
+-	SetButton(BNewNetWorker, FALSE);
+-	SetButton(BCopyWorker, FALSE);
+-	SetButton(BReset, FALSE);
+-	SetButton(BExitOne, FALSE);
+-	SetButton(ID_APP_EXIT, TRUE);
++	if (theApp.m_wndToolBar) {
++		SetButton(ID_FILE_OPEN, TRUE);
++		SetButton(ID_FILE_SAVE, TRUE);
++		SetButton(BNewDynamo, TRUE);
++		SetButton(BNewDiskWorker, FALSE);
++		SetButton(BNewNetWorker, FALSE);
++		SetButton(BCopyWorker, FALSE);
++		SetButton(BReset, FALSE);
++		SetButton(BExitOne, FALSE);
++		SetButton(ID_APP_EXIT, TRUE);
+ 
+-	m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, FALSE, FALSE);
+-	SetButton(BStart, FALSE);
+-	SetButton(BStop, FALSE);
+-	SetButton(BStopAll, FALSE);
++		m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, FALSE, FALSE);
++		SetButton(BStart, FALSE);
++		SetButton(BStop, FALSE);
++		SetButton(BStopAll, FALSE);
+ 
+-	theApp.m_wndToolBar.RedrawWindow();
++		theApp.m_wndToolBar.RedrawWindow();
++	}
+ }
+ 
+ //
+
+Modified: branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-16 01:12:39 UTC (rev 283)
++++ branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-18 20:41:00 UTC (rev 284)
+@@ -227,6 +227,8 @@
+ //
+ BOOL ManagerList::RemoveManager(int index, int purpose)
+ {
++	int i;
++
+ 	if (index < 0 || index >= ManagerCount()) {
+ 		ErrorMessage("Invalid index in ManagerList::RemoveManager().");
+ 		return FALSE;
+@@ -244,10 +246,11 @@
+ 
+ 	// Perform a full reset if all managers have
+ 	// been removed to reset the display properly.
+-	if (!ManagerCount())
++	i = ManagerCount();
++	if (!i)
+ 		theApp.pView->Reset();
+ 
+-	return (ManagerCount());
++	return (i);
+ }
+ 
+ //
+
+
+
+From cheungming at mail.berlios.de  Mon Aug 21 16:48:31 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Mon, 21 Aug 2006 16:48:31 +0200
+Subject: [Iometer-svn] r285 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608211448.k7LEmVAp012844@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-21 16:48:29 +0200 (Mon, 21 Aug 2006)
+New Revision: 285
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp
+   branches/IOMETER-restruct/iometer/src/IOVIPL.cpp
+   branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+   branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+   branches/IOMETER-restruct/iometer/src/VINic.cpp
+Log:
+cleanup the use of _DETAILS and _DEBUG
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -541,7 +541,7 @@
+ 		    << access_spec.max_transfer << endl;
+ 	}
+ 	// Allocating a larger buffer.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Growing grunt data buffers from " << data_size << " to " << access_spec.max_transfer << endl;
+ #endif
+ 
+@@ -956,7 +956,7 @@
+ 		// we first begin doing I/O.  Close these targets.
+ 		if (targets[i]->spec.test_connection_rate) {
+ 			targets[i]->trans_left_in_conn = 0;
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "Defering open for " << targets[i]->spec.name << endl;
+ #endif
+ 			if (!targets[i]->Close(&grunt_state)) {
+@@ -1056,7 +1056,7 @@
+ 			// Check to see if we can close the target.  Targets are not closed
+ 			// until all outstanding I/Os have completed.
+ 			if (target->outstanding_ios == 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 				cout << "Testing connection rate: Closing " << targets[target_id]->spec.name << endl;
+ #endif
+ 
+@@ -1085,7 +1085,7 @@
+ 		}
+ 		// Check to see if we need to open the target.
+ 		if (target->spec.test_connection_rate && target->trans_left_in_conn <= 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "Testing connection rate: Opening " << target->spec.name << endl;
+ #endif
+ 			// Set the number of transactions to do before closing.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -395,7 +395,7 @@
+ 		strncpy(tcp_spec[count].name, inet_ntoa(sin.sin_addr), sizeof(tcp_spec[count].name) - 1);
+ 		tcp_spec[count].type = TCPClientType;	// interface to access a client
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Found " << tcp_spec[count].name << "." << endl;
+ #endif
+ 
+@@ -530,7 +530,7 @@
+ 			vi_spec[count].vi_info.outstanding_ios = nic.nic_attributes.MaxDescriptorsPerQueue >> 1;
+ 
+ 			nic.Close();
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "   Found " << vi_spec[count].name << "." << endl;
+ #endif
+ 
+@@ -545,7 +545,7 @@
+ 
+ 	// All done.
+ 	cout << "   done." << endl;
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Find " << count << " network interface." << endl;
+ #endif
+ 	return count;
+@@ -675,7 +675,7 @@
+ 	for (int g = 0; g < grunt_count; g++) {
+ 		// Only send results for grunts that are running.
+ 		if (grunts[g]->target_count && !grunts[g]->idle) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "Reporting results for grunt " << g << " ...";
+ #endif
+ 			// Copying worker's results into the message.
+@@ -754,7 +754,7 @@
+ 				(void)reorder(data_msg, DATA_MESSAGE_WORKER_RESULTS, SEND);
+ 			}
+ 			prt->Send(&data_msg, DATA_MESSAGE_SIZE);
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "sent." << endl;
+ #endif
+ 		}
+@@ -764,7 +764,7 @@
+ 		// Store current performance counters as baseline for next update.
+ 		Get_Performance(LAST_UPDATE_PERF, FIRST_SNAPSHOT);
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Finished reporting results." << endl;
+ #endif
+ }
+@@ -807,7 +807,7 @@
+ {
+ 	switch (msg.purpose) {
+ 	case ADD_WORKERS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : ADD_WORKERS" << endl;
+ #endif
+ 		Add_Workers(msg.data);
+@@ -816,7 +816,7 @@
+ 		// Signaling to reset all workers
+ 	case RESET:
+ 		// Remove all workers.
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : RESET" << endl;
+ #endif
+ 		Remove_Workers(ALL_WORKERS);
+@@ -824,7 +824,7 @@
+ 		break;
+ 		// Received call to end program or thread execution.
+ 	case EXIT:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : EXIT" << endl;
+ #endif
+ 		Remove_Workers(msg.data);
+@@ -832,14 +832,14 @@
+ 
+ 		// Preparing drives for access.
+ 	case PREP_DISKS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : PREP_DISKS" << endl;
+ #endif
+ 		Prepare_Disks(msg.data);
+ 		break;
+ 		// Signalling to stop disk preparation.
+ 	case STOP_PREPARE:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : STOP_PREPARE" << endl;
+ #endif
+ 		Stop_Prepare(msg.data);
+@@ -847,7 +847,7 @@
+ 
+ 		// Reporting all targets accessible by this manager.
+ 	case REPORT_TARGETS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : REPORT_TARGETS" << endl;
+ #endif
+ 		data_msg.count = Report_Disks(data_msg.data.targets);
+@@ -870,7 +870,7 @@
+ 		break;
+ 		// Setting targets for a given grunt and reporting back.
+ 	case SET_TARGETS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : SET_TARGETS" << endl;
+ #endif
+ 		prt->Receive(&data_msg, DATA_MESSAGE_SIZE);
+@@ -892,7 +892,7 @@
+ 
+ 		// Setting access specifications for next test.
+ 	case SET_ACCESS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : SET_ACCESS" << endl;
+ #endif
+ 		prt->Receive(&data_msg, DATA_MESSAGE_SIZE);
+@@ -909,35 +909,35 @@
+ 
+ 		// Signalling start of test.
+ 	case START:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : START" << endl;
+ #endif
+ 		Start_Test(msg.data);
+ 		break;
+ 		// Beginning to perform I/O.
+ 	case BEGIN_IO:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : BEGIN_IO" << endl;
+ #endif
+ 		Begin_IO(msg.data);
+ 		break;
+ 		// Beginning recording of test results.
+ 	case RECORD_ON:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : RECORD_ON" << endl;
+ #endif
+ 		Record_On(msg.data);
+ 		break;
+ 		// Stopping recording of test results.
+ 	case RECORD_OFF:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : RECORD_OFF" << endl;
+ #endif
+ 		Record_Off(msg.data);
+ 		break;
+ 		// Signalling to stop testing.
+ 	case STOP:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : STOP" << endl;
+ #endif
+ 		Stop_Test(msg.data);
+@@ -945,7 +945,7 @@
+ 
+ 		// Reporting results of whole test to Iometer.
+ 	case REPORT_RESULTS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : REPORT_RESULTS" << endl;
+ #endif
+ 		Report_Results(WHOLE_TEST_PERF);
+@@ -953,7 +953,7 @@
+ 
+ 		// Reporting results since last update to Iometer.
+ 	case REPORT_UPDATE:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "in Process_Message() : REPORT_UPDATE" << endl;
+ #endif
+ 		Report_Results(LAST_UPDATE_PERF);
+@@ -983,7 +983,7 @@
+ 	} else {
+ 		grunts[target]->Start_Test();
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Started." << endl << flush;
+ #endif
+ 	// Reply that test has started.
+@@ -1016,7 +1016,7 @@
+ 		if (grunts[target]->critical_error)
+ 			msg.data = FALSE;
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Performing I/O." << endl << flush;
+ #endif
+ 
+@@ -1150,7 +1150,7 @@
+ 		return TRUE;
+ 	}
+ 	// Grow the manager's data buffer and update all grunts using it.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Growing manager data buffer from " << data_size << " to "
+ 	    << grunts[target]->access_spec.max_transfer << endl << flush;
+ #endif
+@@ -1197,7 +1197,7 @@
+ {
+ 	record = TRUE;		// At least 1 worker is recording.
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Recording Started." << endl << flush;
+ #endif
+ 
+@@ -1233,7 +1233,7 @@
+ 	cout << "   Stopped." << endl << flush;
+ 
+ 	record = FALSE;		// No workers are recording data.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Recording stopped." << endl << flush;
+ #endif
+ 	if (IsBigEndian()) {
+@@ -1250,7 +1250,7 @@
+ {
+ 	msg.data = 0;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Adding " << count << " new worker(s)." << endl << flush;
+ #endif
+ 
+@@ -1274,7 +1274,7 @@
+ 			msg.data--;
+ 		}
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << msg.data << " worker(s) are created." << endl;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -412,12 +412,12 @@
+ 				sizeof(tcp_spec[count].name) - 1);
+ 			tcp_spec[count].type = TCPClientType;	// interface to access a client
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "   Found " << tcp_spec[count].name << "." << endl;
+ #endif
+ 			count++;
+ 		} else {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cerr << "ioctl fail in Manager::Report_TCP()" << endl;
+ #endif
+ 		}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -217,7 +217,7 @@
+ 			strcat(disk_spec[count].name, ", BUF");
+ 		strcat(disk_spec[count].name, "]");
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Found " << disk_spec[count].name << "." << endl << flush;
+ #endif
+ 		count++;
+@@ -300,7 +300,7 @@
+ 			// the physical drive is ready for use.
+ 			memcpy(&disk_spec[count], &d.spec, sizeof(Target_Spec));
+ 			d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "   Found " << disk_spec[count].name << "." << endl << flush;
+ #endif
+ 			count++;
+@@ -348,13 +348,13 @@
+ 	memset(file_name, 0, MAX_NAME);
+ 	// We don't deal directly with slices cXtXdXsX. Never gets that value.
+ 	sprintf(file_name, "%s/%s", RAW_DEVICE_DIR, name);
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Reporting disk partitions: " << file_name << endl << flush;
+ #endif
+ 
+ 	fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ 	if (fd < 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "  open failed.." << endl << flush;
+ #endif
+ 		return (TRUE);
+@@ -362,7 +362,7 @@
+ 
+ 	if ((bytes_read = read(fd, buffer, 512)) < 512) {
+ 		// cannot read start sector. Disk might be bad.
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "  read failed.. returning" << endl << flush;
+ #endif
+ 		close(fd);
+@@ -381,7 +381,7 @@
+ 	} else {
+ 		// We do have partitions.
+ 		strncpy(base_name, name, (strstr(name, "p0") - name));
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   basename: " << base_name << endl << flush;
+ #endif
+ 		for (i = 1; i <= FD_NUMPART; i++) {
+@@ -399,7 +399,7 @@
+ 			}
+ 
+ 			sprintf(file_name, "%sp%d", base_name, i);
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "   file_name: " << file_name << endl << flush;
+ #endif
+ 			// check if this is a swap device. Search the global string.
+@@ -506,7 +506,7 @@
+ 				strcat(disk_spec[*count].name, " ]");
+ 
+ 				d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 				cout << "   Found " << disk_spec[*count].name << "." << endl << flush;
+ #endif
+ 				(*count)++;
+@@ -515,7 +515,7 @@
+ 					break;
+ 			} else {
+ 				// partition access failed.                             
+-#if _DEBUG
++#ifdef _DEBUG
+ 				cout << "   Not found " << file_name << endl << flush;
+ #endif
+ 			}
+@@ -550,12 +550,12 @@
+ 	memset(file_name, 0, MAX_NAME);
+ 
+ 	sprintf(file_name, "%s/%s", RAW_DEVICE_DIR, name);
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Reporting vtoc partitions: " << file_name << endl << flush;
+ #endif
+ 	fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ 	if (fd < 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "  open failed.." << endl << flush;
+ #endif
+ 		return (TRUE);
+@@ -576,7 +576,7 @@
+ 	}
+ 
+ 	strncpy(base_name, name, (strstr(name, "s2") - name));
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "  vtoc basename: " << base_name << endl << flush;
+ #endif
+ 
+@@ -679,7 +679,7 @@
+ 		}
+ 		// Here we do have VTOC parts to report.
+ 		sprintf(file_name, "%ss%d", base_name, i);
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "  vtoc  file_name: " << file_name << endl << flush;
+ #endif
+ 		// check if this is a swap device. Search the global string.
+@@ -769,7 +769,7 @@
+ 			strcat(disk_spec[*count].name, " ]");
+ 
+ 			d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "   Found " << disk_spec[*count].name << "." << endl << flush;
+ #endif
+ 			(*count)++;
+@@ -833,7 +833,7 @@
+ 					strcat(disk_spec[*count].name, " ]");
+ 
+ 					d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 					cout << "   Found " << disk_spec[*count].name << "." << endl << flush;
+ #endif
+ 					(*count)++;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -87,7 +87,7 @@
+ 			cout << "   Unable to retrieve volume information for " << d.spec.name << "." << endl;
+ 			disk_spec[count].name[2] = '\0';
+ 		}
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Found " << disk_spec[count].name << "." << endl;
+ #endif
+ 		count++;
+@@ -118,7 +118,7 @@
+ 		_itoa(drive_number, disk_spec[count].name + strlen(disk_spec[count].name), 10);
+ 		drive_number++;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Found " << disk_spec[count].name << "." << endl;
+ #endif
+ 		count++;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -481,7 +481,7 @@
+ #endif
+ 
+ 	// Get the performance data stored by the system.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Getting system performance data." << endl << flush;
+ #endif
+ 
+@@ -495,7 +495,7 @@
+ 					       NULL, NULL, perf_data, &perf_object_size)) != ERROR_SUCCESS) {
+ 		if (query_result == ERROR_MORE_DATA) {
+ 			// More data than we had room for!  Try a bigger buffer.
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "   RegQueryValueEx() returned ERROR_MORE_DATA!  Number of bytes used: "
+ 			    << perf_object_size << endl << flush
+ 			    << "   Bumping performance data buffer up from " << perf_size
+@@ -552,7 +552,7 @@
+ 		else {
+ 			perf_time = (double)0.0;	// Error gathering performance time, mark as invalid.
+ 		}
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Performance time = " << perf_time << endl << flush;
+ #endif
+ 	}
+@@ -882,7 +882,7 @@
+ 		}
+ 		// retval == 0  is the only case where we have good data
+ 		raw_tcp_data[TCP_SEGMENTS_RESENT][snapshot] = ((struct mib2_tcp *)(strbuf_data.buf))->tcpRetransSegs;
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout << "tcp segments retrans : " << ((struct mib2_tcp *)(strbuf_data.buf))->tcpRetransSegs << endl;
+ #endif
+ 	}
+@@ -948,19 +948,19 @@
+ 	// Save specific performance counters.
+ 	switch (perf_data_type) {
+ 	case PERF_PROCESSOR:
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "Extracting processor data." << endl << flush;
+ #endif
+ 		Extract_CPU_Counters(snapshot);
+ 		break;
+ 	case PERF_NETWORK_TCP:
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Extracting network TCP data." << endl << flush;
+ #endif
+ 		Extract_TCP_Counters(snapshot);
+ 		break;
+ 	case PERF_NETWORK_INTERFACE:
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   Extracting network interface data." << endl << flush;
+ #endif
+ 		Extract_NI_Counters(snapshot);
+@@ -996,7 +996,7 @@
+ 		}
+ 
+ 		if (strncmp(cpu_name, cpu_reg_name, 2)) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout << "Performing exhaustive search for processor instance " << cpu << endl;
+ #endif
+ 
+@@ -1121,7 +1121,7 @@
+ 	// This is normal for performance data disabled by default (e.g. network interface).
+ 	if (i >= (int)pperf_data->NumObjectTypes) {
+ 		perf_object = NULL;
+-#if PERFORMANCE_DETAILS || _DEBUG
++#if PERFORMANCE_DETAILS || defined(_DEBUG)
+ 		cout << "No current performance object to retrieve counters from." << endl
+ 		    << "   Searching for " << perf_object_index << endl << flush;
+ #endif
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -250,7 +250,7 @@
+ void Performance::Get_Perf_Data(DWORD perf_data_type, int snapshot)
+ {
+ 	// Get the performance data stored by the system.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Getting system performance data." << endl << flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -212,7 +212,7 @@
+ void Performance::Get_Perf_Data(DWORD perf_data_type, int snapshot)
+ {
+ 	// Get the performance data stored by the system.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "   Getting system performance data." << endl << flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -151,7 +151,7 @@
+ 
+ #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	if (sockets_in_use++ == 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "Initializing WinSock." << endl << flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -445,7 +445,7 @@
+ 	// reset the disk size.
+ 	if (new_size && (new_size < size)) {
+ 		size = new_size;
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "Resetting accessible size of disk " << spec.name << " to " <<
+ 		    maximum_size << " sectors." << endl << "   " << spec.name << " size = " << size << endl;
+ #endif
+@@ -462,7 +462,7 @@
+ 
+ 	starting_position = (DWORDLONG) starting_sector *(DWORDLONG) spec.disk_info.sector_size;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Moving starting sector of disk " << spec.name << " to " << starting_position << "." << endl;
+ #endif
+ 
+@@ -473,7 +473,7 @@
+ 	if (starting_position + current_size > size) {
+ 		// Re-adjust the accessible size of the disk to reflect the new starting sector.
+ 		size -= starting_position;
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "Starting sector size has shrunk the effective size of the disk." << endl;
+ #endif
+ 	} else {
+@@ -736,7 +736,7 @@
+ 		size = stbuf64.st_size;
+ 
+ 		Set_Sector_Info();
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   " << spec.name << " size = " << size << endl << flush;
+ #endif
+ 		if (open_disk)
+@@ -829,7 +829,7 @@
+ 
+ 		Set_Sector_Info();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   " << spec.name << " size = " << size << endl << flush;
+ #endif
+ 
+@@ -877,7 +877,7 @@
+ 		low_size = GetFileSize(disk_file, &high_size);
+ 		size = (((DWORDLONG) high_size) << 32) | (DWORDLONG) low_size;
+ 		Set_Sector_Info();
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   " << spec.name << " size = " << size << endl;
+ #endif
+ 		if (open_disk)
+@@ -923,7 +923,7 @@
+ 		spec.disk_info.sector_size = disk_geo_info.BytesPerSector;
+ 		Set_Sector_Info();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "   " << spec.name << " size = " << size << endl;
+ #endif
+ 
+@@ -969,7 +969,7 @@
+ 		size = stbuf64.st_size;
+ 
+ 		Set_Sector_Info();
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "    " << spec.name << " size = " << size << endl << flush;
+ #endif
+ 		if (open_disk)
+@@ -1002,7 +1002,7 @@
+ 
+ 		Set_Sector_Info();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "    " << spec.name << " size = " << size << endl << flush;
+ #endif
+ 
+@@ -1140,7 +1140,7 @@
+ 				       (DWORDLONG) spec.disk_info.maximum_size) * spec.disk_info.sector_size))) {
+ 					// A maximum disk size was specified by the user, and the next write 
+ 					// would go past the specified maximum size.  
+-#if _DEBUG
++#ifdef _DEBUG
+ 					cout << "User-specified maximum size reached!" << endl;
+ #endif
+ 					// Stop writing and break out of the write loop.
+@@ -1156,7 +1156,7 @@
+ 					// Do the asynchronous write.
+ 					if (WriteFile(disk_file, (char *)buffer, bytes, &bytes_written, &(olap[i]))) {
+ 						// It succeeded immediately!
+-#if _DEBUG
++#ifdef _DEBUG
+ 						cout << "Wrote (immediately) " << bytes_written << " of "
+ 						    << bytes << " bytes to disk " << spec.name << "." << endl;
+ #endif
+@@ -1177,7 +1177,7 @@
+ 							num_outstanding++;
+ 						} else if (GetLastError() == ERROR_DISK_FULL) {
+ 							// The disk filled up -- this is an expected error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 							cout << "Disk full (immediately) while writing "
+ 							    << bytes_written << " of " << bytes << " bytes to disk "
+ 							    << spec.name << "." << endl;
+@@ -1207,7 +1207,7 @@
+ 					// Check to see if it has completed
+ 					if (GetOverlappedResult(disk_file, &(olap[i]), &bytes_written, FALSE)) {
+ 						// It completed successfully!
+-#if _DEBUG
++#ifdef _DEBUG
+ 						cout << "Wrote (eventually) " << bytes_written << " of " << bytes
+ 						    << " bytes to disk " << spec.name << "." << endl;
+ #endif
+@@ -1230,7 +1230,7 @@
+ 						;	// Do nothing.
+ 					} else if (GetLastError() == ERROR_DISK_FULL) {
+ 						// The disk filled up -- this is an expected error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 						cout << "Disk full (eventually) while writing " << bytes_written <<
+ 						    " of " << bytes << " bytes to disk " << spec.name << "." << endl;
+ #endif
+@@ -1449,7 +1449,7 @@
+ 				offset += user_alignment - remainder;
+ 
+ 				// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 				if ((offset + (DWORDLONG) request_size) > ending_position) {
+ 					cout << "*** Can't align on " << user_alignment << " byte boundaries" << endl;
+ 
+@@ -1480,7 +1480,7 @@
+ 					offset += spec.disk_info.sector_size - remainder;
+ 
+ 					// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 					if ((offset + (DWORDLONG) request_size) > ending_position) {
+ 						cout << "*** Can't align on " << spec.disk_info.sector_size
+ 						    << " byte boundaries" << endl;
+@@ -1494,7 +1494,7 @@
+ 					offset = (offset + spec.disk_info.sector_size) & sector_align_mask;
+ 
+ 					// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 					if ((offset + (DWORDLONG) request_size) > ending_position) {
+ 						cout << "*** ERROR: Can't align on " << spec.disk_info.sector_size
+ 						    << " byte boundaries" << endl;
+@@ -1521,7 +1521,7 @@
+ 				offset = (offset + user_alignment) & sector_align_mask;
+ 
+ 				// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 				if ((offset + (DWORDLONG) request_size) > ending_position) {
+ 					cout << "*** Can't align on " << alignment << " byte boundaries" << endl;
+ 
+@@ -1543,7 +1543,7 @@
+ {
+ 	DWORD error_no;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	// Checking for the access to be a multiple of the sector size.
+ 	// Avoiding this check during actual testing for performance reasons.
+ 	if (offset % spec.disk_info.sector_size) {
+@@ -1613,7 +1613,7 @@
+ {
+ 	DWORD error_no;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	// Verifying that the amount to be written is a multiple of the sector size.
+ 	// Avoiding this check during actual testing for performance reasons.
+ 	if (offset % spec.disk_info.sector_size) {
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -139,7 +139,7 @@
+ 	tcp_socket.SetAddress(CLIENT, spec.name);
+ 
+ 	// Create and bind the client socket.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Creating socket " << spec.name << "." << endl << flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -113,7 +113,7 @@
+ //
+ BOOL TargetVI::Initialize(Target_Spec * target_info, CQ * completion_queue)
+ {
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout << "Initializing VI target on NIC " << target_info->name << endl;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVIPL.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVIPL.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOVIPL.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -168,7 +168,7 @@
+ #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	// Load vipl.dll.
+ 	if (!(vipl_dll = LoadLibrary("vipl.dll"))) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "Unable to load vipl.dll" << endl;
+ #endif
+ 		return;
+
+Modified: branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -153,7 +153,7 @@
+ 	// Initialize WinSock if it has not yet been initialized in this process.
+ 	if ( InterlockedIncrement ( &sockets_in_use ) == 1 )
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			cout << "Initializing WinSock." << endl;
+ 		#endif
+ 
+@@ -181,7 +181,7 @@
+ 	// Clean up WinSock if nobody else is using it in this process.
+ 	if ( InterlockedDecrement ( &sockets_in_use ) == 0 )
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			cout << "Cleaning up WinSock." << endl;
+ 		#endif
+ 		
+@@ -349,7 +349,7 @@
+ 		return ReturnError;
+ 	}
+ 
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		cout << "Bound socket on port " << ntohs(address->sin_port) << "." << endl;
+ 	#endif
+ 
+@@ -378,7 +378,7 @@
+  #warning ===> WARNING: You have to do some coding here to get the port done!
+ #endif
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			// WSAECONNREFUSED means the server isn't up yet or is busy, 
+ 			// don't print an error message
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+@@ -496,7 +496,7 @@
+ 		}
+ 
+ 	// Accept connections to socket.
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		cout << "Accepting connections to socket." << endl;
+ 	#endif
+ 
+@@ -520,7 +520,7 @@
+ 		// A connection was requested.  Accept it.
+ 		addr_len = sizeof( client_address );
+ 		// Create client socket.
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			cout << "Creating client socket." << endl;
+ 		#endif
+ 
+@@ -813,7 +813,7 @@
+ 	}
+ 	else
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			*errmsg << "*** Error " << WSAGetLastError() 
+ 					<< " peeking from socket in NetAsyncTCP::Peek()." << ends;
+ 			OutputErrMsg();
+@@ -847,7 +847,7 @@
+ 		return ReturnSuccess;
+ 	}
+ 
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		cout << "Closing socket." << endl;
+ 	#endif
+ 
+@@ -907,7 +907,7 @@
+ 	LINGER lstruct = {TRUE, 0};
+ 
+ 	
+-#if (NETWORK_DETAILS || _DEBUG) && !defined(IOMTR_OS_LINUX)
++#if (NETWORK_DETAILS || defined(_DEBUG)) && !defined(IOMTR_OS_LINUX)
+ 	BOOL CHECK_setoption;
+ 	LINGER	CHECK_lstruct;
+ 	int size;
+@@ -945,7 +945,7 @@
+ 	/////////////////////////////////////
+ 
+ #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		// When closing the connection, do a hard close.
+ 		size = sizeof(CHECK_lstruct);
+ 		if ( getsockopt( *s, SOL_SOCKET, SO_LINGER, (char *) &CHECK_lstruct, &size ) == SOCKET_ERROR )
+
+Modified: branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -173,7 +173,7 @@
+ 	SetDlgItemInt(EDiskWorkerCount, 0);	// Display a number.
+ 	SetDlgItemInt(ENetWorkerCount, 0);	// Display a number.
+ 	disk_worker_count = -1;	// default number of disk workers               
+-#if _DEBUG
++#ifdef _DEBUG
+ 	net_worker_count = -1;	// create network workers for debug
+ #else
+ 	net_worker_count = 0;	// default number of network workers
+@@ -188,7 +188,7 @@
+ 	SetCyclingInfo(&queue_cycling, FALSE, 1, 32, 2, StepExponential);
+ 	OnSelchangeCQStepType();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	result_type = RecordNone;	// don't save results for debug code
+ #else
+ 	result_type = RecordAll;	// save all results for release code
+
+Modified: branches/IOMETER-restruct/iometer/src/VINic.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/VINic.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/VINic.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -83,7 +83,7 @@
+ 
+ 	// Open the NIC.
+ 	if ((result = vipl.VipOpenNic((const VIP_CHAR *)nic_name, &nic)) != VIP_SUCCESS) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout << "Unable to open VI nic " << nic_name << ": " << vipl.Error(result) << endl;
+ #endif
+ 		return FALSE;
+
+
+
+From cheungming at mail.berlios.de  Mon Aug 21 18:36:27 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Mon, 21 Aug 2006 18:36:27 +0200
+Subject: [Iometer-svn] r286 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608211636.k7LGaRSF026756@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-21 18:36:25 +0200 (Mon, 21 Aug 2006)
+New Revision: 286
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+updated getSizeOfPhysDisk() error messaged to be more meaningful.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-21 14:48:29 UTC (rev 285)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-21 16:36:25 UTC (rev 286)
+@@ -1831,13 +1831,14 @@
+ 		return 0;
+ 	}
+ 	if (ioctl(fd, BLKGETSIZE64, &sz64) < 0) {
+-#ifdef _DEBUG
+-		cerr << "Fail to get size for " << fullDevName << " by BLKGETSIZE64" << endl;
+-#endif
++		//cerr << "Fail to get size for " << fullDevName << " by BLKGETSIZE64" << endl;
++		cerr << "Warning: Reading the device geometry for " << fullDevName << " failed using the ";
++		cerr << "primary detection method - going to try backup method (this puts a 2TB limit ";
++		cerr << "on Iometer for accessing the device)" << endl;
+ 		if (ioctl(fd, BLKGETSIZE, &sz32) < 0) {
+-#ifdef _DEBUG
+-			cerr << "Fail to get size for " << fullDevName << "by BLKGETSIZE" << endl;
+-#endif
++			//cerr << "Fail to get size for " << fullDevName << "by BLKGETSIZE" << endl;
++			cerr << "ERROR: Reading the device geometry for " << fullDevName << " failed using ";
++			cerr << "the backup detection method - give up (device will not be usable by Iometer)" << endl;
+ 			sz64 = 0;
+ 		} else {
+ 			sz64 = sz32;
+
+
+
+From cheungming at mail.berlios.de  Mon Aug 21 20:08:48 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Mon, 21 Aug 2006 20:08:48 +0200
+Subject: [Iometer-svn] r287 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608211808.k7LI8m2X030258@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-21 20:08:39 +0200 (Mon, 21 Aug 2006)
+New Revision: 287
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/Galileo.rc
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+   branches/IOMETER-restruct/iometer/src/IOManager.h
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+added support for using specified port.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 18:08:39 UTC (rev 287)
+@@ -8,6 +8,7 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to allow iometer and dynamo use specified port.
+    - Patch by Ming Zhang to fix 2 memory leaks in ICFOpenDialog and ICFSaveDialog
+      class.
+    - Patch by Ming Zhang to exclude the disk if can not detect the disk size
+@@ -112,6 +113,7 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
++   -Cleanup the use of _DEBUG and _DETAILS.
+    - Renamed Dynamo and Iometer subdirectories to solve the name conflict
+      under case insensitive file system.
+    - Adjusted some variable types to fit 64bit OS and compiler.
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo.rc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-08-21 18:08:39 UTC (rev 287)
+@@ -1011,7 +1011,7 @@
+     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+     IDS_OPEN_DIALOG_TITLE   "Open Test Configuration File"
+     IDS_SAVE_DIALOG_TITLE   "Save Test Configuration File"
+-    IDS_CMDLINE_SYNTAX      "SYNTAX\niometer\niometer /?\niometer config_file [result_file [timeout_value]]\niometer [/c config_file] [/r results_file] [/t timeout_value]\n\n    ? - show Iometer version number and command line syntax\n\n    config_file - the name of the Iometer configuration file to restore\n\twhen Iometer starts (must be a valid .icf file)\n\n    results_file - the name of a writable text file to which the test\n\tresults should be appended.  If the file doesn't exist, it will be\n\tcreated.\n\n    timeout_value - the number of seconds to wait for managers to log in\n\twhen restoring a config file.\n\n    If both config_file and results_file are specified, Iometer will\n    attempt to run the test in batch mode, requiring no user intervention\n    to load the config file, start the tests, stop the tests (if a run time\n    was specified in the Test Setup tab), and close Iometer.  Batch mode\n    can be canceled by aborting the manager waiting list dialog o!
+ r by\n    manually stopping a test while it is running."
++    IDS_CMDLINE_SYNTAX      "SYNTAX\niometer\niometer /?\niometer config_file [result_file [timeout_value]]\niometer [/c config_file] [/r results_file] [/t timeout_value]\n\n    ? - show Iometer version number and command line syntax\n\n    config_file - the name of the Iometer configuration file to restore\n\twhen Iometer starts (must be a valid .icf file)\n\n    results_file - the name of a writable text file to which the test\n\tresults should be appended.  If the file doesn't exist, it will be\n\tcreated.\n\n    timeout_value - the number of seconds to wait for managers to log in\n\twhen restoring a config file.\n\n    port_number - the port number iometer listens on.\n\n    If both config_file and results_file are specified, Iometer will\n    attempt to run the test in batch mode, requiring no user intervention\n    to load the config file, start the tests, stop the tests (if a run time\n    was specified in the Test Setup tab), and close Iometer.  Batch mode\n    can !
+ be canceled by aborting the manager waiting list dialog or by\n    manually stopping a test while it is running."
+     IDS_VERSION_OUTPUT      "Version %s "
+ END
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-21 18:08:39 UTC (rev 287)
+@@ -194,7 +194,7 @@
+ 	//
+ 	// iometer ?
+ 	// iometer [config_file [result_file [timeout_value]]]
+-	// iometer [/c config_file] [/r results_file] [/t timeout_value]
++	// iometer [/c config_file] [/r results_file] [/t timeout_value] [/p port_number]
+ 	//
+ 	//    ? - show Iometer version number and command line syntax
+ 	//
+@@ -208,6 +208,8 @@
+ 	//    timeout_value - the number of seconds to wait for managers to log in
+ 	//       when restoring a config file.
+ 	//
++	//    port_number - allow iometer listen on this port instead of default port.
++	//
+ 	//    If both config_file and results_file are specified, Iometer will
+ 	//    attempt to run the test in batch mode, requiring no user intervention
+ 	//    to load the config file, start the tests, stop the tests (if a run time
+@@ -517,19 +519,26 @@
+ 
+ 	switch (login_state) {
+ 	case closed:
+-		// create and open the port
++		{
++			int login_port_number;
+ 
+-		login_port = new PortTCP(FALSE);	// asynchronous port
+-		if (!login_port->Create(NULL, NULL, 0, WELL_KNOWN_TCP_PORT)) {
+-			ErrorMessage("Could not create TCP/IP port for Dynamo login!");
+-			login_state = failed;
+-			return FALSE;	// go away and don't come back (for a while)
++			// create and open the port
++			login_port_number = theApp.cmdline.GetLoginportnumber();
++			if (!login_port_number)
++				login_port_number = WELL_KNOWN_TCP_PORT;
++ 
++			login_port = new PortTCP(FALSE);	// asynchronous port
++			if (!login_port->Create(NULL, NULL, 0, login_port_number)) {
++				ErrorMessage("Could not create TCP/IP port for Dynamo login!");
++				login_state = failed;
++				return FALSE; // go away and don't come back (for a while)
++			}
++
++			login_state = open;
++			return TRUE; // go away and try again later
++			break;
+ 		}
+ 
+-		login_state = open;
+-		return TRUE;	// go away and try again later
+-		break;
+-
+ 	case open:
+ 		if (!login_port->Accept())	// begin accepting...
+ 		{
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-08-21 18:08:39 UTC (rev 287)
+@@ -89,7 +89,7 @@
+ const char CGalileoCmdLine::DefaultConfigFile[] = "iometer.icf";
+ 
+ CGalileoCmdLine::CGalileoCmdLine():m_bSwitches(FALSE), m_bFail(FALSE),
+-m_sConfigFile(""), m_sResultFile(""), m_iTimeout(-1), m_bOverrideBatch(FALSE)
++m_sConfigFile(""), m_sResultFile(""), m_iTimeout(-1), m_bOverrideBatch(FALSE), m_iLoginportnumber(0)
+ {
+ }
+ 
+@@ -177,6 +177,19 @@
+ 				Fail("T switch should be followed by an integer timeout value.");
+ 			}
+ 			return;
++			// Expecting the port number
++		case 'P':
++			if (m_iLoginportnumber > 0)	// has it already been set?
++			{
++				Fail("Login port number parameter was specified more than once.");
++			} else if (IsValidInteger(pszParam)) {
++				m_iLoginportnumber = atoi(pszParam);
++				if (m_iLoginportnumber < 1 || m_iLoginportnumber > 65535)
++					Fail("P switch should be followed by a valid port value (1-65535).");
++			} else {
++				Fail("P switch should be followed by a valid port value (1-65535).");
++			}
++			return;
+ 		default:
+ 			{
+ 				char tmpary[2] = { last_switch, 0 };
+@@ -286,6 +299,11 @@
+ 		return CGalileoCmdLine::DefaultTimeout;
+ }
+ 
++int CGalileoCmdLine::GetLoginportnumber()
++{
++	return m_iLoginportnumber;
++}
++
+ //
+ // Is Iometer in batch mode?
+ //
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h	2006-08-21 18:08:39 UTC (rev 287)
+@@ -73,6 +73,7 @@
+ 	CString GetConfigFile();
+ 	CString GetResultFile();
+ 	int GetTimeout();
++	int GetLoginportnumber();
+ 
+ 	// Interactive mode is the normal mode of operation for Iometer.
+ 	// If the user specifies both the config file and the results file
+@@ -101,6 +102,7 @@
+ 	CString m_sConfigFile;	// the specified config file
+ 	CString m_sResultFile;	// the specified result file
+ 	int m_iTimeout;		// the specified timeout value
++	int m_iLoginportnumber; // the specified port number
+ 
+ 	BOOL m_bOverrideBatch;	// if set, forces IsBatchMode to return FALSE
+ };
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-21 18:08:39 UTC (rev 287)
+@@ -208,7 +208,7 @@
+ //
+ // Logging into Iometer.  Returns success.
+ //
+-BOOL Manager::Login(char *port_name)
++BOOL Manager::Login(char* port_name, int login_port_number)
+ {
+ 	Port *login_port;
+ 	Message msg, reply;
+@@ -286,7 +286,9 @@
+ 	if (prt->type == PORT_TYPE_TCP) {
+ 		login_port = new PortTCP;
+ 
+-		if (!login_port->Connect(port_name)) {
++		if (!login_port_number)
++			login_port_number = WELL_KNOWN_TCP_PORT;
++		if (!login_port->Connect(port_name, login_port_number)) {
+ 			cout << "*** Could not create TCP/IP port to connect with Iometer!" << endl;
+ 			return FALSE;
+ 		}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.h	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/IOManager.h	2006-08-21 18:08:39 UTC (rev 287)
+@@ -122,7 +122,7 @@
+ 
+ 	const char *GetVersionString(BOOL fWithDebugIndicator = FALSE);
+ 	BOOL Process_Message();
+-	BOOL Login(char *port_name);
++	BOOL Login(char *port_name, int login_port_number);
+ 	BOOL Run();
+ 
+ 	Port *prt;		// Communication port to Iometer.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-08-21 18:08:39 UTC (rev 287)
+@@ -51,8 +51,7 @@
+ /* ##                                                                     ## */
+ /* ##  Changes ...: 2004-07-30 (daniel.scheibli at edelbyte.org)             ## */
+ /* ##               - Changed the version to current date.                ## */
+-/* ##               2003-12-16 (daniel.scheibli at edelbyte.org)             ## */
+-/* ##  Changes ...: 2004-08-21 (daniel.scheibli at edelbyte.org)             ## */
++/* ##               2004-08-21 (daniel.scheibli at edelbyte.org)             ## */
+ /* ##               - Changed the version to <latest release>-post.       ## */
+ /* ##               2003-12-16 (daniel.scheibli at edelbyte.org)             ## */
+ /* ##               - Changed the version to current date.                ## */
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2006-08-21 16:36:25 UTC (rev 286)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2006-08-21 18:08:39 UTC (rev 287)
+@@ -164,6 +164,7 @@
+ 	char *manager_exclude_fs;
+ 	char (*blkdevlist)[MAX_TARGETS][MAX_NAME];
+ 	unsigned long cpu_affinity;
++	int login_port_number;
+ };
+ 
+ /////////////////////////////////////////////////////////////////////////////
+@@ -378,6 +379,7 @@
+ 	param.manager_computer_name = manager.prt->network_name;
+ 	param.manager_exclude_fs = manager.exclude_filesys;
+ 	param.blkdevlist = &manager.blkdevlist;
++	param.login_port_number = 0;
+ 
+ 	ParseParam(argc, argv, &param);
+ 
+@@ -488,7 +490,7 @@
+ 	// Dynamo to be reset from Iometer.  If everything works smoothly, resets should be rare.
+ 	while (TRUE) {
+ 		// Initializing worker and logging into Iometer director.
+-		if (!manager.Login(iometer))
++		if (!manager.Login(iometer, param.login_port_number))
+ 			break;
+ 
+ 		// Manager will continue to run until an error, or stopped by Iometer.
+@@ -540,16 +542,17 @@
+ #if defined(IOMTR_OS_LINUX)
+ 	cout << "dynamo [-i iometer_computer_name -m manager_computer_name] [-n manager_name]" << endl;
+ 	cout << "       [-x excluded_fs_type] [-d extra_device] [-f extra_device_file] [-l]" << endl;
+-	cout << "       [-c cpu_affinity]" << endl;
++	cout << "       [-c cpu_affinity] [-p login_port_number]" << endl;
+ #elif defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+ 	cout << "dynamo [-i iometer_computer_name -m manager_computer_name] [-n manager_name]" << endl;
+ 	cout << "       [-x excluded_fs_type] [-d extra_device] [-f extra_device_file] [-l]" << endl;
++	cout << "       [-p login_port_number]" << endl;
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	cout << "dynamo [/i iometer_computer_name /m manager_computer_name] [/n manager_name]" << endl;
+-	cout << "       [/c cpu_affinity]" << endl;
++	cout << "       [/c cpu_affinity] [/p login_port_number]" << endl;
+ #elif defined(IOMTR_OS_NETWARE)
+ 	cout << "dynamo [/i iometer_computer_name /m manager_computer_name] [/n manager_name]" << endl;
+-	cout << "       [/x excluded_volumes] [/c cpu_affinity]" << endl;
++	cout << "       [/x excluded_volumes] [/c cpu_affinity] [/p login_port_number]" << endl;
+ #else
+ #warning ===> WARNING: You have to do some coding here to get the port done!
+ #endif
+@@ -573,6 +576,9 @@
+ 	cout << "      Make sure iometer box can ping this name successfully, otherwise dynamo" << endl;
+ 	cout << "      and iometer will hang a long time during login." << endl;
+ 	cout << endl;
++	cout << "   login_port_number - the port number Iometer is listening on. If this" << endl;
++	cout << "      parameter is not given, the default port(" << WELL_KNOWN_TCP_PORT << ") will be used." << endl;
++	cout << endl;
+ 
+ #if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+ 	cout << "   excluded_fs_type - type of filesystems to exclude from device search" << endl;
+@@ -694,6 +700,15 @@
+ 			}
+ 			strcpy(param->manager_name, argv[I]);
+ 			break;
++		case 'P':
++			if (argv[I])
++				param->login_port_number = atoi(argv[I]);
++			if (param->login_port_number < 1 || param->login_port_number > 65535) {
++				Syntax("Port number was out of range.");
++				param->login_port_number = 0;
++				return;
++			}
++			break;
+ #if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+ 		case 'X':
+ 			if ((strlen(argv[I]) + strlen(param->manager_exclude_fs)) >= MAX_EXCLUDE_FILESYS) {
+
+
+
+From cheungming at mail.berlios.de  Mon Aug 21 21:14:14 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Mon, 21 Aug 2006 21:14:14 +0200
+Subject: [Iometer-svn] r288 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608211914.k7LJEEXF027791@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-21 21:14:10 +0200 (Mon, 21 Aug 2006)
+New Revision: 288
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/Galileo.rc
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+Log:
+added support for optional display Bigmeter when iometer starts.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 19:14:10 UTC (rev 288)
+@@ -8,6 +8,7 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to support optional display BigMeter when iometer starts.
+    - Patch by Ming Zhang to allow iometer and dynamo use specified port.
+    - Patch by Ming Zhang to fix 2 memory leaks in ICFOpenDialog and ICFSaveDialog
+      class.
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo.rc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-08-21 19:14:10 UTC (rev 288)
+@@ -1011,7 +1011,7 @@
+     ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+     IDS_OPEN_DIALOG_TITLE   "Open Test Configuration File"
+     IDS_SAVE_DIALOG_TITLE   "Save Test Configuration File"
+-    IDS_CMDLINE_SYNTAX      "SYNTAX\niometer\niometer /?\niometer config_file [result_file [timeout_value]]\niometer [/c config_file] [/r results_file] [/t timeout_value]\n\n    ? - show Iometer version number and command line syntax\n\n    config_file - the name of the Iometer configuration file to restore\n\twhen Iometer starts (must be a valid .icf file)\n\n    results_file - the name of a writable text file to which the test\n\tresults should be appended.  If the file doesn't exist, it will be\n\tcreated.\n\n    timeout_value - the number of seconds to wait for managers to log in\n\twhen restoring a config file.\n\n    port_number - the port number iometer listens on.\n\n    If both config_file and results_file are specified, Iometer will\n    attempt to run the test in batch mode, requiring no user intervention\n    to load the config file, start the tests, stop the tests (if a run time\n    was specified in the Test Setup tab), and close Iometer.  Batch mode\n    can !
+ be canceled by aborting the manager waiting list dialog or by\n    manually stopping a test while it is running."
++    IDS_CMDLINE_SYNTAX      "SYNTAX\niometer\niometer /?\niometer config_file [result_file [timeout_value]]\niometer [/c config_file] [/r results_file] [/t timeout_value] [/p port] [/m 1]\n\n    ? - show Iometer version number and command line syntax\n\n    config_file - the name of the Iometer configuration file to restore\n\twhen Iometer starts (must be a valid .icf file)\n\n    results_file - the name of a writable text file to which the test\n\tresults should be appended.  If the file doesn't exist, it will be\n\tcreated.\n\n    timeout_value - the number of seconds to wait for managers to log in\n\twhen restoring a config file.\n\n    port_number - the port number iometer listens on.\n\n    specify /m option will have BigMeter shown automatically.\n\n    If both config_file and results_file are specified, Iometer will\n    attempt to run the test in batch mode, requiring no user intervention\n    to load the config file, start the tests, stop the tests (if a run time\n!
+     was specified in the Test Setup tab), and close Iometer.  Batch mode\n    can be canceled by aborting the manager waiting list dialog or by\n    manually stopping a test while it is running."
+     IDS_VERSION_OUTPUT      "Version %s "
+ END
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-21 19:14:10 UTC (rev 288)
+@@ -194,7 +194,7 @@
+ 	//
+ 	// iometer ?
+ 	// iometer [config_file [result_file [timeout_value]]]
+-	// iometer [/c config_file] [/r results_file] [/t timeout_value] [/p port_number]
++	// iometer [/c config_file] [/r results_file] [/t timeout_value] [/p port_number] [/m 1]
+ 	//
+ 	//    ? - show Iometer version number and command line syntax
+ 	//
+@@ -210,6 +210,9 @@
+ 	//
+ 	//    port_number - allow iometer listen on this port instead of default port.
+ 	//
++	//    specify /m option will have BigMeter shown automatically. The 
++	//       parameter must be 1.
++	//
+ 	//    If both config_file and results_file are specified, Iometer will
+ 	//    attempt to run the test in batch mode, requiring no user intervention
+ 	//    to load the config file, start the tests, stop the tests (if a run time
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-08-21 19:14:10 UTC (rev 288)
+@@ -89,7 +89,7 @@
+ const char CGalileoCmdLine::DefaultConfigFile[] = "iometer.icf";
+ 
+ CGalileoCmdLine::CGalileoCmdLine():m_bSwitches(FALSE), m_bFail(FALSE),
+-m_sConfigFile(""), m_sResultFile(""), m_iTimeout(-1), m_bOverrideBatch(FALSE), m_iLoginportnumber(0)
++m_sConfigFile(""), m_sResultFile(""), m_iTimeout(-1), m_bOverrideBatch(FALSE), m_iLoginportnumber(0), m_bShowBigmeter(FALSE)
+ {
+ }
+ 
+@@ -190,6 +190,18 @@
+ 				Fail("P switch should be followed by a valid port value (1-65535).");
+ 			}
+ 			return;
++			// Check if need to show Bigmeter automatically
++		case 'M':
++			if (m_bShowBigmeter == TRUE)	// has it already been set?
++			{
++				Fail("Show Bigmeter parameter was specified more than once.");
++			} else {
++				int i = atoi(pszParam);
++
++				if (i == 1)
++					m_bShowBigmeter = TRUE;
++			}
++			return;
+ 		default:
+ 			{
+ 				char tmpary[2] = { last_switch, 0 };
+@@ -304,6 +316,11 @@
+ 	return m_iLoginportnumber;
+ }
+ 
++BOOL CGalileoCmdLine::GetShowBigmeter()
++{
++	return m_bShowBigmeter;
++}
++
+ //
+ // Is Iometer in batch mode?
+ //
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h	2006-08-21 19:14:10 UTC (rev 288)
+@@ -74,6 +74,7 @@
+ 	CString GetResultFile();
+ 	int GetTimeout();
+ 	int GetLoginportnumber();
++	BOOL GetShowBigmeter();
+ 
+ 	// Interactive mode is the normal mode of operation for Iometer.
+ 	// If the user specifies both the config file and the results file
+@@ -103,6 +104,7 @@
+ 	CString m_sResultFile;	// the specified result file
+ 	int m_iTimeout;		// the specified timeout value
+ 	int m_iLoginportnumber; // the specified port number
++	BOOL m_bShowBigmeter;// automatically show bigmeter
+ 
+ 	BOOL m_bOverrideBatch;	// if set, forces IsBatchMode to return FALSE
+ };
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 19:14:10 UTC (rev 288)
+@@ -797,6 +797,10 @@
+ 
+ 	m_pPageDisplay->Update();
+ 
++	// display BigMeter if need
++	if (theApp.cmdline.GetShowBigmeter())
++		m_pPageDisplay->ShowBigMeter(0);
++
+ 	// Display the current test status.
+ 	UpdateTestStatus();
+ 
+
+
+
+From cheungming at mail.berlios.de  Mon Aug 21 22:14:46 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Mon, 21 Aug 2006 22:14:46 +0200
+Subject: [Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608212014.k7LKEkNY016490@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-21 22:14:45 +0200 (Mon, 21 Aug 2006)
+New Revision: 289
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoView.h
+Log:
+Patch by Keith Moyer to add a ramp/run time remaining notification to the status bar during appropriate periods.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 19:14:10 UTC (rev 288)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 20:14:45 UTC (rev 289)
+@@ -8,6 +8,8 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
++     status bar during appropriate periods.
+    - Patch by Ming Zhang to support optional display BigMeter when iometer starts.
+    - Patch by Ming Zhang to allow iometer and dynamo use specified port.
+    - Patch by Ming Zhang to fix 2 memory leaks in ICFOpenDialog and ICFSaveDialog
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 19:14:10 UTC (rev 288)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 20:14:45 UTC (rev 289)
+@@ -811,9 +811,10 @@
+ 		return;
+ 	}
+ 	// Waiting ramping up period or signaling to start recording results.
+-	if (m_pPageSetup->ramp_time)
++	if (m_pPageSetup->ramp_time) {
+ 		SetTimer(RAMP_TIMER, m_pPageSetup->ramp_time * 1000, NULL);
+-	else
++		StartRemainNotification(m_pPageSetup->ramp_time);
++	} else
+ 		StartRecording();
+ 
+ 	// enable Stop and Stop All buttons
+@@ -845,9 +846,40 @@
+ 	// Get update frequency of results display.
+ 	if (timer_delay = m_pPageDisplay->GetUpdateDelay())
+ 		SetTimer(DISPLAY_TIMER, timer_delay, NULL);
++
++	// Start "remaining" notification.
++	StartRemainNotification(m_pPageSetup->GetRunTime() / 1000);
+ }
+ 
+ //
++// Start the 'time remaining' notification in the status bar.
++//
++void CGalileoView::StartRemainNotification(int timeRem)
++{
++	SetTimer(NOTE_TIMER, 1000, NULL);
++	noteTime = timeRem;
++	UpdateRemainNotification();
++}
++
++//
++// Update the 'time remaining' notification in the status bar.
++//
++void CGalileoView::UpdateRemainNotification(void)
++{
++	CString note;
++
++	if (!noteTime) {
++		KillTimer(NOTE_TIMER);
++		note = "";
++ 	} else if (theApp.test_state == TestRecording)
++		note.Format("Run remaining: %d sec", noteTime);
++	else
++		note.Format("Ramp remaining: %d sec", noteTime);
++	SetStatusBarPaneText(1, note);
++	noteTime--;
++}
++
++//
+ // Prepare drives that need to be prepared.
+ //
+ BOOL CGalileoView::DisksNotPrepared()
+@@ -907,6 +939,10 @@
+ 		StartRecording();
+ 		return;
+ 
++	case NOTE_TIMER:
++		UpdateRemainNotification();
++		return;
++
+ 	case PREPARE_TIMER:
+ 		// See if Dynamo has responded that the drive is prepared.
+ 		if (!theApp.manager_list.GetManager(manager_to_prepare)->Peek(worker_to_prepare))
+@@ -966,6 +1002,7 @@
+ 	KillTimer(RAMP_TIMER);
+ 	KillTimer(TEST_TIMER);
+ 	KillTimer(DISPLAY_TIMER);
++	KillTimer(NOTE_TIMER);
+ 	theApp.test_state = TestIdle;
+ 	theApp.manager_list.SendActiveManagers(STOP);
+ 
+@@ -2055,6 +2092,15 @@
+ }
+ 
+ //
++// Updating a pane in the status bar with a single notification message.
++//
++void CGalileoView::SetStatusBarPaneText(int paneIndex, CString text)
++{
++	if (theApp.m_wndStatusBar)
++		theApp.m_wndStatusBar.GetStatusBarCtrl().SetText(text, paneIndex, 0);
++}
++
++//
+ // Clearing all information displayed in the status bar.
+ //
+ void CGalileoView::ClearStatusBar()
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.h	2006-08-21 19:14:10 UTC (rev 288)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.h	2006-08-21 20:14:45 UTC (rev 289)
+@@ -63,6 +63,7 @@
+ #define PREPARE_TIMER		2
+ #define RAMP_TIMER		3
+ #define IDLE_TIMER		4
++#define NOTE_TIMER		5
+ 
+ #define DISK_PAGE		0
+ #define NETWORK_PAGE		1
+@@ -147,6 +148,7 @@
+ 
+ 	// Function to set text in the status bar.
+ 	void SetStatusBarText(CString text1 = "", CString text2 = "", CString text3 = "");
++	void SetStatusBarPaneText(int paneIndex = 0, CString text = "");
+ 	void ClearStatusBar();
+ 	void UpdateTestStatus();
+ 
+@@ -189,6 +191,7 @@
+ 	int manager_to_prepare;
+ 	int worker_to_prepare;
+ 	CString result_file;
++	int noteTime;
+ 
+ 	struct {
+ 		UINT nID;
+@@ -211,6 +214,9 @@
+ 	void SaveAccessSpecs();
+ 	void StartTest();
+ 	void StartRecording();
++	void StartRemainNotification( int timeRem);
++	void UpdateRemainNotification();
++
+       public:
+ 	void StopTest(ReturnVal test_successful);
+       protected:
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 03:31:00 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 03:31:00 +0200
+Subject: [Iometer-svn] r290 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608220131.k7M1V0Sl015124@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 03:30:54 +0200 (Tue, 22 Aug 2006)
+New Revision: 290
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+Log:
+now under Linux will allocate memory with 4KB aligned address.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 20:14:45 UTC (rev 289)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 01:30:54 UTC (rev 290)
+@@ -8,6 +8,7 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to allocate memory under Linux as 4KB aligned.
+    - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
+      status bar during appropriate periods.
+    - Patch by Ming Zhang to support optional display BigMeter when iometer starts.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-21 20:14:45 UTC (rev 289)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-22 01:30:54 UTC (rev 290)
+@@ -556,7 +556,14 @@
+ 		free(read_data);
+ 	}
+ 	errno = 0;
++#if defined(IOMTR_OS_LINUX)
++	if (posix_memalign(&read_data, 4096, access_spec.max_transfer))
++#elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
+ 	if (!(read_data = valloc(access_spec.max_transfer)))
++#else
++#warning ===> WARNING: You have to do some coding here to get the port done! 
++#endif
++
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+ 	if (read_data) {
+ 		VirtualFree(read_data, 0, MEM_RELEASE);
+@@ -583,7 +590,14 @@
+ 		free(write_data);
+ 	}
+ 	errno = 0;
+-	if (!(write_data = valloc(access_spec.max_transfer)))
++#if defined(IOMTR_OS_LINUX)
++        if (posix_memalign(&write_data, 4096, access_spec.max_transfer))
++#elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
++        if (!(write_data = valloc(access_spec.max_transfer)))
++#else
++#warning ===> WARNING: You have to do some coding here to get the port done!
++#endif
++
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+ 	if (write_data) {
+ 		VirtualFree(write_data, 0, MEM_RELEASE);
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 15:02:57 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 15:02:57 +0200
+Subject: [Iometer-svn] r291 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608221302.k7MD2voN019264@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 15:02:39 +0200 (Tue, 22 Aug 2006)
+New Revision: 291
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+Log:
+enhanced Strip() a bit.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-22 01:30:54 UTC (rev 290)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-22 13:02:39 UTC (rev 291)
+@@ -759,25 +759,32 @@
+ 
+ inline char *Strip(char *pcString)
+ {
+-	size_t uiLength = strlen(pcString); // 64bit version now return qword values!
++	size_t uiLength;
+ 	size_t I;
+ 	size_t iIndex = 0;
+ 	size_t iPos1, iPos2;
+ 
++	if (!pcString)
++		return pcString;
++	uiLength = strlen(pcString); // 64bit version now return qword values!
++	if (!uiLength)
++		return pcString;
+ 	for (iPos1 = 0; ((iPos1 < uiLength) && (pcString[iPos1] == (int)' ')); iPos1++) {
+ 		/* NOP */
+ 	}
+-	for (iPos2 = uiLength - 1; ((iPos2 >= 0) && (pcString[iPos2] == (int)' ')); iPos2--) {
++	for (iPos2 = uiLength - 1; ((iPos2 != 0) && (pcString[iPos2] == (int)' ')); iPos2--) {
+ 		/* NOP */
+ 	}
+-
++	if ((iPos2 == 0) && (pcString[iPos2] == (int)' '))
++		pcString[0] = '\0';
++	
+ 	if ((iPos1 != 0) || (iPos2 != (uiLength - 1))) {
+ 		for (I = iPos1; I <= iPos2; I++) {
+ 			pcString[iIndex] = pcString[I];
+ 			iIndex++;
+ 		}
+ 		pcString[iIndex] = '\0';
+- 	}
++	}
+ 	return(pcString);
+ }
+ 
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 16:22:39 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 16:22:39 +0200
+Subject: [Iometer-svn] r292 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608221422.k7MEMdda023683@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 16:22:38 +0200 (Tue, 22 Aug 2006)
+New Revision: 292
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+Log:
+fixed the recv() return value processing error in Peek().
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 13:02:39 UTC (rev 291)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 14:22:38 UTC (rev 292)
+@@ -8,6 +8,7 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to fix recv() return value processing error in Peek();
+    - Patch by Ming Zhang to allocate memory under Linux as 4KB aligned.
+    - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
+      status bar during appropriate periods.
+
+Modified: branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-08-22 13:02:39 UTC (rev 291)
++++ branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-08-22 14:22:38 UTC (rev 292)
+@@ -577,7 +577,9 @@
+ 	struct sockaddr	address;
+ 	socklen_t addr_len = sizeof( address );
+ 
+-	fd_set		readfds;
++	fd_set readfds;
++	int res;
++
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+ 	struct File    *fp = (struct File *)client_socket;
+ #endif
+@@ -603,48 +605,42 @@
+ 
+ 	// If we're not connected to anything, return.
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+-	if ( getpeername( fp->fd, &address, &addr_len ) == SOCKET_ERROR ) 
++	res = getpeername(fp->fd, &address, &addr_len);
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+-	if ( getpeername( client_socket, &address, &addr_len ) == SOCKET_ERROR ) 
++	res = getpeername(client_socket, &address, &addr_len);
+ #else
+  #warning ===> WARNING: You have to do some coding here to get the port done! 
+ #endif
+-
+-	{
++	if (res == SOCKET_ERROR) {
+ 		#if NETWORK_DETAILS || _DETAILS
+ 			cout << "Not connected to anything.  Aborting WaitForDisconnect()." << endl;
+ 		#endif
+ 		return ReturnSuccess;
+ 	}
+ 
+-	SetTimeout( 1, 0 );
+-	FD_ZERO( &readfds );
++	SetTimeout(1, 0);
++	FD_ZERO(&readfds);
+ 
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+-	FD_SET( fp->fd, &readfds);
+-	if ( select( maxfd, &readfds, NULL, NULL, &timeout ) )
++	FD_SET(fp->fd, &readfds);
++	res = select(maxfd, &readfds, NULL, NULL, &timeout);
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+-	FD_SET( client_socket, &readfds );
+-	SetTimeout( 1, 0 );		// wait 1 second for the connection to close
++	FD_SET(client_socket, &readfds);
++	SetTimeout(1, 0);		// wait 1 second for the connection to close
+ 
+-	if ( select( 0, &readfds, NULL, NULL, &timeout ) )
++	res = select(0, &readfds, NULL, NULL, &timeout);
+ #else
+  #warning ===> WARNING: You have to do some coding here to get the port done! 
+ #endif
+-
+-	{
++	if (res) {
+ 		// This must mean that client_socket was closed.
+ 		return ReturnSuccess;
+-	}
+-	else
+-	{
++	} else {
+ 		// The socket still wasn't closed after one second.
+ 		return ReturnRetry;
+ 	}
+ }
+ 
+-
+-
+ //
+ // Close both the server and client sockets.  Calls shutdown first.
+ //
+@@ -793,37 +789,40 @@
+ 
+ 	// we have to provide a buffer, so we provide just one character of buffer
+ 	char buf[1];
++	int res = 0, t = 0;
+ 
+ #if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+-	if ( recv ( ((struct File *)client_socket)->fd, buf, sizeof(buf), MSG_PEEK ) == ReturnSuccess )
++	res = (int)recv(((struct File *)client_socket)->fd, buf, sizeof(buf), MSG_PEEK);
++	if (res > 0) {
++		bytes_available = res;
++		res = ReturnSuccess;
++	} else
++		t = errno;
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	wsa_buf.buf = buf;
+ 	wsa_buf.len = sizeof(buf);
+ 
+-	if ( Receive( buf, 1, &bytes_available, NULL, MSG_PEEK ) == ReturnSuccess )
++	res = Receive(buf, 1, &bytes_available, NULL, MSG_PEEK);
++	if (res != ReturnSuccess)
++		t = WSAGetLastError();
++
+ #else
+  #warning ===> WARNING: You have to do some coding here to get the port done! 
+ #endif
+-	{
++	if (res == ReturnSuccess) {
+ 		#if NETWORK_DETAILS || _DETAILS
+-			cout << "* Peeked " << bytes_available 
+-				<< " bytes from socket." << endl;
++			cout << "* Peeked " << bytes_available << " bytes from socket." << endl;
+ 		#endif
+-		return (DWORD) bytes_available;
+-	}
+-	else
+-	{
++		return bytes_available;
++	} else {
+ 		#if NETWORK_DETAILS || defined(_DEBUG)
+-			*errmsg << "*** Error " << WSAGetLastError() 
+-					<< " peeking from socket in NetAsyncTCP::Peek()." << ends;
++			*errmsg << "*** Error " << t << " peeking from socket in NetAsyncTCP::Peek()." << ends;
+ 			OutputErrMsg();
+ 		#endif
+ 		return 0;	// no data available at this time, maybe later
+ 	}
+ }
+ 
+-
+-
+ //
+ // Utility function to close a socket.
+ //
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 18:25:03 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 18:25:03 +0200
+Subject: [Iometer-svn] r293 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200608221625.k7MGP3Vf006775@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 18:25:01 +0200 (Tue, 22 Aug 2006)
+New Revision: 293
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+   branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+   branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+   branches/IOMETER-restruct/iometer/src/Worker.cpp
+Log:
+used snprintf instead of sprintf to reduce risk of buffer overrun.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 16:25:01 UTC (rev 293)
+@@ -118,7 +118,8 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
+-   -Cleanup the use of _DEBUG and _DETAILS.
++   - Use snprintf instead of sprinf to reduce the risk of buffer overrun.
++   - Cleanup the use of _DEBUG and _DETAILS.
+    - Renamed Dynamo and Iometer subdirectories to solve the name conflict
+      under case insensitive file system.
+    - Adjusted some variable types to fit 64bit OS and compiler.
+
+Modified: branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -608,7 +608,7 @@
+ 	name.Format("Copy of %s", spec->name);
+ 	copy_number = 1;
+ 	do {
+-		sprintf(spec->name, "%s (%d)", name, copy_number++);
++		snprintf(spec->name, MAX_NAME, "%s (%d)", name, copy_number++);
+ 	} while (RefByName(spec->name) != spec);
+ 
+ 	return spec;
+@@ -1132,7 +1132,7 @@
+ 	// Ensure that names are not duplicated.
+ 	do {
+ 		// We have the current number, so we add 1 for the next number.
+-		sprintf(name, "Untitled %d", ++next_number);
++		snprintf(name, MAX_NAME, "Untitled %d", ++next_number);
+ 	}
+ 	while (RefByName(name));
+ }
+@@ -1191,5 +1191,5 @@
+ 	while (RefByName((LPCTSTR) name)) {
+ 		name.Format("%s %d", name.Left(name_size), ++spec_number);
+ 	}
+-	sprintf(spec->name, "%s", name);
++	snprintf(spec->name, MAX_NAME, "%s", name);
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -607,6 +607,10 @@
+ 				// Compare it with Dynamo's version number (will be 0 or uninitialized for 
+ 				// versions before 1998.09.23)
+ 				if (login_msg->data != iometer_version) {
++					// give the user a message box explaining the problem
++					size_t msg_len = 2 * MAX_VERSION_LENGTH + 100;
++					char errmsg[msg_len];
++
+ 					// versions failed to match...  refuse connection
+ 
+ 					// tell Dynamo that the connection is being refused
+@@ -616,19 +620,16 @@
+ 
+ 					login_port->Disconnect();
+ 
+-					// give the user a message box explaining the problem
+-					char errmsg[2 * MAX_VERSION_LENGTH + 100];
+-
+ 					if (login_msg->data > 19970101 && login_msg->data < 21001231) {
+ 						year = (int)(login_msg->data / 10000);
+ 						month = (int)(login_msg->data / 100) - (year * 100);
+ 						day = login_msg->data - (month * 100) - (year * 10000);
+ 
+-						sprintf(errmsg,
++						snprintf(errmsg, msg_len,
+ 							"Iometer %s is not compatible with Dynamo %04d.%02d.%02d",
+ 							m_pVersionStringWithDebug, year, month, day);
+ 					} else {
+-						sprintf(errmsg,
++						snprintf(errmsg, msg_len,
+ 							"Iometer %s is not compatible with Dynamo (unknown version number)",
+ 							m_pVersionStringWithDebug);
+ 					}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -467,7 +467,7 @@
+ 		while (TRUE) {
+ 			// Form VI NIC name to open.
+ 			vi_spec[count].type = VIClientType;
+-			sprintf(vi_spec[count].name, "%s%i", vi_nic_name[nic_base], vi_nic_name_no[nic_base]++);
++			snprintf(vi_spec[count].name, MAX_NAME, "%s%i", vi_nic_name[nic_base], vi_nic_name_no[nic_base]++);
+ 
+ 			// Try opening VI NIC.
+ 			if (!nic.Open(vi_spec[count].name)) {
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -290,7 +290,7 @@
+ 	// "fscanf(... %<nn>s)" has to be "MAX_NAME - 1"
+ #endif
+ 	while ((count < MAX_TARGETS) && (fscanf(file, "%*d %*d %*d %79s", devName) == 1)) {
+-		sprintf(paddedDevName, " %s ", devName);
++		snprintf(paddedDevName, MAX_NAME + 2, " %s ", devName);
+ #ifdef _DEBUG
+ 		cout << __FUNCTION__ << ": Found device " << devName << "\n";
+ #endif
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -169,7 +169,7 @@
+ #ifdef _DEBUG
+ 			cout << __FUNCTION__ << ": Device is not reserved.\n";
+ #endif
+-			sprintf(disk_name, "[%d]", next);
++			snprintf(disk_name, 128, "[%d]", next);
+ 			if (d.Init_Physical(disk_name)) {
+ 				d.spec.type = PhysicalDiskType;
+ 				memcpy(&disk_spec[count], &d.spec, sizeof(Target_Spec));
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -347,7 +347,7 @@
+ 	memset(base_name, 0, MAX_NAME);
+ 	memset(file_name, 0, MAX_NAME);
+ 	// We don't deal directly with slices cXtXdXsX. Never gets that value.
+-	sprintf(file_name, "%s/%s", RAW_DEVICE_DIR, name);
++	snprintf(file_name, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, name);
+ #ifdef _DEBUG
+ 	cout << "   Reporting disk partitions: " << file_name << endl << flush;
+ #endif
+@@ -391,14 +391,14 @@
+ 				// Do this only once even if you have multiple solaris partitions.
+ 				// Other Solaris parts are invisible through the disk label/vtoc.
+ 				has_solaris_parts = TRUE;
+-				sprintf(file_name, "%ss2", base_name);
++				snprintf(file_name, MAX_NAME, "%ss2", base_name);
+ 				if (Report_VTOC_Partitions(file_name, disk_spec, count, logical_count) == TRUE) {
+ 					VTOC_valid = TRUE;
+ 					continue;
+ 				}
+ 			}
+ 
+-			sprintf(file_name, "%sp%d", base_name, i);
++			snprintf(file_name, MAX_NAME, "%sp%d", base_name, i);
+ #ifdef _DEBUG
+ 			cout << "   file_name: " << file_name << endl << flush;
+ #endif
+@@ -549,7 +549,7 @@
+ 	memset(base_name, 0, MAX_NAME);
+ 	memset(file_name, 0, MAX_NAME);
+ 
+-	sprintf(file_name, "%s/%s", RAW_DEVICE_DIR, name);
++	snprintf(file_name, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, name);
+ #ifdef _DEBUG
+ 	cout << "   Reporting vtoc partitions: " << file_name << endl << flush;
+ #endif
+@@ -666,7 +666,7 @@
+ #ifdef _DEBUG
+ 			cerr << "NOTE: Overlapping slices : " << i << ", " << j << endl;
+ #endif
+-			sprintf(temp, "%ss%d", base_name, j);
++			snprintf(temp, MAX_NAME, "%ss%d", base_name, j);
+ 			if (Has_File_System(temp, fstype) == TRUE) {
+ 				// this slice 'i' overlaps with an unmounted file system.
+ 				continue;
+@@ -678,7 +678,7 @@
+ 			// else we are ok. overlapping empty slices is just fine.
+ 		}
+ 		// Here we do have VTOC parts to report.
+-		sprintf(file_name, "%ss%d", base_name, i);
++		snprintf(file_name, MAX_NAME, "%ss%d", base_name, i);
+ #ifdef _DEBUG
+ 		cout << "  vtoc  file_name: " << file_name << endl << flush;
+ #endif
+@@ -787,7 +787,7 @@
+ 		// NOTE: EXTRA LOOP TO GRAB WHOLE SLICE if nothing else left.
+ 		for (i = 0; i < this_vtoc.v_nparts; i++) {
+ 			if (this_vtoc.v_part[i].p_tag == V_BACKUP) {
+-				sprintf(file_name, "%ss%d", base_name, i);
++				snprintf(file_name, MAX_NAME, "%ss%d", base_name, i);
+ 				if (d.Init_Physical(file_name)) {
+ 					if (d.Init_Physical(file_name))
+ 						// Disk Initialization succeeded,
+@@ -857,8 +857,8 @@
+ 
+ 	// Initialize
+ 	fstype[0] = 0;
+-	sprintf(path, "/dev/rdsk/%s", file_name);
+-	sprintf(cmd, "/usr/sbin/fstyp %s 2>/dev/null", path);
++	snprintf(path, MAX_NAME, "/dev/rdsk/%s", file_name);
++	snprintf(cmd, MAX_NAME, "/usr/sbin/fstyp %s 2>/dev/null", path);
+ 	if ((pptr = popen(cmd, "r")) != NULL) {
+ 		// popen succeeded.
+ 		fgets(buf, BUFSIZ, pptr);
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -96,7 +96,7 @@
+ 	// Reporting physical drives.
+ 	while (count < MAX_TARGETS) {
+ 		// See if the physical drive exists.
+-		sprintf(d.spec.name, "%s%i", PHYSICAL_DISK, drive_number);
++		snprintf(d.spec.name, MAX_NAME, "%s%i", PHYSICAL_DISK, drive_number);
+ 		strcpy(d.file_name, d.spec.name);
+ 		d.spec.type = PhysicalDiskType;
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -278,12 +278,12 @@
+ BOOL TargetDisk::Init_Logical(char *drive)
+ {
+ 	// Setting spec.name of the drive.
+-	sprintf(spec.name, "%s", drive);
++	snprintf(spec.name, MAX_NAME, "%s", drive);
+ 
+ 	if (spec.name[strlen(spec.name) - 1] == ':') {
+-		sprintf(file_name, "%s%s", spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, "%s%s", spec.name, TEST_FILE);
+ 	} else {
+-		sprintf(file_name, "%s:%s", spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, "%s:%s", spec.name, TEST_FILE);
+ 	}
+ 
+ 	spec.type = LogicalDiskType;
+@@ -309,12 +309,12 @@
+ 		spec.name[p - drive] = 0;
+ 	} else
+ 		// Setting spec.name of the drive.
+-		sprintf(spec.name, "%s", drive);
++		snprintf(spec.name, MAX_NAME, "%s", drive);
+ 
+ 	if (spec.name[strlen(spec.name) - 1] == '/') {
+-		sprintf(file_name, "%s%s", spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, "%s%s", spec.name, TEST_FILE);
+ 	} else {
+-		sprintf(file_name, "%s/%s", spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, "%s/%s", spec.name, TEST_FILE);
+ 	}
+ 
+ 	spec.type = LogicalDiskType;
+@@ -334,8 +334,8 @@
+ BOOL TargetDisk::Init_Logical(char drive)
+ {
+ 	// Setting spec.name of the drive.
+-	sprintf(spec.name, "%c%s", drive, LOGICAL_DISK);
+-	sprintf(file_name, "%s%s", spec.name, TEST_FILE);
++	snprintf(spec.name, MAX_NAME, "%c%s", drive, LOGICAL_DISK);
++	snprintf(file_name, MAX_NAME, "%s%s", spec.name, TEST_FILE);
+ 
+ 	spec.type = LogicalDiskType;
+ 	size = 0;
+@@ -359,9 +359,9 @@
+ 	// Setting the spec.name of the drive.
+ 	printf("TargetDisk::Init_Physical: name=%s, mmID=%X\n", drive, drive1);
+ 	MM_ReturnObjectGenericInfo(drive1, sizeof(struct IOObjectGenericInfoDef), &info);
+-	sprintf(spec.name, "[%d] %s", drive1, info.name);
++	snprintf(spec.name, MAX_NAME, "[%d] %s", drive1, info.name);
+ 
+-	sprintf(file_name, "%d", drive1);
++	snprintf(file_name, MAX_NAME, "%d", drive1);
+ 
+ 	spec.type = PhysicalDiskType;
+ 	size = 0;
+@@ -387,13 +387,13 @@
+ 		spec.name[p - drive] = 0;
+ 	} else {
+ 		// Setting spec.name of the drive.
+-		sprintf(spec.name, "%s", drive);
++		snprintf(spec.name, MAX_NAME, "%s", drive);
+ 	}
+ 
+ 	if (!strstr(spec.name, RAW_DEVICE_DIR))
+-		sprintf(file_name, "%s/%s", RAW_DEVICE_DIR, spec.name);
++		snprintf(file_name, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, spec.name);
+ 	else
+-		sprintf(file_name, "%s", spec.name);
++		snprintf(file_name, MAX_NAME, "%s", spec.name);
+ 
+ 	spec.type = PhysicalDiskType;
+ 	size = 0;
+@@ -414,7 +414,7 @@
+ BOOL TargetDisk::Init_Physical(int drive)
+ {
+ 	// Setting the spec.name of the drive.
+-	sprintf(spec.name, "%s%i", PHYSICAL_DISK, drive);
++	snprintf(spec.name, MAX_NAME, "%s%i", PHYSICAL_DISK, drive);
+ 	strcpy(file_name, spec.name);
+ 
+ 	spec.type = PhysicalDiskType;
+@@ -1721,7 +1721,7 @@
+ 
+ 	length = strlen(part_name);
+ 	part_name[length - 1] = '0';	// Converting cXtXdXpX to cXtXdXp0
+-	sprintf(disk_name, "%s/%s", RAW_DEVICE_DIR, part_name);
++	snprintf(disk_name, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, part_name);
+ 	fd = open(disk_name, O_RDONLY);
+ 	if (fd < 0) {
+ 		return (0);
+@@ -1752,7 +1752,7 @@
+ 
+ 	length = strlen(part_name);
+ 	part_name[length - 1] = '2';	// Converting cXtXdXsX to cXtXdXs2
+-	sprintf(disk_name, "%s/%s", RAW_DEVICE_DIR, part_name);
++	snprintf(disk_name, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, part_name);
+ 	fd = open(disk_name, O_RDONLY);
+ 	if (fd < 0) {
+ 		return (0);
+@@ -1775,14 +1775,14 @@
+ 
+ static int getSectorSizeOfPhysDisk(const char *devName)
+ {
+-	char devNameBuf[40];
++	char devNameBuf[MAX_NAME];
+ 	const char *fullDevName;
+ 	int fd, ssz;
+ 
+ 	if (devName[0] == '/') {
+ 		fullDevName = devName;
+ 	} else {
+-		sprintf(devNameBuf, "%s/%s", RAW_DEVICE_DIR, devName);
++		snprintf(devNameBuf, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, devName);
+ 		fullDevName = devNameBuf;
+ 	}
+ 	if ((fd = open(fullDevName, O_RDWR)) < 0) {
+@@ -1823,7 +1823,7 @@
+ 	if (devName[0] == '/') {
+ 		fullDevName = devName;
+ 	} else {
+-		sprintf(devNameBuf, "%s/%s", RAW_DEVICE_DIR, devName);
++		snprintf(devNameBuf, MAX_NAME, "%s/%s", RAW_DEVICE_DIR, devName);
+ 		fullDevName = devNameBuf;
+ 	}
+ 	if ((fd = open(fullDevName, O_RDWR)) < 0) {
+
+Modified: branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -499,7 +499,7 @@
+ 	(*file) << "'Time Stamp" << endl;
+ 	_ftime(&tb);
+ 	ptm = localtime(&tb.time);
+-	sprintf(acDummy, "%04d-%02d-%02d %02d:%02d:%02d:%003d", ptm->tm_year + 1900,
++	snprintf(acDummy, 64, "%04d-%02d-%02d %02d:%02d:%02d:%003d", ptm->tm_year + 1900,
+ 		ptm->tm_mon + 1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec, tb.millitm);
+ 	(*file) << acDummy << endl;
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -297,7 +297,7 @@
+ 	(*file) << "'Time Stamp" << endl;
+ 	_ftime(&tb);
+ 	ptm = localtime(&tb.time);
+-	sprintf(acDummy, "%04d-%02d-%02d %02d:%02d:%02d:%003d", ptm->tm_year + 1900,
++	snprintf(acDummy, 64, "%04d-%02d-%02d %02d:%02d:%02d:%003d", ptm->tm_year + 1900,
+ 		ptm->tm_mon + 1, ptm->tm_mday, ptm->tm_hour, ptm->tm_min, ptm->tm_sec, tb.millitm);
+ 	(*file) << acDummy << endl;
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/Worker.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -1131,7 +1131,7 @@
+ 	// Record that I am the client's net_partner and what target it is.
+ 	net_partner->net_partner = this;
+ 	net_partner->net_target_index = 0;
+-	sprintf(net_partner->name, "[%s]", name);
++	snprintf(net_partner->name, MAX_WORKER_NAME, "[%s]", name);
+ 
+ 	// add the new worker to the display - this should be handled by the GUI
+ 	theApp.pView->m_pWorkerView->AddWorker(net_partner);
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 19:47:49 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 19:47:49 +0200
+Subject: [Iometer-svn] r294 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608221747.k7MHlngY001199@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 19:47:45 +0200 (Tue, 22 Aug 2006)
+New Revision: 294
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+Log:
+fixed previous commit code error. windows only have _snprintf. and one minor fix.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-22 16:25:01 UTC (rev 293)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-22 17:47:45 UTC (rev 294)
+@@ -608,8 +608,7 @@
+ 				// versions before 1998.09.23)
+ 				if (login_msg->data != iometer_version) {
+ 					// give the user a message box explaining the problem
+-					size_t msg_len = 2 * MAX_VERSION_LENGTH + 100;
+-					char errmsg[msg_len];
++					char errmsg[2 * MAX_VERSION_LENGTH + 100];
+ 
+ 					// versions failed to match...  refuse connection
+ 
+@@ -625,11 +624,11 @@
+ 						month = (int)(login_msg->data / 100) - (year * 100);
+ 						day = login_msg->data - (month * 100) - (year * 10000);
+ 
+-						snprintf(errmsg, msg_len,
++						snprintf(errmsg, 2 * MAX_VERSION_LENGTH + 100,
+ 							"Iometer %s is not compatible with Dynamo %04d.%02d.%02d",
+ 							m_pVersionStringWithDebug, year, month, day);
+ 					} else {
+-						snprintf(errmsg, msg_len,
++						snprintf(errmsg, 2 * MAX_VERSION_LENGTH + 100,
+ 							"Iometer %s is not compatible with Dynamo (unknown version number)",
+ 							m_pVersionStringWithDebug);
+ 					}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-22 16:25:01 UTC (rev 293)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-22 17:47:45 UTC (rev 294)
+@@ -285,6 +285,11 @@
+   #include "ostream64.h"
+  #endif
+ #endif
++
++#if defined(IOMTR_OSFAMILY_WINDOWS)
++#define snprintf _snprintf
++#endif
++
+ // ----------------------------------------------------------------------------
+ #include "IOVersion.h"   // version info definitions
+ // ----------------------------------------------------------------------------
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 20:28:36 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 20:28:36 +0200
+Subject: [Iometer-svn] r295 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608221828.k7MISaFW015096@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 20:28:11 +0200 (Tue, 22 Aug 2006)
+New Revision: 295
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+   branches/IOMETER-restruct/iometer/src/PageDisk.cpp
+   branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+Log:
+changed from double to float in some place. also some cosmetic fixes.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -1539,7 +1539,7 @@
+ 		targets_to_run += m_pPageSetup->target_cycling.step;
+ 	} else {
+ 		targets_to_run = m_pPageSetup->target_cycling.start *
+-		    (int)pow((double)m_pPageSetup->target_cycling.step, (double)target_exponent++);
++		    (int)powf((float)m_pPageSetup->target_cycling.step, (float)target_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1593,7 +1593,7 @@
+ 		workers_to_run += m_pPageSetup->worker_cycling.step;
+ 	} else {
+ 		workers_to_run = m_pPageSetup->worker_cycling.start *
+-		    (int)pow((double)m_pPageSetup->worker_cycling.step, (double)worker_exponent++);
++		    (int)powf((float)m_pPageSetup->worker_cycling.step, (float)worker_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1654,7 +1654,7 @@
+ 			targets_to_run += m_pPageSetup->target_cycling.step;
+ 		else
+ 			targets_to_run = m_pPageSetup->target_cycling.start *
+-			    (int)pow((double)m_pPageSetup->target_cycling.step, (double)target_exponent++);
++			    (int)powf((float)m_pPageSetup->target_cycling.step, (float)target_exponent++);
+ 		return worker_count;
+ 	}
+ 	// Reset the number of targets to run and add additional workers.
+@@ -1665,7 +1665,7 @@
+ 		workers_to_run += m_pPageSetup->worker_cycling.step;
+ 	else
+ 		workers_to_run = m_pPageSetup->worker_cycling.start *
+-		    (int)pow((double)m_pPageSetup->worker_cycling.step, (double)worker_exponent++);
++		    (int)powf((float)m_pPageSetup->worker_cycling.step, (float)worker_exponent++);
+ 
+ 	// Try running with the next set of workers.  If no new workers were set
+ 	// running, we're done.
+@@ -1715,7 +1715,7 @@
+ 		targets_to_run += m_pPageSetup->target_cycling.step;
+ 	} else {
+ 		targets_to_run = m_pPageSetup->target_cycling.start *
+-		    (int)pow((double)m_pPageSetup->target_cycling.step, (double)target_exponent++);
++		    (int)powf((float)m_pPageSetup->target_cycling.step, (float)target_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1765,7 +1765,7 @@
+ 		targets_to_run += m_pPageSetup->target_cycling.step;
+ 	} else {
+ 		targets_to_run = m_pPageSetup->target_cycling.start *
+-		    (int)pow((double)m_pPageSetup->target_cycling.step, (double)target_exponent++);
++		    (int)powf((float)m_pPageSetup->target_cycling.step, (float)target_exponent++);
+ 	}
+ 
+ 	// Return TRUE if new targets are now active.
+@@ -1823,7 +1823,7 @@
+ 		queue_depth_to_run += m_pPageSetup->queue_cycling.step;
+ 	else
+ 		queue_depth_to_run = m_pPageSetup->queue_cycling.start *
+-		    (int)pow((double)m_pPageSetup->queue_cycling.step, (double)queue_exponent++);
++		    (int)powf((float)m_pPageSetup->queue_cycling.step, (float)queue_exponent++);
+ 
+ 	// Continue to cycle queue depth as long as all workers are not idle.
+ 	return workers_running;
+
+Modified: branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -51,7 +51,7 @@
+ /* ## ------------------------------------------------------------------- ## */
+ /* ##                                                                     ## */
+ /* ##  Changes ...: 2006-08-04 (vedrand at yahoo.com)                        ## */
+-/* ##               -misc syntactical -- explicit pow() arg typecasts     ## */
++/* ##               - misc syntactical -- explicit pow() arg typecasts    ## */
+ /* ##               2004-09-01 (henryx.w.tieman at intel.com)                ## */
+ /* ##               - Needed to cast parameters to some functions         ## */
+ /* ##                 because latest Visual Studio C++ library has        ## */
+@@ -248,9 +248,9 @@
+ 		return;
+ 	}
+ 	// Calculate the new scale.
+-	scale = (int)powf(10.0, floor(log10((float)max_range)));
++	scale = (int)powf(10.0, floorf(log10f((float)max_range)));
+ 
+-	if ((max_range == (int)powf(10.0, floor(log10((float)max_range))))) {
++	if ((max_range == (int)powf(10.0, floorf(log10f((float)max_range))))) {
+ 		// max_range is a power of 10
+ 		scale /= 10;
+ 	}
+@@ -280,11 +280,11 @@
+ 
+ 	// Sets the range that the marker labels will span.
+ 	range_diff = (float) (max_range - min_range);
+-	if ((range_diff == powf(10.0, floor(log10(range_diff)))) && (range_diff != 1)) {
++	if ((range_diff == powf(10.0, floorf(log10f(range_diff)))) && (range_diff != 1)) {
+ 		// range_diff is a power of 10, but is not exactly 1
+ 		display_range = 10;
+ 	} else {
+-		display_range = range_diff / powf(10.0, floor(log10(range_diff)));
++		display_range = range_diff / powf(10.0, floorf(log10f(range_diff)));
+ 	}
+ 
+ 	// Set the increment from one label to the next.
+
+Modified: branches/IOMETER-restruct/iometer/src/PageDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageDisk.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/PageDisk.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -691,7 +691,7 @@
+ 	// If the disk size was left blank, use the previous value.
+ 	if (!m_EDiskSize.LineLength())
+ 		ShowSettings();
+-	else
++	else {
+ 		// Seeing what kind of item is selected.
+ 		switch (theApp.pView->m_pWorkerView->GetSelectedType()) {
+ 		case WORKER:
+@@ -707,6 +707,7 @@
+ 			theApp.manager_list.SetDiskSize(GetDlgItemInt(EDiskSize));
+ 			break;
+ 		}
++	}
+ 
+ 	EnableWindow();
+ }
+@@ -895,16 +896,14 @@
+ 			// Extend the selection. Clear any other items if the control
+ 			// key is not pressed.
+ 			SelectRange(selected, highlighted, !control, TargetChecked);
+-		} else if (control)	// toggle.
+-		{
++		} else if (control) {	// toggle.
+ 			// Toggle the selection, but do not clear any other items.
+ 			if (GetSelectionCheck(highlighted) == TargetChecked) {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetUnChecked);
+ 			} else {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetChecked);
+ 			}
+-		} else		// normal
+-		{
++		} else {	// normal
+ 			// Select only the highlighted item and clear any other.
+ 			SelectRange(highlighted, highlighted, TRUE, TargetChecked);
+ 		}
+
+Modified: branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-22 17:47:45 UTC (rev 294)
++++ branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-22 18:28:11 UTC (rev 295)
+@@ -1220,16 +1220,14 @@
+ 			// Extend the selection. Clear any other items if the control
+ 			// key is not pressed.
+ 			SelectRange(selected, highlighted, !control, TargetChecked);
+-		} else if (control)	// toggle.
+-		{
++		} else if (control) {	// toggle.
+ 			// Toggle the selection, but do not clear any other items.
+ 			if (GetSelectionCheck(highlighted) == TargetChecked) {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetUnChecked);
+ 			} else {
+ 				SelectRange(highlighted, highlighted, FALSE, TargetChecked);
+ 			}
+-		} else		// normal
+-		{
++		} else {	// normal
+ 			// Uniquely select the item with the focus.
+ 			SelectRange(highlighted, highlighted, TRUE, TargetChecked);
+ 		}
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 21:03:14 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 21:03:14 +0200
+Subject: [Iometer-svn] r296 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608221903.k7MJ3E1W024022@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 21:02:43 +0200 (Tue, 22 Aug 2006)
+New Revision: 296
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp
+Log:
+minor fix.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp	2006-08-22 18:28:11 UTC (rev 295)
++++ branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp	2006-08-22 19:02:43 UTC (rev 296)
+@@ -93,7 +93,7 @@
+ 	int length, volNum;
+ 	DWORD ret = 0;
+ 	DWORD next;
+-	char disk_name[128];
++	char disk_name[MAX_NAME];
+ 
+ #define MM_DIRECT_ACCESS_DEVICE 0
+ 	cout << "Reporting drive information..." << endl;
+@@ -169,7 +169,7 @@
+ #ifdef _DEBUG
+ 			cout << __FUNCTION__ << ": Device is not reserved.\n";
+ #endif
+-			snprintf(disk_name, 128, "[%d]", next);
++			snprintf(disk_name, MAX_NAME, "[%d]", next);
+ 			if (d.Init_Physical(disk_name)) {
+ 				d.spec.type = PhysicalDiskType;
+ 				memcpy(&disk_spec[count], &d.spec, sizeof(Target_Spec));
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 22 21:13:10 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 22 Aug 2006 21:13:10 +0200
+Subject: [Iometer-svn] r297 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608221913.k7MJDAoF028156@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-22 21:13:08 +0200 (Tue, 22 Aug 2006)
+New Revision: 297
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+Log:
+used better way to get PAGE_SIZE.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-22 19:02:43 UTC (rev 296)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-22 19:13:08 UTC (rev 297)
+@@ -557,7 +557,7 @@
+ 	}
+ 	errno = 0;
+ #if defined(IOMTR_OS_LINUX)
+-	if (posix_memalign(&read_data, 4096, access_spec.max_transfer))
++	if (posix_memalign(&read_data, sysconf(_SC_PAGESIZE), access_spec.max_transfer))
+ #elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
+ 	if (!(read_data = valloc(access_spec.max_transfer)))
+ #else
+@@ -591,7 +591,7 @@
+ 	}
+ 	errno = 0;
+ #if defined(IOMTR_OS_LINUX)
+-        if (posix_memalign(&write_data, 4096, access_spec.max_transfer))
++        if (posix_memalign(&write_data, sysconf(_SC_PAGESIZE), access_spec.max_transfer))
+ #elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
+         if (!(write_data = valloc(access_spec.max_transfer)))
+ #else
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 23 21:55:18 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 23 Aug 2006 21:55:18 +0200
+Subject: [Iometer-svn] r298 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608231955.k7NJtId5005969@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-23 21:55:16 +0200 (Wed, 23 Aug 2006)
+New Revision: 298
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPort.h
+   branches/IOMETER-restruct/iometer/src/Network.h
+Log:
+fixed to allow compile and run under NW.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPort.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPort.h	2006-08-22 19:13:08 UTC (rev 297)
++++ branches/IOMETER-restruct/iometer/src/IOPort.h	2006-08-23 19:55:16 UTC (rev 298)
+@@ -74,7 +74,7 @@
+ #ifndef PORT_DEFINED
+ #define PORT_DEFINED
+ 
+-#ifdef IOMTR_OSFAMILY_WINDOWS
++#if defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_NETWARE)
+ namespace std {
+ }
+ #endif
+
+Modified: branches/IOMETER-restruct/iometer/src/Network.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Network.h	2006-08-22 19:13:08 UTC (rev 297)
++++ branches/IOMETER-restruct/iometer/src/Network.h	2006-08-23 19:55:16 UTC (rev 298)
+@@ -72,7 +72,7 @@
+ #ifndef NETWORK_DEFINED
+ #define NETWORK_DEFINED
+ 
+-#ifdef IOMTR_OSFAMILY_WINDOWS
++#if defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_NETWARE)
+ namespace std {
+ }
+ #endif
+
+
+
+From cheungming at mail.berlios.de  Sat Aug 26 00:54:07 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Sat, 26 Aug 2006 00:54:07 +0200
+Subject: [Iometer-svn] r299 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608252254.k7PMs7RT018922@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-26 00:54:03 +0200 (Sat, 26 Aug 2006)
+New Revision: 299
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+Log:
+fixed the crash when exit the iometer directly when there is some test running.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-23 19:55:16 UTC (rev 298)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-25 22:54:03 UTC (rev 299)
+@@ -1960,38 +1960,40 @@
+ //
+ void CGalileoView::ButtonReady()
+ {
+-	Manager *manager = m_pWorkerView->GetSelectedManager();
+-	BOOL new_disk_worker_ok;
+-	BOOL new_net_worker_ok;
++	if (theApp.m_wndToolBar) {
++		Manager *manager = m_pWorkerView->GetSelectedManager();
++		BOOL new_disk_worker_ok;
++		BOOL new_net_worker_ok;
+ 
+-	SetButton(ID_FILE_OPEN, TRUE);
+-	SetButton(ID_FILE_SAVE, TRUE);
+-	SetButton(BNewDynamo, TRUE);
++		SetButton(ID_FILE_OPEN, TRUE);
++		SetButton(ID_FILE_SAVE, TRUE);
++		SetButton(BNewDynamo, TRUE);
+ 
+-	// Only enable the new worker buttons if creating a worker of that kind
+-	// is allowed on the given manager or worker's manager.
+-	if (manager) {
+-		new_disk_worker_ok = manager->InterfaceCount(GenericDiskType);
+-		new_net_worker_ok = manager->InterfaceCount(GenericNetType);
+-	} else {
+-		new_disk_worker_ok = FALSE;
+-		new_net_worker_ok = FALSE;
+-	}
+-	SetButton(BNewDiskWorker, new_disk_worker_ok);
+-	SetButton(BNewNetWorker, new_net_worker_ok);
++		// Only enable the new worker buttons if creating a worker of that kind
++		// is allowed on the given manager or worker's manager.
++		if (manager) {
++			new_disk_worker_ok = manager->InterfaceCount(GenericDiskType);
++			new_net_worker_ok = manager->InterfaceCount(GenericNetType);
++		} else {
++			new_disk_worker_ok = FALSE;
++			new_net_worker_ok = FALSE;
++		}
++		SetButton(BNewDiskWorker, new_disk_worker_ok);
++		SetButton(BNewNetWorker, new_net_worker_ok);
+ 
+-	// Enable worker copy button if a worker is selected.
+-	SetButton(BCopyWorker, (BOOL) (PtrToLong(m_pWorkerView->GetSelectedWorker())));
+-	SetButton(BReset, TRUE);
+-	SetButton(BExitOne, TRUE);
+-	SetButton(ID_APP_EXIT, TRUE);
++		// Enable worker copy button if a worker is selected.
++		SetButton(BCopyWorker, (BOOL) (PtrToLong(m_pWorkerView->GetSelectedWorker())));
++		SetButton(BReset, TRUE);
++		SetButton(BExitOne, TRUE);
++		SetButton(ID_APP_EXIT, TRUE);
+ 
+-	m_pPageDisplay->m_dlgBigMeter.SetButtonState(TRUE, FALSE, FALSE);
+-	SetButton(BStart, TRUE);
+-	SetButton(BStop, FALSE);
+-	SetButton(BStopAll, FALSE);
++		m_pPageDisplay->m_dlgBigMeter.SetButtonState(TRUE, FALSE, FALSE);
++		SetButton(BStart, TRUE);
++		SetButton(BStop, FALSE);
++		SetButton(BStopAll, FALSE);
+ 
+-	theApp.m_wndToolBar.RedrawWindow();
++		theApp.m_wndToolBar.RedrawWindow();
++	}
+ }
+ 
+ //
+@@ -1999,22 +2001,24 @@
+ //
+ void CGalileoView::ButtonPrepare()
+ {
+-	SetButton(ID_FILE_OPEN, FALSE);
+-	SetButton(ID_FILE_SAVE, FALSE);
+-	SetButton(BNewDynamo, FALSE);
+-	SetButton(BNewDiskWorker, FALSE);
+-	SetButton(BNewNetWorker, FALSE);
+-	SetButton(BCopyWorker, FALSE);
+-	SetButton(BReset, FALSE);
+-	SetButton(BExitOne, FALSE);
+-	SetButton(ID_APP_EXIT, TRUE);
++	if (theApp.m_wndToolBar) {
++		SetButton(ID_FILE_OPEN, FALSE);
++		SetButton(ID_FILE_SAVE, FALSE);
++		SetButton(BNewDynamo, FALSE);
++		SetButton(BNewDiskWorker, FALSE);
++		SetButton(BNewNetWorker, FALSE);
++		SetButton(BCopyWorker, FALSE);
++		SetButton(BReset, FALSE);
++		SetButton(BExitOne, FALSE);
++		SetButton(ID_APP_EXIT, TRUE);
+ 
+-	m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, FALSE, TRUE);
+-	SetButton(BStart, FALSE);
+-	SetButton(BStop, FALSE);
+-	SetButton(BStopAll, TRUE);
++		m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, FALSE, TRUE);
++		SetButton(BStart, FALSE);
++		SetButton(BStop, FALSE);
++		SetButton(BStopAll, TRUE);
+ 
+-	theApp.m_wndToolBar.RedrawWindow();
++		theApp.m_wndToolBar.RedrawWindow();
++	}
+ }
+ 
+ //
+@@ -2022,20 +2026,22 @@
+ //
+ void CGalileoView::ButtonTest()
+ {
+-	SetButton(ID_FILE_OPEN, FALSE);
+-	SetButton(ID_FILE_SAVE, FALSE);
+-	SetButton(BNewDynamo, FALSE);
+-	SetButton(BNewDiskWorker, FALSE);
+-	SetButton(BNewNetWorker, FALSE);
+-	SetButton(BCopyWorker, FALSE);
+-	SetButton(BReset, FALSE);
+-	SetButton(BExitOne, FALSE);
+-	SetButton(ID_APP_EXIT, TRUE);
++	if (theApp.m_wndToolBar) {
++		SetButton(ID_FILE_OPEN, FALSE);
++		SetButton(ID_FILE_SAVE, FALSE);
++		SetButton(BNewDynamo, FALSE);
++		SetButton(BNewDiskWorker, FALSE);
++		SetButton(BNewNetWorker, FALSE);
++		SetButton(BCopyWorker, FALSE);
++		SetButton(BReset, FALSE);
++		SetButton(BExitOne, FALSE);
++		SetButton(ID_APP_EXIT, TRUE);
+ 
+-	m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, TRUE, FALSE);
+-	SetButton(BStart, FALSE);
+-	SetButton(BStop, TRUE);
+-	SetButton(BStopAll, FALSE);
++		m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, TRUE, FALSE);
++		SetButton(BStart, FALSE);
++		SetButton(BStop, TRUE);
++		SetButton(BStopAll, FALSE);
++	}
+ }
+ 
+ //
+@@ -2043,22 +2049,24 @@
+ //
+ void CGalileoView::ButtonOff()
+ {
+-	SetButton(ID_FILE_OPEN, FALSE);
+-	SetButton(ID_FILE_SAVE, FALSE);
+-	SetButton(BNewDynamo, FALSE);
+-	SetButton(BNewDiskWorker, FALSE);
+-	SetButton(BNewNetWorker, FALSE);
+-	SetButton(BCopyWorker, FALSE);
+-	SetButton(BReset, FALSE);
+-	SetButton(BExitOne, FALSE);
+-	SetButton(ID_APP_EXIT, TRUE);
++	if (theApp.m_wndToolBar) {
++		SetButton(ID_FILE_OPEN, FALSE);
++		SetButton(ID_FILE_SAVE, FALSE);
++		SetButton(BNewDynamo, FALSE);
++		SetButton(BNewDiskWorker, FALSE);
++		SetButton(BNewNetWorker, FALSE);
++		SetButton(BCopyWorker, FALSE);
++		SetButton(BReset, FALSE);
++		SetButton(BExitOne, FALSE);
++		SetButton(ID_APP_EXIT, TRUE);
+ 
+-	m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, FALSE, FALSE);
+-	SetButton(BStart, FALSE);
+-	SetButton(BStop, FALSE);
+-	SetButton(BStopAll, FALSE);
++		m_pPageDisplay->m_dlgBigMeter.SetButtonState(FALSE, FALSE, FALSE);
++		SetButton(BStart, FALSE);
++		SetButton(BStop, FALSE);
++		SetButton(BStopAll, FALSE);
+ 
+-	theApp.m_wndToolBar.RedrawWindow();
++		theApp.m_wndToolBar.RedrawWindow();
++	}
+ }
+ 
+ //
+
+
+
+From cheungming at mail.berlios.de  Sun Aug 27 01:19:01 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Sun, 27 Aug 2006 01:19:01 +0200
+Subject: [Iometer-svn] r300 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200608262319.k7QNJ1ZM012454@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-08-27 01:18:57 +0200 (Sun, 27 Aug 2006)
+New Revision: 300
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+fixed a tricky sprintf/snprintf issue. one code path will have sprintf(x, "%s", x). so basically print one string to itself. with sprintf this still works. but now snprintf(x,...,x) will behave weired.
+safe way si to judge the pointer before doing such copy. also allow an error message printed even without _DEBUG flag, which makes life easier.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-25 22:54:03 UTC (rev 299)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-26 23:18:57 UTC (rev 300)
+@@ -387,7 +387,8 @@
+ 		spec.name[p - drive] = 0;
+ 	} else {
+ 		// Setting spec.name of the drive.
+-		snprintf(spec.name, MAX_NAME, "%s", drive);
++		if (spec.name != drive)
++			snprintf(spec.name, MAX_NAME, "%s", drive);
+ 	}
+ 
+ 	if (!strstr(spec.name, RAW_DEVICE_DIR))
+@@ -503,10 +504,8 @@
+ 
+ 	if (open_disk) {
+ 		if (!Open(NULL)) {
+-#ifdef _DEBUG
+ 			cout << __FUNCTION__ << ": Open on \"" << file_name <<
+ 			    "\" failed (error " << strerror(errno) << ")." << endl;
+-#endif
+ 			return (FALSE);
+ 		}
+ 		fd = ((struct File *)disk_file)->fd;
+
+
+

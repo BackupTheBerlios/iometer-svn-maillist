@@ -1,0 +1,78 @@
+From rfeldman94306 at yahoo.com  Thu Dec  4 05:25:42 2008
+From: rfeldman94306 at yahoo.com (Robert Feldman)
+Date: Wed, 3 Dec 2008 20:25:42 -0800 (PST)
+Subject: [Iometer-svn] latest dynamo src/binary for Linux (FC6)
+Message-ID: <372734.3168.qm@web53009.mail.re2.yahoo.com>
+
+I am trying to download the latest-n-greatest dynamo src/binary for Linux (FC6). 
+Ran into a problem with iometer-2006_07_27.linux.i386 package: unable to increase avgqu-sz (avg queue depth reported by iostat) above 1 range, although iomter gui (windows-based) specifies qd=1,4,16,64. Also tried multiple (eg., 8, 16) iometer workers - avgqu-sz gets stuck at 2. 
+
+Load/throughput correspondingly low compared to windows on same config.
+Removed O_DIRECT from open() in IOTargetDisk.cpp, recompiled dynamo, same pblem.
+
+Looks like fix has already been checked into dynamo src. Tried "svn co svn://svn.berlios.de/iometer/iometer/branches/IOMETER-restruct
+svn: Can't connect to host 'svn.berlios.de': Connection refused
+
+Would like to download latest-n-greatest bits as soon as possible, both src and executable (if available).
+
+Any help on this would be greatly appreciated.
+
+Thanks,
+Robert
+
+
+
+      
+
+
+From rfeldman94306 at yahoo.com  Thu Dec  4 05:51:46 2008
+From: rfeldman94306 at yahoo.com (Robert Feldman)
+Date: Wed, 3 Dec 2008 20:51:46 -0800 (PST)
+Subject: [Iometer-svn] Fw: latest dynamo src/binary for Linux (FC6)
+Message-ID: <359466.90889.qm@web53008.mail.re2.yahoo.com>
+
+I should also mention that I have specified a mounted Linux filesystem as iometer target. The reason is that I am characterizing/tuning perf of a single-drive notebook platform. Created 4G Linux partition on same drive as boot partition; created fs in the 4G parition; mounted under /DYNOTEST. Dynamo did create /DYNOTEST/iobw.tst as expected, yielded expected results for qd=1.
+
+So, what do I need to do to get dynamo to correctly generate high qd load on this platform?
+
+Thanks,
+Robert
+
+
+--- On Wed, 12/3/08, Robert Feldman <rfeldman94306 at yahoo.com> wrote:
+
+> From: Robert Feldman <rfeldman94306 at yahoo.com>
+> Subject: latest dynamo src/binary for Linux (FC6)
+> To: iometer-svn at lists.berlios.de
+> Date: Wednesday, December 3, 2008, 8:25 PM
+> I am trying to download the latest-n-greatest dynamo
+> src/binary for Linux (FC6). 
+> Ran into a problem with iometer-2006_07_27.linux.i386
+> package: unable to increase avgqu-sz (avg queue depth
+> reported by iostat) above 1 range, although iomter gui
+> (windows-based) specifies qd=1,4,16,64. Also tried multiple
+> (eg., 8, 16) iometer workers - avgqu-sz gets stuck at 2. 
+> 
+> Load/throughput correspondingly low compared to windows on
+> same config.
+> Removed O_DIRECT from open() in IOTargetDisk.cpp,
+> recompiled dynamo, same pblem.
+> 
+> Looks like fix has already been checked into dynamo src.
+> Tried "svn co
+> svn://svn.berlios.de/iometer/iometer/branches/IOMETER-restruct
+> svn: Can't connect to host 'svn.berlios.de':
+> Connection refused
+> 
+> Would like to download latest-n-greatest bits as soon as
+> possible, both src and executable (if available).
+> 
+> Any help on this would be greatly appreciated.
+> 
+> Thanks,
+> Robert
+
+
+      
+
+

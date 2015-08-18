@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r290 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r290%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608220131.k7M1V0Sl015124%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000058.html">
+   <LINK REL="Next"  HREF="000060.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r290 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r290%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608220131.k7M1V0Sl015124%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r290 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 22 03:31:00 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000058.html">[Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+        <LI>Next message: <A HREF="000060.html">[Iometer-svn] r291 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-22 03:30:54 +0200 (Tue, 22 Aug 2006)
+New Revision: 290
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+Log:
+now under Linux will allocate memory with 4KB aligned address.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 20:14:45 UTC (rev 289)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 01:30:54 UTC (rev 290)
+@@ -8,6 +8,7 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to allocate memory under Linux as 4KB aligned.
+    - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
+      status bar during appropriate periods.
+    - Patch by Ming Zhang to support optional display BigMeter when iometer starts.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-21 20:14:45 UTC (rev 289)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-22 01:30:54 UTC (rev 290)
+@@ -556,7 +556,14 @@
+ 		free(read_data);
+ 	}
+ 	errno = 0;
++#if defined(IOMTR_OS_LINUX)
++	if (posix_memalign(&amp;read_data, 4096, access_spec.max_transfer))
++#elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
+ 	if (!(read_data = valloc(access_spec.max_transfer)))
++#else
++#warning ===&gt; WARNING: You have to do some coding here to get the port done! 
++#endif
++
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+ 	if (read_data) {
+ 		VirtualFree(read_data, 0, MEM_RELEASE);
+@@ -583,7 +590,14 @@
+ 		free(write_data);
+ 	}
+ 	errno = 0;
+-	if (!(write_data = valloc(access_spec.max_transfer)))
++#if defined(IOMTR_OS_LINUX)
++        if (posix_memalign(&amp;write_data, 4096, access_spec.max_transfer))
++#elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
++        if (!(write_data = valloc(access_spec.max_transfer)))
++#else
++#warning ===&gt; WARNING: You have to do some coding here to get the port done!
++#endif
++
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+ 	if (write_data) {
+ 		VirtualFree(write_data, 0, MEM_RELEASE);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000058.html">[Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+	<LI>Next message: <A HREF="000060.html">[Iometer-svn] r291 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#59">[ date ]</a>
+              <a href="thread.html#59">[ thread ]</a>
+              <a href="subject.html#59">[ subject ]</a>
+              <a href="author.html#59">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

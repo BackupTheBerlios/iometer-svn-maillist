@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r331 - branches/IOMETER-restruct/iometer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r331%20-%20branches/IOMETER-restruct/iometer&In-Reply-To=%3C200806270113.m5R1Ddcu021138%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000096.html">
+   <LINK REL="Next"  HREF="000098.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r331 - branches/IOMETER-restruct/iometer</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r331%20-%20branches/IOMETER-restruct/iometer&In-Reply-To=%3C200806270113.m5R1Ddcu021138%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r331 - branches/IOMETER-restruct/iometer">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun 27 03:13:39 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000096.html">[Iometer-svn] r330 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000098.html">[Iometer-svn] r332 - branches/IOMETER-restruct/iometer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#97">[ date ]</a>
+              <a href="thread.html#97">[ thread ]</a>
+              <a href="subject.html#97">[ subject ]</a>
+              <a href="author.html#97">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2008-06-27 03:13:38 +0200 (Fri, 27 Jun 2008)
+New Revision: 331
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+updated CHANGELOG for 08 release.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-19 06:48:45 UTC (rev 330)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-27 01:13:38 UTC (rev 331)
+@@ -3,7 +3,51 @@
+ ----+----|----+----|----+----|----+----|----+----|----+----|----+----|----+----|
+ 
+ 
++ChangeLog (IOMETER2 - 2008.06.18rc1):
++==================================
+ 
++-All of the following changes pertain to Windows. Infrastructure is in place to
++ enable this for other OSes but some coding is still required
++ -The following defines must be turned on for successful compatibility with the
++  IOMeter GUI: USE_NEW_DISCOVERY_MECHANISM, FORCE_STRUCT_ALIGN (more info below)
++
++-New disk detection and common structure changes (USE_NEW_DISCOVERY_MECHANISM)
++ -volume mount point support
++ -improved raw disk detection and soft raid awareness
++ -improved networking detection
++ -backwards compatiblity for older versions of Windows
++ -new display names for disks in Iometer GUI (e.g. inquiry info for raw disks)
++ -display raw disks with partitions using /force_raw option in dynamo
++  -iometer hierarchically chains raw disks to corresponding volumes if any
++  -other OSes need to do some coding to enable this, else works as before
++
++-Abstracted timer code
++ -added speed step detection
++ -default timer for x86 is Windows high-perf counter (Intel)
++ -Win64 attempts the TSC first and falls back to high-perf counter
++  -use /no_rdtsc in dynamo to disable the use of TSC and force high-perf cntr
++ -other OSes need to do some coding to enable this, else works as before
++
++-CPU affinity (IOMTR_SETTING_CPU_AFFINITY)
++ -existing cmdline option trims the affinity set to whatever you specify
++ -each worker is now affinitized to a single CPU
++ -CPUs are round robined within a given affinity mask
++ -other OSes need to do some coding to enable, else default behavior
++
++-Full 64bit disk sizes supported 
++ -including specifying start offset in GUI
++
++-Structure packing (FORCE_STRUCT_ALIGN)
++ -structure are 8byte aligned with compiler directive
++ -should not need padding members for compatibility for other OSes
++
++-Project/solution files
++ -created new Visual Studio 2005 solution files in \msvc
++  -binaries get deposited within there
++ -ddk binaries will end up in \ddk once you run the first build
++
++
++
+ ChangeLog (IOMETER2 - 200X.XX.XX):
+ ==================================
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000096.html">[Iometer-svn] r330 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000098.html">[Iometer-svn] r332 - branches/IOMETER-restruct/iometer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#97">[ date ]</a>
+              <a href="thread.html#97">[ thread ]</a>
+              <a href="subject.html#97">[ subject ]</a>
+              <a href="author.html#97">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

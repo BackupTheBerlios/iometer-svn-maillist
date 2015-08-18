@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r323 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r323%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200806180432.m5I4WVFe001074%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000091.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r323 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r323%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200806180432.m5I4WVFe001074%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r323 - branches/IOMETER-restruct/iometer/src">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Wed Jun 18 06:32:31 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000091.html">[Iometer-svn] r324 - branches/IOMETER-restruct/iometer/src/Galileo
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-06-18 06:32:26 +0200 (Wed, 18 Jun 2008)
+New Revision: 323
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+Log:
+Minor fix for physical drive detection.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-05-03 00:45:31 UTC (rev 322)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-18 04:32:26 UTC (rev 323)
+@@ -1183,8 +1183,8 @@
+ 
+ 		memset(&amp;d.spec, 0, sizeof(d.spec));
+ 
+-		// The last char in our dev_list link string is the physicaldrive number
+-		drive_number = atoi(&amp;dev_list.list[i].link[strlen(dev_list.list[i].link) - 1]);
++		// The last chars in our dev_list link string are the physicaldrive number
++		drive_number = atoi(&amp;dev_list.list[i].link[strlen(&quot;PhysicalDrive&quot;)]);
+ 
+ 		// We already have the string (but w/out \\.\, so regenerate is here.
+ 		sprintf( d.spec.name, &quot;%s%i&quot;, PHYSICAL_DISK, drive_number );
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000091.html">[Iometer-svn] r324 - branches/IOMETER-restruct/iometer/src/Galileo
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#90">[ date ]</a>
+              <a href="thread.html#90">[ thread ]</a>
+              <a href="subject.html#90">[ subject ]</a>
+              <a href="author.html#90">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

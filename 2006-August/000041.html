@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r272 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r272%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608080019.k780JVEu032180%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000040.html">
+   <LINK REL="Next"  HREF="000042.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r272 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r272%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608080019.k780JVEu032180%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r272 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug  8 02:19:31 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000040.html">[Iometer-svn] r271 - branches/IOMETER-restruct/iometer
+</A></li>
+        <LI>Next message: <A HREF="000042.html">[Iometer-svn] r273 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#41">[ date ]</a>
+              <a href="thread.html#41">[ thread ]</a>
+              <a href="subject.html#41">[ subject ]</a>
+              <a href="author.html#41">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-08 02:19:18 +0200 (Tue, 08 Aug 2006)
+New Revision: 272
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+   branches/IOMETER-restruct/iometer/src/PageDisplay.cpp
+   branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+Log:
+minor code style fix. avoid to define local variables in loop and reuse outside of loop.
+
+by Vedran Degoricija(<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">vedrand at yahoo.com</A>)
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-03 23:05:18 UTC (rev 271)
++++ branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-08 00:19:18 UTC (rev 272)
+@@ -1175,6 +1175,7 @@
+ char *ManagerList::GetCommonAccessSpec(int spec_index, char *const specname)
+ {
+ 	char compare_string[MAX_WORKER_NAME];
++	int manager_index;
+ 
+ 	// Return null string if there are no managers.
+ 	if (ManagerCount() == 0) {
+@@ -1182,7 +1183,7 @@
+ 		return specname;
+ 	}
+ 	// Find the first manager with workers.
+-	for (int manager_index = 0; manager_index &lt; ManagerCount(); manager_index++) {
++	for (manager_index = 0; manager_index &lt; ManagerCount(); manager_index++) {
+ 		if (GetManager(manager_index)-&gt;WorkerCount()) {
+ 			// Store that manager's access spec name.
+ 			GetManager(manager_index)-&gt;GetCommonAccessSpec(spec_index, specname);
+
+Modified: branches/IOMETER-restruct/iometer/src/PageDisplay.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageDisplay.cpp	2006-08-03 23:05:18 UTC (rev 271)
++++ branches/IOMETER-restruct/iometer/src/PageDisplay.cpp	2006-08-08 00:19:18 UTC (rev 272)
+@@ -302,18 +302,19 @@
+ void CPageDisplay::Update()
+ {
+ 	int max_rate[NUM_STATUS_BARS];
++	int i, j;
+ 	CString max_range_text;
+ 	double stat_double;
+ 	CString stat_string;
+ 
+ 	// Setting ranges on status bar display based on selections.
+-	for (int i = 0; i &lt; NUM_STATUS_BARS; i++) {
++	for (i = 0; i &lt; NUM_STATUS_BARS; i++) {
+ 		max_rate[i] = GetMaxRange(&amp;(barcharts[i].results[GetWhichPerf()]), barcharts[i].result_to_display);
+ 	}
+ 
+ 	// If the results to display are the same, giving them the same ranges for easier comparisons.
+ 	for (i = 0; i &lt; NUM_STATUS_BARS - 1; i++) {
+-		for (int j = i; j &lt; NUM_STATUS_BARS; j++) {
++		for (j = i; j &lt; NUM_STATUS_BARS; j++) {
+ 			if (barcharts[i].result_to_display == barcharts[j].result_to_display) {
+ 				if (max_rate[i] &gt; max_rate[j])
+ 					max_rate[j] = max_rate[i];
+
+Modified: branches/IOMETER-restruct/iometer/src/PageNetwork.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-03 23:05:18 UTC (rev 271)
++++ branches/IOMETER-restruct/iometer/src/PageNetwork.cpp	2006-08-08 00:19:18 UTC (rev 272)
+@@ -263,6 +263,7 @@
+ 	TV_INSERTSTRUCT tvstruct;
+ 	HTREEITEM hmgr, hifc;
+ 	Manager *sel_mgr;
++	int n;
+ 
+ 	// Do not add the manager if it doesn't have any interfaces that are
+ 	// accessible from the selected manager.
+@@ -328,7 +329,7 @@
+ 	tvstruct.item.state = INDEXTOSTATEIMAGEMASK(TARGET_STATE_UNCHECKED);
+ 
+ 	// insert the manager's network interfaces as its children in the tree
+-	for (int n = 0; n &lt; manager-&gt;InterfaceCount(GenericNetType); n++) {
++	for (n = 0; n &lt; manager-&gt;InterfaceCount(GenericNetType); n++) {
+ 		// Only add interfaces that are accessible.
+ 		if (!sel_mgr-&gt;InterfaceCount(manager-&gt;GetInterface(n, GenericNetType)-&gt;type)) {
+ 			continue;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000040.html">[Iometer-svn] r271 - branches/IOMETER-restruct/iometer
+</A></li>
+	<LI>Next message: <A HREF="000042.html">[Iometer-svn] r273 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#41">[ date ]</a>
+              <a href="thread.html#41">[ thread ]</a>
+              <a href="subject.html#41">[ subject ]</a>
+              <a href="author.html#41">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

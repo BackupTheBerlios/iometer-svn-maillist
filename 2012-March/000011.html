@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> No subject
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2012-March/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20No%20subject&In-Reply-To=%3Cmailman.0.1331734067.3598.iometer-svn%40lists.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000019.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>No subject</H1>
+    <B></B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20No%20subject&In-Reply-To=%3Cmailman.0.1331734067.3598.iometer-svn%40lists.berlios.de%3E"
+       TITLE="No subject">
+       </A><BR>
+    <I>Wed Mar 14 15:07:45 CET 2012</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000019.html">No subject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>
+
+Modified: branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-02-21 01:08:33 UTC (rev 244)
++++ branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-02-21 01:27:31 UTC (rev 245)
+@@ -711,6 +711,8 @@
+ 			CheckData(ENetWorkerCount, &amp;net_worker_count, FALSE);
+ 
+ 		GetDlgItemText(ETestName, test_name);
++		// Find all commas and replace with '-'
++		test_name.Replace(',', '-');
+ 	} else {
+ 		// Update all the combo box selections.
+ 		m_CResultType.SetCurSel(result_type);
+
+Modified: branches/IOMETER-restruct/iometer/src/Worker.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-02-21 01:08:33 UTC (rev 244)
++++ branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-02-21 01:27:31 UTC (rev 245)
+@@ -768,26 +768,34 @@
+ 	}
+ 
+ 	for (i = 0; i &lt; target_count; i++) {
++		char PrintName[MAX_NAME], *TheOffendingChar;
++
+ 		if (!IsType(Type(), GenericClientType))
+ 			target = GetTarget(i);
+ 		if (!IsType(target-&gt;spec.type, ActiveType))
+ 			continue;
+ 
++		strcpy(PrintName, target-&gt;spec.name);
++		TheOffendingChar = PrintName;
++		// convert commas, newlines and cariage returns to spaces so these don't break the .csv output
++		while ((TheOffendingChar = strpbrk(TheOffendingChar, &quot;\n\r,&quot;)) != NULL)
++			*TheOffendingChar = ' ';
++
+ 		// Retrieving results for a single target in order to save it to a file.
+ 		if (IsType(target-&gt;spec.type, GenericDiskType)) {
+-			(*file) &lt;&lt; &quot;DISK&quot; &lt;&lt; &quot;,&quot; &lt;&lt; target-&gt;spec.name;
++			(*file) &lt;&lt; &quot;DISK&quot; &lt;&lt; &quot;,&quot; &lt;&lt; PrintName;
+ 		} else if (IsType(target-&gt;spec.type, TCPClientType)) {
+ 			// Show name as local address &gt;&gt; remote address.
+ 			(*file) &lt;&lt; &quot;NETWORK&quot; &lt;&lt; &quot;,&quot; &lt;&lt; manager-&gt;name &lt;&lt; &quot;:&quot;
+-			    &lt;&lt; target-&gt;spec.name &lt;&lt; &quot; &gt;&gt; &quot;
++			    &lt;&lt; PrintName &lt;&lt; &quot; &gt;&gt; &quot;
+ 			    &lt;&lt; net_partner-&gt;manager-&gt;name &lt;&lt; &quot;:&quot; &lt;&lt; target-&gt;spec.tcp_info.remote_address;
+ 		} else if (IsType(target-&gt;spec.type, VIClientType)) {
+ 			// Show name as local address &gt;&gt; remote address.
+ 			(*file) &lt;&lt; &quot;NETWORK&quot; &lt;&lt; &quot;,&quot; &lt;&lt; manager-&gt;name &lt;&lt; &quot;:&quot;
+-			    &lt;&lt; target-&gt;spec.name &lt;&lt; &quot; &gt;&gt; &quot;
++			    &lt;&lt; PrintName &lt;&lt; &quot; &gt;&gt; &quot;
+ 			    &lt;&lt; net_partner-&gt;manager-&gt;name &lt;&lt; &quot;:&quot; &lt;&lt; target-&gt;spec.vi_info.remote_nic_name;
+ 		} else {
+-			(*file) &lt;&lt; &quot;UNKNOWN&quot; &lt;&lt; &quot;,&quot; &lt;&lt; target-&gt;spec.name;
++			(*file) &lt;&lt; &quot;UNKNOWN&quot; &lt;&lt; &quot;,&quot; &lt;&lt; PrintName;
+ 		}
+ 
+ 		(*file) &lt;&lt; &quot;,,,,&quot;	// space for access spec name, workers, managers and targets running.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000019.html">No subject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#11">[ date ]</a>
+              <a href="thread.html#11">[ thread ]</a>
+              <a href="subject.html#11">[ subject ]</a>
+              <a href="author.html#11">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

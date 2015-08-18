@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r281 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r281%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608160105.k7G15JD3004055%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000049.html">
+   <LINK REL="Next"  HREF="000051.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r281 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r281%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608160105.k7G15JD3004055%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r281 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug 16 03:05:19 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000049.html">[Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+        <LI>Next message: <A HREF="000051.html">[Iometer-svn] r282 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-16 03:05:06 +0200 (Wed, 16 Aug 2006)
+New Revision: 281
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+Log:
+used powf() to replace pow(). double is overkilled for us, float is enough.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-16 01:01:52 UTC (rev 280)
++++ branches/IOMETER-restruct/iometer/src/MeterCtrl.cpp	2006-08-16 01:05:06 UTC (rev 281)
+@@ -50,7 +50,9 @@
+ /* ##                                                                     ## */
+ /* ## ------------------------------------------------------------------- ## */
+ /* ##                                                                     ## */
+-/* ##  Changes ...: 2004-09-01 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">henryx.w.tieman at intel.com</A>)                ## */
++/* ##  Changes ...: 2006-08-04 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">vedrand at yahoo.com</A>)                        ## */
++/* ##               -misc syntactical -- explicit pow() arg typecasts     ## */
++/* ##               2004-09-01 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">henryx.w.tieman at intel.com</A>)                ## */
+ /* ##               - Needed to cast parameters to some functions         ## */
+ /* ##                 because latest Visual Studio C++ library has        ## */
+ /* ##                 multiple entry points for those functions.          ## */
+@@ -246,9 +248,9 @@
+ 		return;
+ 	}
+ 	// Calculate the new scale.
+-	scale = (int)pow((double)10, (int)floor(log10((double)max_range)));
++	scale = (int)powf(10.0, floor(log10((float)max_range)));
+ 
+-	if ((max_range == (int)pow((double)10, (int)floor(log10((double)max_range))))) {
++	if ((max_range == (int)powf(10.0, floor(log10((float)max_range))))) {
+ 		// max_range is a power of 10
+ 		scale /= 10;
+ 	}
+@@ -269,35 +271,35 @@
+ //
+ void CMeterCtrl::UpdateLabelInfo()
+ {
+-	double range_diff;
+-	double display_range;	// range normalized to ##.##### for ranges &gt; 10
+-	double label_increment;
+-	double display_value;
++	float range_diff;
++	float display_range;	// range normalized to ##.##### for ranges &gt; 10
++	float label_increment;
++	float display_value;
+ 	int label_angle;
+ 	LONG x, y;		// temporary point coordinates
+ 
+ 	// Sets the range that the marker labels will span.
+-	range_diff = max_range - min_range;
+-	if ((range_diff == pow((double)10, (int)floor(log10(range_diff)))) &amp;&amp; (range_diff != 1)) {
++	range_diff = (float) (max_range - min_range);
++	if ((range_diff == powf(10.0, floor(log10(range_diff)))) &amp;&amp; (range_diff != 1)) {
+ 		// range_diff is a power of 10, but is not exactly 1
+ 		display_range = 10;
+ 	} else {
+-		display_range = range_diff / pow((double)10, (int)floor(log10(range_diff)));
++		display_range = range_diff / powf(10.0, floor(log10(range_diff)));
+ 	}
+ 
+ 	// Set the increment from one label to the next.
+ 	if (display_range &lt;= 1)
+-		label_increment = .1;
++		label_increment = (float) .1;
+ 	else if (display_range &lt;= 2)
+-		label_increment = .2;
++		label_increment = (float) .2;
+ 	else if (display_range &lt;= 5)
+-		label_increment = .5;
++		label_increment = (float) .5;
+ 	else if (display_range &lt;= 10)
+ 		label_increment = 1;
+ 
+ 	// Update the marker label text boxes.
+ 	label_count = 0;
+-	display_value = min_range;
++	display_value = (float) min_range;
+ 	while (display_value &lt;= display_range) {
+ 		// Set the position of the text boxes.
+ 		label_angle = (int)(display_value / display_range * NEEDLE_SWEEP);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000049.html">[Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+	<LI>Next message: <A HREF="000051.html">[Iometer-svn] r282 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#50">[ date ]</a>
+              <a href="thread.html#50">[ thread ]</a>
+              <a href="subject.html#50">[ subject ]</a>
+              <a href="author.html#50">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,1041 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r285 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r285%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608211448.k7LEmVAp012844%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000053.html">
+   <LINK REL="Next"  HREF="000055.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r285 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r285%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608211448.k7LEmVAp012844%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r285 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 21 16:48:31 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000053.html">[Iometer-svn] r284 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000055.html">[Iometer-svn] r286 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-21 16:48:29 +0200 (Mon, 21 Aug 2006)
+New Revision: 285
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp
+   branches/IOMETER-restruct/iometer/src/IOVIPL.cpp
+   branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+   branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+   branches/IOMETER-restruct/iometer/src/VINic.cpp
+Log:
+cleanup the use of _DETAILS and _DEBUG
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -541,7 +541,7 @@
+ 		    &lt;&lt; access_spec.max_transfer &lt;&lt; endl;
+ 	}
+ 	// Allocating a larger buffer.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Growing grunt data buffers from &quot; &lt;&lt; data_size &lt;&lt; &quot; to &quot; &lt;&lt; access_spec.max_transfer &lt;&lt; endl;
+ #endif
+ 
+@@ -956,7 +956,7 @@
+ 		// we first begin doing I/O.  Close these targets.
+ 		if (targets[i]-&gt;spec.test_connection_rate) {
+ 			targets[i]-&gt;trans_left_in_conn = 0;
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;Defering open for &quot; &lt;&lt; targets[i]-&gt;spec.name &lt;&lt; endl;
+ #endif
+ 			if (!targets[i]-&gt;Close(&amp;grunt_state)) {
+@@ -1056,7 +1056,7 @@
+ 			// Check to see if we can close the target.  Targets are not closed
+ 			// until all outstanding I/Os have completed.
+ 			if (target-&gt;outstanding_ios == 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 				cout &lt;&lt; &quot;Testing connection rate: Closing &quot; &lt;&lt; targets[target_id]-&gt;spec.name &lt;&lt; endl;
+ #endif
+ 
+@@ -1085,7 +1085,7 @@
+ 		}
+ 		// Check to see if we need to open the target.
+ 		if (target-&gt;spec.test_connection_rate &amp;&amp; target-&gt;trans_left_in_conn &lt;= 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;Testing connection rate: Opening &quot; &lt;&lt; target-&gt;spec.name &lt;&lt; endl;
+ #endif
+ 			// Set the number of transactions to do before closing.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -395,7 +395,7 @@
+ 		strncpy(tcp_spec[count].name, inet_ntoa(sin.sin_addr), sizeof(tcp_spec[count].name) - 1);
+ 		tcp_spec[count].type = TCPClientType;	// interface to access a client
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Found &quot; &lt;&lt; tcp_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+ 
+@@ -530,7 +530,7 @@
+ 			vi_spec[count].vi_info.outstanding_ios = nic.nic_attributes.MaxDescriptorsPerQueue &gt;&gt; 1;
+ 
+ 			nic.Close();
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   Found &quot; &lt;&lt; vi_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+ 
+@@ -545,7 +545,7 @@
+ 
+ 	// All done.
+ 	cout &lt;&lt; &quot;   done.&quot; &lt;&lt; endl;
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Find &quot; &lt;&lt; count &lt;&lt; &quot; network interface.&quot; &lt;&lt; endl;
+ #endif
+ 	return count;
+@@ -675,7 +675,7 @@
+ 	for (int g = 0; g &lt; grunt_count; g++) {
+ 		// Only send results for grunts that are running.
+ 		if (grunts[g]-&gt;target_count &amp;&amp; !grunts[g]-&gt;idle) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;Reporting results for grunt &quot; &lt;&lt; g &lt;&lt; &quot; ...&quot;;
+ #endif
+ 			// Copying worker's results into the message.
+@@ -754,7 +754,7 @@
+ 				(void)reorder(data_msg, DATA_MESSAGE_WORKER_RESULTS, SEND);
+ 			}
+ 			prt-&gt;Send(&amp;data_msg, DATA_MESSAGE_SIZE);
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;sent.&quot; &lt;&lt; endl;
+ #endif
+ 		}
+@@ -764,7 +764,7 @@
+ 		// Store current performance counters as baseline for next update.
+ 		Get_Performance(LAST_UPDATE_PERF, FIRST_SNAPSHOT);
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Finished reporting results.&quot; &lt;&lt; endl;
+ #endif
+ }
+@@ -807,7 +807,7 @@
+ {
+ 	switch (msg.purpose) {
+ 	case ADD_WORKERS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : ADD_WORKERS&quot; &lt;&lt; endl;
+ #endif
+ 		Add_Workers(msg.data);
+@@ -816,7 +816,7 @@
+ 		// Signaling to reset all workers
+ 	case RESET:
+ 		// Remove all workers.
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : RESET&quot; &lt;&lt; endl;
+ #endif
+ 		Remove_Workers(ALL_WORKERS);
+@@ -824,7 +824,7 @@
+ 		break;
+ 		// Received call to end program or thread execution.
+ 	case EXIT:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : EXIT&quot; &lt;&lt; endl;
+ #endif
+ 		Remove_Workers(msg.data);
+@@ -832,14 +832,14 @@
+ 
+ 		// Preparing drives for access.
+ 	case PREP_DISKS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : PREP_DISKS&quot; &lt;&lt; endl;
+ #endif
+ 		Prepare_Disks(msg.data);
+ 		break;
+ 		// Signalling to stop disk preparation.
+ 	case STOP_PREPARE:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : STOP_PREPARE&quot; &lt;&lt; endl;
+ #endif
+ 		Stop_Prepare(msg.data);
+@@ -847,7 +847,7 @@
+ 
+ 		// Reporting all targets accessible by this manager.
+ 	case REPORT_TARGETS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : REPORT_TARGETS&quot; &lt;&lt; endl;
+ #endif
+ 		data_msg.count = Report_Disks(data_msg.data.targets);
+@@ -870,7 +870,7 @@
+ 		break;
+ 		// Setting targets for a given grunt and reporting back.
+ 	case SET_TARGETS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : SET_TARGETS&quot; &lt;&lt; endl;
+ #endif
+ 		prt-&gt;Receive(&amp;data_msg, DATA_MESSAGE_SIZE);
+@@ -892,7 +892,7 @@
+ 
+ 		// Setting access specifications for next test.
+ 	case SET_ACCESS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : SET_ACCESS&quot; &lt;&lt; endl;
+ #endif
+ 		prt-&gt;Receive(&amp;data_msg, DATA_MESSAGE_SIZE);
+@@ -909,35 +909,35 @@
+ 
+ 		// Signalling start of test.
+ 	case START:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : START&quot; &lt;&lt; endl;
+ #endif
+ 		Start_Test(msg.data);
+ 		break;
+ 		// Beginning to perform I/O.
+ 	case BEGIN_IO:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : BEGIN_IO&quot; &lt;&lt; endl;
+ #endif
+ 		Begin_IO(msg.data);
+ 		break;
+ 		// Beginning recording of test results.
+ 	case RECORD_ON:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : RECORD_ON&quot; &lt;&lt; endl;
+ #endif
+ 		Record_On(msg.data);
+ 		break;
+ 		// Stopping recording of test results.
+ 	case RECORD_OFF:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : RECORD_OFF&quot; &lt;&lt; endl;
+ #endif
+ 		Record_Off(msg.data);
+ 		break;
+ 		// Signalling to stop testing.
+ 	case STOP:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : STOP&quot; &lt;&lt; endl;
+ #endif
+ 		Stop_Test(msg.data);
+@@ -945,7 +945,7 @@
+ 
+ 		// Reporting results of whole test to Iometer.
+ 	case REPORT_RESULTS:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : REPORT_RESULTS&quot; &lt;&lt; endl;
+ #endif
+ 		Report_Results(WHOLE_TEST_PERF);
+@@ -953,7 +953,7 @@
+ 
+ 		// Reporting results since last update to Iometer.
+ 	case REPORT_UPDATE:
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;in Process_Message() : REPORT_UPDATE&quot; &lt;&lt; endl;
+ #endif
+ 		Report_Results(LAST_UPDATE_PERF);
+@@ -983,7 +983,7 @@
+ 	} else {
+ 		grunts[target]-&gt;Start_Test();
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Started.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 	// Reply that test has started.
+@@ -1016,7 +1016,7 @@
+ 		if (grunts[target]-&gt;critical_error)
+ 			msg.data = FALSE;
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Performing I/O.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -1150,7 +1150,7 @@
+ 		return TRUE;
+ 	}
+ 	// Grow the manager's data buffer and update all grunts using it.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Growing manager data buffer from &quot; &lt;&lt; data_size &lt;&lt; &quot; to &quot;
+ 	    &lt;&lt; grunts[target]-&gt;access_spec.max_transfer &lt;&lt; endl &lt;&lt; flush;
+ #endif
+@@ -1197,7 +1197,7 @@
+ {
+ 	record = TRUE;		// At least 1 worker is recording.
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Recording Started.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -1233,7 +1233,7 @@
+ 	cout &lt;&lt; &quot;   Stopped.&quot; &lt;&lt; endl &lt;&lt; flush;
+ 
+ 	record = FALSE;		// No workers are recording data.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Recording stopped.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 	if (IsBigEndian()) {
+@@ -1250,7 +1250,7 @@
+ {
+ 	msg.data = 0;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Adding &quot; &lt;&lt; count &lt;&lt; &quot; new worker(s).&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -1274,7 +1274,7 @@
+ 			msg.data--;
+ 		}
+ 	}
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; msg.data &lt;&lt; &quot; worker(s) are created.&quot; &lt;&lt; endl;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -412,12 +412,12 @@
+ 				sizeof(tcp_spec[count].name) - 1);
+ 			tcp_spec[count].type = TCPClientType;	// interface to access a client
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   Found &quot; &lt;&lt; tcp_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+ 			count++;
+ 		} else {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cerr &lt;&lt; &quot;ioctl fail in Manager::Report_TCP()&quot; &lt;&lt; endl;
+ #endif
+ 		}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -217,7 +217,7 @@
+ 			strcat(disk_spec[count].name, &quot;, BUF&quot;);
+ 		strcat(disk_spec[count].name, &quot;]&quot;);
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		count++;
+@@ -300,7 +300,7 @@
+ 			// the physical drive is ready for use.
+ 			memcpy(&amp;disk_spec[count], &amp;d.spec, sizeof(Target_Spec));
+ 			d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 			count++;
+@@ -348,13 +348,13 @@
+ 	memset(file_name, 0, MAX_NAME);
+ 	// We don't deal directly with slices cXtXdXsX. Never gets that value.
+ 	sprintf(file_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, name);
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Reporting disk partitions: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+ 	fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ 	if (fd &lt; 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;  open failed..&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		return (TRUE);
+@@ -362,7 +362,7 @@
+ 
+ 	if ((bytes_read = read(fd, buffer, 512)) &lt; 512) {
+ 		// cannot read start sector. Disk might be bad.
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;  read failed.. returning&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		close(fd);
+@@ -381,7 +381,7 @@
+ 	} else {
+ 		// We do have partitions.
+ 		strncpy(base_name, name, (strstr(name, &quot;p0&quot;) - name));
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   basename: &quot; &lt;&lt; base_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		for (i = 1; i &lt;= FD_NUMPART; i++) {
+@@ -399,7 +399,7 @@
+ 			}
+ 
+ 			sprintf(file_name, &quot;%sp%d&quot;, base_name, i);
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   file_name: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 			// check if this is a swap device. Search the global string.
+@@ -506,7 +506,7 @@
+ 				strcat(disk_spec[*count].name, &quot; ]&quot;);
+ 
+ 				d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 				cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[*count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 				(*count)++;
+@@ -515,7 +515,7 @@
+ 					break;
+ 			} else {
+ 				// partition access failed.                             
+-#if _DEBUG
++#ifdef _DEBUG
+ 				cout &lt;&lt; &quot;   Not found &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 			}
+@@ -550,12 +550,12 @@
+ 	memset(file_name, 0, MAX_NAME);
+ 
+ 	sprintf(file_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, name);
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Reporting vtoc partitions: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 	fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ 	if (fd &lt; 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;  open failed..&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		return (TRUE);
+@@ -576,7 +576,7 @@
+ 	}
+ 
+ 	strncpy(base_name, name, (strstr(name, &quot;s2&quot;) - name));
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;  vtoc basename: &quot; &lt;&lt; base_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -679,7 +679,7 @@
+ 		}
+ 		// Here we do have VTOC parts to report.
+ 		sprintf(file_name, &quot;%ss%d&quot;, base_name, i);
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;  vtoc  file_name: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		// check if this is a swap device. Search the global string.
+@@ -769,7 +769,7 @@
+ 			strcat(disk_spec[*count].name, &quot; ]&quot;);
+ 
+ 			d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[*count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 			(*count)++;
+@@ -833,7 +833,7 @@
+ 					strcat(disk_spec[*count].name, &quot; ]&quot;);
+ 
+ 					d.spec.type = PhysicalDiskType;
+-#if _DEBUG
++#ifdef _DEBUG
+ 					cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[*count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 					(*count)++;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -87,7 +87,7 @@
+ 			cout &lt;&lt; &quot;   Unable to retrieve volume information for &quot; &lt;&lt; d.spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ 			disk_spec[count].name[2] = '\0';
+ 		}
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+ 		count++;
+@@ -118,7 +118,7 @@
+ 		_itoa(drive_number, disk_spec[count].name + strlen(disk_spec[count].name), 10);
+ 		drive_number++;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Found &quot; &lt;&lt; disk_spec[count].name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+ 		count++;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -481,7 +481,7 @@
+ #endif
+ 
+ 	// Get the performance data stored by the system.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Getting system performance data.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -495,7 +495,7 @@
+ 					       NULL, NULL, perf_data, &amp;perf_object_size)) != ERROR_SUCCESS) {
+ 		if (query_result == ERROR_MORE_DATA) {
+ 			// More data than we had room for!  Try a bigger buffer.
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   RegQueryValueEx() returned ERROR_MORE_DATA!  Number of bytes used: &quot;
+ 			    &lt;&lt; perf_object_size &lt;&lt; endl &lt;&lt; flush
+ 			    &lt;&lt; &quot;   Bumping performance data buffer up from &quot; &lt;&lt; perf_size
+@@ -552,7 +552,7 @@
+ 		else {
+ 			perf_time = (double)0.0;	// Error gathering performance time, mark as invalid.
+ 		}
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Performance time = &quot; &lt;&lt; perf_time &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 	}
+@@ -882,7 +882,7 @@
+ 		}
+ 		// retval == 0  is the only case where we have good data
+ 		raw_tcp_data[TCP_SEGMENTS_RESENT][snapshot] = ((struct mib2_tcp *)(strbuf_data.buf))-&gt;tcpRetransSegs;
+-#ifdef _DETAILS
++#if _DETAILS
+ 		cout &lt;&lt; &quot;tcp segments retrans : &quot; &lt;&lt; ((struct mib2_tcp *)(strbuf_data.buf))-&gt;tcpRetransSegs &lt;&lt; endl;
+ #endif
+ 	}
+@@ -948,19 +948,19 @@
+ 	// Save specific performance counters.
+ 	switch (perf_data_type) {
+ 	case PERF_PROCESSOR:
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;Extracting processor data.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		Extract_CPU_Counters(snapshot);
+ 		break;
+ 	case PERF_NETWORK_TCP:
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Extracting network TCP data.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		Extract_TCP_Counters(snapshot);
+ 		break;
+ 	case PERF_NETWORK_INTERFACE:
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   Extracting network interface data.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		Extract_NI_Counters(snapshot);
+@@ -996,7 +996,7 @@
+ 		}
+ 
+ 		if (strncmp(cpu_name, cpu_reg_name, 2)) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 			cout &lt;&lt; &quot;Performing exhaustive search for processor instance &quot; &lt;&lt; cpu &lt;&lt; endl;
+ #endif
+ 
+@@ -1121,7 +1121,7 @@
+ 	// This is normal for performance data disabled by default (e.g. network interface).
+ 	if (i &gt;= (int)pperf_data-&gt;NumObjectTypes) {
+ 		perf_object = NULL;
+-#if PERFORMANCE_DETAILS || _DEBUG
++#if PERFORMANCE_DETAILS || defined(_DEBUG)
+ 		cout &lt;&lt; &quot;No current performance object to retrieve counters from.&quot; &lt;&lt; endl
+ 		    &lt;&lt; &quot;   Searching for &quot; &lt;&lt; perf_object_index &lt;&lt; endl &lt;&lt; flush;
+ #endif
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -250,7 +250,7 @@
+ void Performance::Get_Perf_Data(DWORD perf_data_type, int snapshot)
+ {
+ 	// Get the performance data stored by the system.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Getting system performance data.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceOSX.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -212,7 +212,7 @@
+ void Performance::Get_Perf_Data(DWORD perf_data_type, int snapshot)
+ {
+ 	// Get the performance data stored by the system.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Getting system performance data.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -151,7 +151,7 @@
+ 
+ #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	if (sockets_in_use++ == 0) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;Initializing WinSock.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -445,7 +445,7 @@
+ 	// reset the disk size.
+ 	if (new_size &amp;&amp; (new_size &lt; size)) {
+ 		size = new_size;
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;Resetting accessible size of disk &quot; &lt;&lt; spec.name &lt;&lt; &quot; to &quot; &lt;&lt;
+ 		    maximum_size &lt;&lt; &quot; sectors.&quot; &lt;&lt; endl &lt;&lt; &quot;   &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl;
+ #endif
+@@ -462,7 +462,7 @@
+ 
+ 	starting_position = (DWORDLONG) starting_sector *(DWORDLONG) spec.disk_info.sector_size;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Moving starting sector of disk &quot; &lt;&lt; spec.name &lt;&lt; &quot; to &quot; &lt;&lt; starting_position &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+ 
+@@ -473,7 +473,7 @@
+ 	if (starting_position + current_size &gt; size) {
+ 		// Re-adjust the accessible size of the disk to reflect the new starting sector.
+ 		size -= starting_position;
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;Starting sector size has shrunk the effective size of the disk.&quot; &lt;&lt; endl;
+ #endif
+ 	} else {
+@@ -736,7 +736,7 @@
+ 		size = stbuf64.st_size;
+ 
+ 		Set_Sector_Info();
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		if (open_disk)
+@@ -829,7 +829,7 @@
+ 
+ 		Set_Sector_Info();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -877,7 +877,7 @@
+ 		low_size = GetFileSize(disk_file, &amp;high_size);
+ 		size = (((DWORDLONG) high_size) &lt;&lt; 32) | (DWORDLONG) low_size;
+ 		Set_Sector_Info();
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl;
+ #endif
+ 		if (open_disk)
+@@ -923,7 +923,7 @@
+ 		spec.disk_info.sector_size = disk_geo_info.BytesPerSector;
+ 		Set_Sector_Info();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;   &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl;
+ #endif
+ 
+@@ -969,7 +969,7 @@
+ 		size = stbuf64.st_size;
+ 
+ 		Set_Sector_Info();
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;    &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 		if (open_disk)
+@@ -1002,7 +1002,7 @@
+ 
+ 		Set_Sector_Info();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;    &quot; &lt;&lt; spec.name &lt;&lt; &quot; size = &quot; &lt;&lt; size &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+@@ -1140,7 +1140,7 @@
+ 				       (DWORDLONG) spec.disk_info.maximum_size) * spec.disk_info.sector_size))) {
+ 					// A maximum disk size was specified by the user, and the next write 
+ 					// would go past the specified maximum size.  
+-#if _DEBUG
++#ifdef _DEBUG
+ 					cout &lt;&lt; &quot;User-specified maximum size reached!&quot; &lt;&lt; endl;
+ #endif
+ 					// Stop writing and break out of the write loop.
+@@ -1156,7 +1156,7 @@
+ 					// Do the asynchronous write.
+ 					if (WriteFile(disk_file, (char *)buffer, bytes, &amp;bytes_written, &amp;(olap[i]))) {
+ 						// It succeeded immediately!
+-#if _DEBUG
++#ifdef _DEBUG
+ 						cout &lt;&lt; &quot;Wrote (immediately) &quot; &lt;&lt; bytes_written &lt;&lt; &quot; of &quot;
+ 						    &lt;&lt; bytes &lt;&lt; &quot; bytes to disk &quot; &lt;&lt; spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+@@ -1177,7 +1177,7 @@
+ 							num_outstanding++;
+ 						} else if (GetLastError() == ERROR_DISK_FULL) {
+ 							// The disk filled up -- this is an expected error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 							cout &lt;&lt; &quot;Disk full (immediately) while writing &quot;
+ 							    &lt;&lt; bytes_written &lt;&lt; &quot; of &quot; &lt;&lt; bytes &lt;&lt; &quot; bytes to disk &quot;
+ 							    &lt;&lt; spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+@@ -1207,7 +1207,7 @@
+ 					// Check to see if it has completed
+ 					if (GetOverlappedResult(disk_file, &amp;(olap[i]), &amp;bytes_written, FALSE)) {
+ 						// It completed successfully!
+-#if _DEBUG
++#ifdef _DEBUG
+ 						cout &lt;&lt; &quot;Wrote (eventually) &quot; &lt;&lt; bytes_written &lt;&lt; &quot; of &quot; &lt;&lt; bytes
+ 						    &lt;&lt; &quot; bytes to disk &quot; &lt;&lt; spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+@@ -1230,7 +1230,7 @@
+ 						;	// Do nothing.
+ 					} else if (GetLastError() == ERROR_DISK_FULL) {
+ 						// The disk filled up -- this is an expected error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 						cout &lt;&lt; &quot;Disk full (eventually) while writing &quot; &lt;&lt; bytes_written &lt;&lt;
+ 						    &quot; of &quot; &lt;&lt; bytes &lt;&lt; &quot; bytes to disk &quot; &lt;&lt; spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ #endif
+@@ -1449,7 +1449,7 @@
+ 				offset += user_alignment - remainder;
+ 
+ 				// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 				if ((offset + (DWORDLONG) request_size) &gt; ending_position) {
+ 					cout &lt;&lt; &quot;*** Can't align on &quot; &lt;&lt; user_alignment &lt;&lt; &quot; byte boundaries&quot; &lt;&lt; endl;
+ 
+@@ -1480,7 +1480,7 @@
+ 					offset += spec.disk_info.sector_size - remainder;
+ 
+ 					// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 					if ((offset + (DWORDLONG) request_size) &gt; ending_position) {
+ 						cout &lt;&lt; &quot;*** Can't align on &quot; &lt;&lt; spec.disk_info.sector_size
+ 						    &lt;&lt; &quot; byte boundaries&quot; &lt;&lt; endl;
+@@ -1494,7 +1494,7 @@
+ 					offset = (offset + spec.disk_info.sector_size) &amp; sector_align_mask;
+ 
+ 					// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 					if ((offset + (DWORDLONG) request_size) &gt; ending_position) {
+ 						cout &lt;&lt; &quot;*** ERROR: Can't align on &quot; &lt;&lt; spec.disk_info.sector_size
+ 						    &lt;&lt; &quot; byte boundaries&quot; &lt;&lt; endl;
+@@ -1521,7 +1521,7 @@
+ 				offset = (offset + user_alignment) &amp; sector_align_mask;
+ 
+ 				// If we went beyond the end of the disk again, report an error.
+-#if _DEBUG
++#ifdef _DEBUG
+ 				if ((offset + (DWORDLONG) request_size) &gt; ending_position) {
+ 					cout &lt;&lt; &quot;*** Can't align on &quot; &lt;&lt; alignment &lt;&lt; &quot; byte boundaries&quot; &lt;&lt; endl;
+ 
+@@ -1543,7 +1543,7 @@
+ {
+ 	DWORD error_no;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	// Checking for the access to be a multiple of the sector size.
+ 	// Avoiding this check during actual testing for performance reasons.
+ 	if (offset % spec.disk_info.sector_size) {
+@@ -1613,7 +1613,7 @@
+ {
+ 	DWORD error_no;
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	// Verifying that the amount to be written is a multiple of the sector size.
+ 	// Avoiding this check during actual testing for performance reasons.
+ 	if (offset % spec.disk_info.sector_size) {
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOTargetTCP.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -139,7 +139,7 @@
+ 	tcp_socket.SetAddress(CLIENT, spec.name);
+ 
+ 	// Create and bind the client socket.
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Creating socket &quot; &lt;&lt; spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl &lt;&lt; flush;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOTargetVI.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -113,7 +113,7 @@
+ //
+ BOOL TargetVI::Initialize(Target_Spec * target_info, CQ * completion_queue)
+ {
+-#if _DEBUG
++#ifdef _DEBUG
+ 	cout &lt;&lt; &quot;Initializing VI target on NIC &quot; &lt;&lt; target_info-&gt;name &lt;&lt; endl;
+ #endif
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVIPL.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVIPL.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/IOVIPL.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -168,7 +168,7 @@
+ #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	// Load vipl.dll.
+ 	if (!(vipl_dll = LoadLibrary(&quot;vipl.dll&quot;))) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;Unable to load vipl.dll&quot; &lt;&lt; endl;
+ #endif
+ 		return;
+
+Modified: branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -153,7 +153,7 @@
+ 	// Initialize WinSock if it has not yet been initialized in this process.
+ 	if ( InterlockedIncrement ( &amp;sockets_in_use ) == 1 )
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			cout &lt;&lt; &quot;Initializing WinSock.&quot; &lt;&lt; endl;
+ 		#endif
+ 
+@@ -181,7 +181,7 @@
+ 	// Clean up WinSock if nobody else is using it in this process.
+ 	if ( InterlockedDecrement ( &amp;sockets_in_use ) == 0 )
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			cout &lt;&lt; &quot;Cleaning up WinSock.&quot; &lt;&lt; endl;
+ 		#endif
+ 		
+@@ -349,7 +349,7 @@
+ 		return ReturnError;
+ 	}
+ 
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		cout &lt;&lt; &quot;Bound socket on port &quot; &lt;&lt; ntohs(address-&gt;sin_port) &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ 	#endif
+ 
+@@ -378,7 +378,7 @@
+  #warning ===&gt; WARNING: You have to do some coding here to get the port done!
+ #endif
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			// WSAECONNREFUSED means the server isn't up yet or is busy, 
+ 			// don't print an error message
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+@@ -496,7 +496,7 @@
+ 		}
+ 
+ 	// Accept connections to socket.
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		cout &lt;&lt; &quot;Accepting connections to socket.&quot; &lt;&lt; endl;
+ 	#endif
+ 
+@@ -520,7 +520,7 @@
+ 		// A connection was requested.  Accept it.
+ 		addr_len = sizeof( client_address );
+ 		// Create client socket.
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			cout &lt;&lt; &quot;Creating client socket.&quot; &lt;&lt; endl;
+ 		#endif
+ 
+@@ -813,7 +813,7 @@
+ 	}
+ 	else
+ 	{
+-		#if NETWORK_DETAILS || _DEBUG
++		#if NETWORK_DETAILS || defined(_DEBUG)
+ 			*errmsg &lt;&lt; &quot;*** Error &quot; &lt;&lt; WSAGetLastError() 
+ 					&lt;&lt; &quot; peeking from socket in NetAsyncTCP::Peek().&quot; &lt;&lt; ends;
+ 			OutputErrMsg();
+@@ -847,7 +847,7 @@
+ 		return ReturnSuccess;
+ 	}
+ 
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		cout &lt;&lt; &quot;Closing socket.&quot; &lt;&lt; endl;
+ 	#endif
+ 
+@@ -907,7 +907,7 @@
+ 	LINGER lstruct = {TRUE, 0};
+ 
+ 	
+-#if (NETWORK_DETAILS || _DEBUG) &amp;&amp; !defined(IOMTR_OS_LINUX)
++#if (NETWORK_DETAILS || defined(_DEBUG)) &amp;&amp; !defined(IOMTR_OS_LINUX)
+ 	BOOL CHECK_setoption;
+ 	LINGER	CHECK_lstruct;
+ 	int size;
+@@ -945,7 +945,7 @@
+ 	/////////////////////////////////////
+ 
+ #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+-	#if NETWORK_DETAILS || _DEBUG
++	#if NETWORK_DETAILS || defined(_DEBUG)
+ 		// When closing the connection, do a hard close.
+ 		size = sizeof(CHECK_lstruct);
+ 		if ( getsockopt( *s, SOL_SOCKET, SO_LINGER, (char *) &amp;CHECK_lstruct, &amp;size ) == SOCKET_ERROR )
+
+Modified: branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -173,7 +173,7 @@
+ 	SetDlgItemInt(EDiskWorkerCount, 0);	// Display a number.
+ 	SetDlgItemInt(ENetWorkerCount, 0);	// Display a number.
+ 	disk_worker_count = -1;	// default number of disk workers               
+-#if _DEBUG
++#ifdef _DEBUG
+ 	net_worker_count = -1;	// create network workers for debug
+ #else
+ 	net_worker_count = 0;	// default number of network workers
+@@ -188,7 +188,7 @@
+ 	SetCyclingInfo(&amp;queue_cycling, FALSE, 1, 32, 2, StepExponential);
+ 	OnSelchangeCQStepType();
+ 
+-#if _DEBUG
++#ifdef _DEBUG
+ 	result_type = RecordNone;	// don't save results for debug code
+ #else
+ 	result_type = RecordAll;	// save all results for release code
+
+Modified: branches/IOMETER-restruct/iometer/src/VINic.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/VINic.cpp	2006-08-18 20:41:00 UTC (rev 284)
++++ branches/IOMETER-restruct/iometer/src/VINic.cpp	2006-08-21 14:48:29 UTC (rev 285)
+@@ -83,7 +83,7 @@
+ 
+ 	// Open the NIC.
+ 	if ((result = vipl.VipOpenNic((const VIP_CHAR *)nic_name, &amp;nic)) != VIP_SUCCESS) {
+-#if _DEBUG
++#ifdef _DEBUG
+ 		cout &lt;&lt; &quot;Unable to open VI nic &quot; &lt;&lt; nic_name &lt;&lt; &quot;: &quot; &lt;&lt; vipl.Error(result) &lt;&lt; endl;
+ #endif
+ 		return FALSE;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000053.html">[Iometer-svn] r284 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000055.html">[Iometer-svn] r286 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#54">[ date ]</a>
+              <a href="thread.html#54">[ thread ]</a>
+              <a href="subject.html#54">[ subject ]</a>
+              <a href="author.html#54">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

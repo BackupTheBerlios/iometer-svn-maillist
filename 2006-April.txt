@@ -1,0 +1,319 @@
+From cheungming at berlios.de  Thu Apr 27 23:15:32 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Thu, 27 Apr 2006 23:15:32 +0200
+Subject: [Iometer-svn] r254 - in branches/IOMETER-restruct/iometer/src: . iomtr_kstat
+Message-ID: <200604272115.k3RLFW4e018440@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-04-27 23:15:27 +0200 (Thu, 27 Apr 2006)
+New Revision: 254
+
+Added:
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/README.first
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/load24.sh
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/load26.sh
+Removed:
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/README
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/load.sh
+Modified:
+   branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c
+Log:
+various fixes for iomtr_kstat from Wolstenholme, Daniel E <daniel.e.wolstenholme AT intel.com>
+
+* Update to support newer 2.6.x kernel.
+* New shell script as an example on how to load module for 2.6.x kernel.
+* Minor fixes.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale	2006-04-27 21:15:27 UTC (rev 254)
+@@ -68,7 +68,7 @@
+ #.IGNORE:
+ .SUFFIXES: .cpp .c .o
+ 
+-CXX=/usr/local/arm/2.95.3/bin/arm-linux-g++
++CXX=g++
+ RM=/bin/rm -f
+ MV=/bin/mv
+ TOUCH=/usr/bin/touch
+@@ -85,7 +85,7 @@
+ 	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_LINUX \
+ 	-DIOMTR_CPU_XSCALE \
+ 	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+-	-D_REENTRANT \
++	-D_REENTRANT -DNOMINMAX \
+  	-static
+ #	-ggdb
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2006-04-27 21:15:27 UTC (rev 254)
+@@ -185,9 +185,10 @@
+ 	int res;
+ 
+ 	res = open("/dev/iomtr_kstat", O_RDONLY);
+-	if (res < 0)
++	if (res < 0) {
+ 		cerr << "Fail to open kstat device file. You can ignore this warning" << endl;
+-	cerr << "unless you are running dynamo on XSCALE CPU." << endl;
++		cerr << "unless you are running dynamo on XSCALE CPU." << endl;
++	}
+ 	return res;
+ }
+ 
+
+Deleted: branches/IOMETER-restruct/iometer/src/iomtr_kstat/README
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/README	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/README	2006-04-27 21:15:27 UTC (rev 254)
+@@ -1,26 +0,0 @@
+-* What is iomtr_kstat?
+-iomtr_kstat is a kernel module that exports a virtual character device interface
+-and exchange data with user space application via ioctl interface. It can 
+-reports various information like number of cpu, cpu speed, and performance
+-data.
+-
+-* Why do we need iomtr_kstat?
+-You can run iometer without iomtr_kstat. So iomtr_kstat is only an option. Because
+-on Linux, whenever it wants to gather any performance related data including CPU,
+-NI, TCP data, it has to open and read certain file from /proc file system, parse
+-the file content. This is not a big deal on current fast speed CPU. But when you
+-want to run IoMeter more precisely, or run dynamo on some low speed embedded CPU,
+-then you have to think about this. With iomtr_kstat, any data acquire only needs
+-one system call overhead.
+-
+-* How to use the iomtr_kstat?
+-Please see INSTALL under the same directory.
+-
+-* Which platforms does iomtr_kstat run on?
+-Currently it only support Linux.
+-
+-* Which cpu architecture does iomtr_kstat run on?
+-Currently it only support IA32, IOP321, and IOP331.
+-
+-* Who I should blame if I meet problem?
+-Ming Zhang (mingz at ele.uri.edu), a not so good programmer.
+
+Copied: branches/IOMETER-restruct/iometer/src/iomtr_kstat/README.first (from rev 253, branches/IOMETER-restruct/iometer/src/iomtr_kstat/README)
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/README	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/README.first	2006-04-27 21:15:27 UTC (rev 254)
+@@ -0,0 +1,27 @@
++* What is iomtr_kstat?
++iomtr_kstat is a kernel module that exports a virtual character device interface
++and exchange data with user space application via ioctl interface. It can 
++reports various information like number of cpu, cpu speed, and performance
++data.
++
++* Why do we need iomtr_kstat?
++You can run iometer WITHOUT iomtr_kstat. Iomtr_kstat is only an option. Because
++on Linux, whenever it wants to gather any performance related data including CPU,
++NI, TCP data, it has to open and read certain file from /proc file system, parse
++the file content. This is not a big deal on current fast speed CPU. But when you
++want to run IoMeter more precisely, or run dynamo on some low speed embedded CPU,
++then you have to think about this. With iomtr_kstat, any data acquire only needs
++one system call overhead.
++
++* How to use the iomtr_kstat?
++Please see INSTALL under the same directory.
++
++* Which platforms does iomtr_kstat run on?
++Currently it only support Linux.
++
++* Which cpu architecture does iomtr_kstat run on?
++Currently it only support IOP321, and IOP331.
++
++* Who I should blame if I meet problem?
++Ming Zhang (mingz at ele.uri.edu).
++
+
+Modified: branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c	2006-04-27 21:15:27 UTC (rev 254)
+@@ -81,10 +81,12 @@
+ 
+ #define DEBUG
+ 
+-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0))
++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,8))
+ #define IOMTR_OSVERSION_LINUX26
+ #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,4,0)) && (LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0))
+ #define IOMTR_OSVERSION_LINUX24
++#else
++#error Kernel version not supported!
+ #endif
+ 
+ #include "iomtr_kstat.h"
+@@ -269,17 +271,16 @@
+ 			t.retranssegs += tcp_statistics[ 2 * cpu_logical_map(i)].TcpRetransSegs;
+ 			t.retranssegs += tcp_statistics[ 2 * cpu_logical_map(i) + 1].TcpRetransSegs;
+ 		}
+-#endif
+-#ifdef IOMTR_OSVERSION_LINUX26
++#elif IOMTR_OSVERSION_LINUX26
+ 		for (i = 0; i < NR_CPUS; i++) {
+ 			if (!cpu_possible(i))
+ 				continue;
+-			t.insegs += ((struct tcp_mib *) per_cpu_ptr(tcp_statistics[0], i))->TcpInSegs;
+-			t.insegs += ((struct tcp_mib *) per_cpu_ptr(tcp_statistics[1], i))->TcpInSegs;
+-			t.outsegs += ((struct tcp_mib *) per_cpu_ptr(tcp_statistics[0], i))->TcpOutSegs;
+-			t.outsegs += ((struct tcp_mib *) per_cpu_ptr(tcp_statistics[1], i))->TcpOutSegs;
+-			t.retranssegs += ((struct tcp_mib *) per_cpu_ptr(tcp_statistics[0], i))->TcpRetransSegs;
+-			t.retranssegs += ((struct tcp_mib *) per_cpu_ptr(tcp_statistics[1], i))->TcpRetransSegs;
++			t.insegs += (per_cpu_ptr(tcp_statistics[0], i))->mibs[TCP_MIB_INSEGS];
++			t.insegs += (per_cpu_ptr(tcp_statistics[1], i))->mibs[TCP_MIB_INSEGS];
++			t.outsegs += (per_cpu_ptr(tcp_statistics[0], i))->mibs[TCP_MIB_OUTSEGS];
++			t.outsegs += (per_cpu_ptr(tcp_statistics[1], i))->mibs[TCP_MIB_OUTSEGS];
++			t.retranssegs += (per_cpu_ptr(tcp_statistics[0], i))->mibs[TCP_MIB_RETRANSSEGS];
++			t.retranssegs += (per_cpu_ptr(tcp_statistics[1], i))->mibs[TCP_MIB_RETRANSSEGS];
+ 		}
+ #endif
+ #ifdef DEBUG
+
+Deleted: branches/IOMETER-restruct/iometer/src/iomtr_kstat/load.sh
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/load.sh	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/load.sh	2006-04-27 21:15:27 UTC (rev 254)
+@@ -1,26 +0,0 @@
+-#!/bin/sh
+-module="iomtr_kstat"
+-device="iomtr_kstat"
+-mode="664"
+-
+-# Group: since distributions do it differently, look for wheel or use staff
+-if grep '^staff:' /etc/group > /dev/null; then
+-    group="staff"
+-else
+-    group="wheel"
+-fi
+-
+-# invoke insmod with all arguments we got
+-# and use a pathname, as newer modutils don't look in . by default
+-/sbin/insmod $module.o $* || exit 1
+-
+-major=`cat /proc/devices | awk "\\$2==\"$module\" {print \\$1}"`
+-
+-# Remove stale nodes and replace them, then give gid and perms
+-rm -f /dev/${device}0
+-rm -f /dev/${device}
+-mknod /dev/${device}0 c $major 0
+-ln -sf ${device}0 /dev/${device}
+-chgrp $group /dev/${device}
+-chmod $mode  /dev/${device}
+-
+
+Added: branches/IOMETER-restruct/iometer/src/iomtr_kstat/load24.sh
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/load24.sh	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/load24.sh	2006-04-27 21:15:27 UTC (rev 254)
+@@ -0,0 +1,26 @@
++#!/bin/sh
++module="iomtr_kstat"
++device="iomtr_kstat"
++mode="664"
++
++# Group: since distributions do it differently, look for wheel or use staff
++if grep '^staff:' /etc/group > /dev/null; then
++    group="staff"
++else
++    group="wheel"
++fi
++
++# invoke insmod with all arguments we got
++# and use a pathname, as newer modutils don't look in . by default
++/sbin/insmod $module.o $* || exit 1
++
++major=`cat /proc/devices | awk "\\$2==\"$module\" {print \\$1}"`
++
++# Remove stale nodes and replace them, then give gid and perms
++rm -f /dev/${device}0
++rm -f /dev/${device}
++mknod /dev/${device}0 c $major 0
++ln -sf ${device}0 /dev/${device}
++chgrp $group /dev/${device}
++chmod $mode  /dev/${device}
++
+
+Added: branches/IOMETER-restruct/iometer/src/iomtr_kstat/load26.sh
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/load26.sh	2006-03-17 23:27:58 UTC (rev 253)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/load26.sh	2006-04-27 21:15:27 UTC (rev 254)
+@@ -0,0 +1,26 @@
++#!/bin/sh
++module="iomtr_kstat"
++device="iomtr_kstat"
++mode="664"
++
++# Group: since distributions do it differently, look for wheel or use staff
++if grep '^staff:' /etc/group > /dev/null; then
++    group="staff"
++else
++    group="wheel"
++fi
++
++# invoke insmod with all arguments we got
++# and use a pathname, as newer modutils don't look in . by default
++/sbin/insmod $module.ko $* || exit 1
++
++major=`cat /proc/devices | awk "\\$2==\"$module\" {print \\$1}"`
++
++# Remove stale nodes and replace them, then give gid and perms
++rm -f /dev/${device}0
++rm -f /dev/${device}
++mknod /dev/${device}0 c $major 0
++ln -sf ${device}0 /dev/${device}
++chgrp $group /dev/${device}
++chmod $mode  /dev/${device}
++
+
+
+
+From cheungming at berlios.de  Thu Apr 27 23:20:41 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Thu, 27 Apr 2006 23:20:41 +0200
+Subject: [Iometer-svn] r255 - branches/IOMETER-restruct/iometer/src/Iometer
+Message-ID: <200604272120.k3RLKfOe024836@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-04-27 23:20:39 +0200 (Thu, 27 Apr 2006)
+New Revision: 255
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Iometer/sources
+Log:
+The linker under DDK environment didn't find the library in the SDK path, but rather the CRT 
+path.
+
+"I checked and all three architectures build the GUI with this change.
+
+Note that the dynamo build already pulled MSVCPRT from the
+CRT_LIB_PATH, only the Iometer GUI pulled from the SDK_LIB_PATH."
+
+Fix is from Fabian Tillier <fab AT tillier.net>
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Iometer/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Iometer/sources	2006-04-27 21:15:27 UTC (rev 254)
++++ branches/IOMETER-restruct/iometer/src/Iometer/sources	2006-04-27 21:20:39 UTC (rev 255)
+@@ -21,7 +21,7 @@
+     $(SDK_LIB_PATH)\WINSPOOL.LIB	\
+     $(SDK_LIB_PATH)\SHELL32.LIB		\
+     $(SDK_LIB_PATH)\VERSION.LIB		\
+-    $(SDK_LIB_PATH)\MSVCPRT.LIB
++    $(CRT_LIB_PATH)\MSVCPRT.LIB
+ 
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+
+
+

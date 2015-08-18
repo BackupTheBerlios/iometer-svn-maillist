@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r241 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r241%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200602210054.k1L0sFV1004088%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000005.html">
+   <LINK REL="Next"  HREF="000007.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r241 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r241%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200602210054.k1L0sFV1004088%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r241 - branches/IOMETER-restruct/iometer/src">cheungming at berlios.de
+       </A><BR>
+    <I>Tue Feb 21 01:54:15 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000005.html">[Iometer-svn] r240 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000007.html">[Iometer-svn] r242 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-02-21 01:54:08 +0100 (Tue, 21 Feb 2006)
+New Revision: 241
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+Log:
+From: 	Rick Altherr &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">raltherr at apple.com</A>&gt;
+To: 	iometer-devel-list &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">iometer-devel at lists.sourceforge.net</A>&gt;
+Subject: 	[Iometer-devel] IOmeter OS X patch
+Date: 	Wed, 8 Feb 2006 11:37:03 -0800  (14:37 EST)
+
+As part of the OS X merge, a few structures were included too late in  
+IOCommon.h for the compile to succeed.  The attached patch fixes this  
+issue and should allow OS X builds again.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-02-08 19:44:42 UTC (rev 240)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-02-21 00:54:08 UTC (rev 241)
+@@ -256,6 +256,14 @@
+ 
+  #if defined(IOMTR_OS_OSX)
+   #include &lt;sys/aio.h&gt;
++  #define aiocb64 		aiocb
++  #define aio_suspend64	aio_suspend
++  #define aio_error64		aio_error
++  #define aio_cancel64		aio_cancel
++  #define aio_read64		aio_read
++  #define aio_write64		aio_write
++  #define aio_return64		aio_return
++
+  #elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
+   #include &lt;malloc.h&gt;
+   #include &lt;aio.h&gt;
+@@ -864,14 +872,6 @@
+   #define Sleep(x)		delay((x))
+  #elif defined(IOMTR_OSFAMILY_UNIX)
+   #if defined(IOMTR_OS_OSX)
+-   #define aiocb64 		aiocb
+-   #define aio_suspend64	aio_suspend
+-   #define aio_error64		aio_error
+-   #define aio_cancel64		aio_cancel
+-   #define aio_read64		aio_read
+-   #define aio_write64		aio_write
+-   #define aio_return64		aio_return
+-
+    #define _timeb		timeval
+    #define _ftime(x)		gettimeofday(x,NULL)
+    #define _time		tv_sec
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000005.html">[Iometer-svn] r240 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000007.html">[Iometer-svn] r242 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#6">[ date ]</a>
+              <a href="thread.html#6">[ thread ]</a>
+              <a href="subject.html#6">[ subject ]</a>
+              <a href="author.html#6">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

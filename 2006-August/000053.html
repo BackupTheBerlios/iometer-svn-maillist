@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r284 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r284%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608182041.k7IKf12Q025543%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000052.html">
+   <LINK REL="Next"  HREF="000054.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r284 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r284%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608182041.k7IKf12Q025543%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r284 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug 18 22:41:01 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000052.html">[Iometer-svn] r283 - tags
+</A></li>
+        <LI>Next message: <A HREF="000054.html">[Iometer-svn] r285 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#53">[ date ]</a>
+              <a href="thread.html#53">[ thread ]</a>
+              <a href="subject.html#53">[ subject ]</a>
+              <a href="author.html#53">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-18 22:41:00 +0200 (Fri, 18 Aug 2006)
+New Revision: 284
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+Log:
+fixed the debug version assertion error on exit. the m_wndToolBar is NULL on exit. anyway do reset in OnDestroy looks weired.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-16 01:12:39 UTC (rev 283)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-18 20:41:00 UTC (rev 284)
+@@ -1894,22 +1894,24 @@
+ 
+ void CGalileoView::ButtonReset()
+ {
+-	SetButton(ID_FILE_OPEN, TRUE);
+-	SetButton(ID_FILE_SAVE, TRUE);
+-	SetButton(BNewDynamo, TRUE);
+-	SetButton(BNewDiskWorker, FALSE);
+-	SetButton(BNewNetWorker, FALSE);
+-	SetButton(BCopyWorker, FALSE);
+-	SetButton(BReset, FALSE);
+-	SetButton(BExitOne, FALSE);
+-	SetButton(ID_APP_EXIT, TRUE);
++	if (theApp.m_wndToolBar) {
++		SetButton(ID_FILE_OPEN, TRUE);
++		SetButton(ID_FILE_SAVE, TRUE);
++		SetButton(BNewDynamo, TRUE);
++		SetButton(BNewDiskWorker, FALSE);
++		SetButton(BNewNetWorker, FALSE);
++		SetButton(BCopyWorker, FALSE);
++		SetButton(BReset, FALSE);
++		SetButton(BExitOne, FALSE);
++		SetButton(ID_APP_EXIT, TRUE);
+ 
+-	m_pPageDisplay-&gt;m_dlgBigMeter.SetButtonState(FALSE, FALSE, FALSE);
+-	SetButton(BStart, FALSE);
+-	SetButton(BStop, FALSE);
+-	SetButton(BStopAll, FALSE);
++		m_pPageDisplay-&gt;m_dlgBigMeter.SetButtonState(FALSE, FALSE, FALSE);
++		SetButton(BStart, FALSE);
++		SetButton(BStop, FALSE);
++		SetButton(BStopAll, FALSE);
+ 
+-	theApp.m_wndToolBar.RedrawWindow();
++		theApp.m_wndToolBar.RedrawWindow();
++	}
+ }
+ 
+ //
+
+Modified: branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-16 01:12:39 UTC (rev 283)
++++ branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-18 20:41:00 UTC (rev 284)
+@@ -227,6 +227,8 @@
+ //
+ BOOL ManagerList::RemoveManager(int index, int purpose)
+ {
++	int i;
++
+ 	if (index &lt; 0 || index &gt;= ManagerCount()) {
+ 		ErrorMessage(&quot;Invalid index in ManagerList::RemoveManager().&quot;);
+ 		return FALSE;
+@@ -244,10 +246,11 @@
+ 
+ 	// Perform a full reset if all managers have
+ 	// been removed to reset the display properly.
+-	if (!ManagerCount())
++	i = ManagerCount();
++	if (!i)
+ 		theApp.pView-&gt;Reset();
+ 
+-	return (ManagerCount());
++	return (i);
+ }
+ 
+ //
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000052.html">[Iometer-svn] r283 - tags
+</A></li>
+	<LI>Next message: <A HREF="000054.html">[Iometer-svn] r285 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#53">[ date ]</a>
+              <a href="thread.html#53">[ thread ]</a>
+              <a href="subject.html#53">[ subject ]</a>
+              <a href="author.html#53">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

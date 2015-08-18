@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r274 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r274%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608080043.k780hgSK004653%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000042.html">
+   <LINK REL="Next"  HREF="000044.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r274 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r274%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608080043.k780hgSK004653%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r274 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug  8 02:43:42 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000042.html">[Iometer-svn] r273 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000044.html">[Iometer-svn] r275 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#43">[ date ]</a>
+              <a href="thread.html#43">[ thread ]</a>
+              <a href="subject.html#43">[ subject ]</a>
+              <a href="author.html#43">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-08 02:43:38 +0200 (Tue, 08 Aug 2006)
+New Revision: 274
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/AccessDialog.cpp
+Log:
+used another way to get function pointer. make compiler happier.
+
+By  Vedran Degoricija
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/AccessDialog.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/AccessDialog.cpp	2006-08-08 00:25:45 UTC (rev 273)
++++ branches/IOMETER-restruct/iometer/src/AccessDialog.cpp	2006-08-08 00:43:38 UTC (rev 274)
+@@ -223,8 +223,8 @@
+ 	//  since it really isn't needed anyway...
+ 	//size_controls.GetFunc                 = this-&gt;GetSize;
+ 	//size_controls.SetFunc                 = this-&gt;SetSize;
+-	size_controls.GetFunc = GetSize;
+-	size_controls.SetFunc = SetSize;
++	size_controls.GetFunc = &amp;CAccessDialog::GetSize;
++	size_controls.SetFunc = &amp;CAccessDialog::SetSize;
+ 
+ 	align_controls.EBytesCtrl = &amp;m_EAlignBytes;
+ 	align_controls.EKilobytesCtrl = &amp;m_EAlignKilobytes;
+@@ -245,8 +245,8 @@
+ 	//  since it really isn't needed anyway...
+ 	//align_controls.GetFunc                        = this-&gt;GetAlign;
+ 	//align_controls.SetFunc                        = this-&gt;SetAlign;
+-	align_controls.GetFunc = GetAlign;
+-	align_controls.SetFunc = SetAlign;
++	align_controls.GetFunc = &amp;CAccessDialog::GetAlign;
++	align_controls.SetFunc = &amp;CAccessDialog::SetAlign;
+ 
+ // RSelectedID MUST be greater than RNotSelectedID, for the sake of GetCheckedRadioButton().
+ #if !(RAlignBytes &gt; RAlignSector)
+@@ -272,8 +272,8 @@
+ 	//  since it really isn't needed anyway...
+ 	//reply_controls.GetFunc                        = this-&gt;GetReply;
+ 	//reply_controls.SetFunc                        = this-&gt;SetReply;
+-	reply_controls.GetFunc = GetReply;
+-	reply_controls.SetFunc = SetReply;
++	reply_controls.GetFunc = &amp;CAccessDialog::GetReply;
++	reply_controls.SetFunc = &amp;CAccessDialog::SetReply;
+ 
+ // RSelectedID MUST be greater than RNotSelectedID, for the sake of GetCheckedRadioButton().
+ #if !(RReplySize &gt; RNoReply)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000042.html">[Iometer-svn] r273 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000044.html">[Iometer-svn] r275 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#43">[ date ]</a>
+              <a href="thread.html#43">[ thread ]</a>
+              <a href="subject.html#43">[ subject ]</a>
+              <a href="author.html#43">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

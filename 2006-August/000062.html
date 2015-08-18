@@ -1,0 +1,472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r293 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r293%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608221625.k7MGP3Vf006775%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000061.html">
+   <LINK REL="Next"  HREF="000063.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r293 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r293%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608221625.k7MGP3Vf006775%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r293 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 22 18:25:03 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000061.html">[Iometer-svn] r292 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+        <LI>Next message: <A HREF="000063.html">[Iometer-svn] r294 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-22 18:25:01 +0200 (Tue, 22 Aug 2006)
+New Revision: 293
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+   branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+   branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+   branches/IOMETER-restruct/iometer/src/Worker.cpp
+Log:
+used snprintf instead of sprintf to reduce risk of buffer overrun.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-22 16:25:01 UTC (rev 293)
+@@ -118,7 +118,8 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
+-   -Cleanup the use of _DEBUG and _DETAILS.
++   - Use snprintf instead of sprinf to reduce the risk of buffer overrun.
++   - Cleanup the use of _DEBUG and _DETAILS.
+    - Renamed Dynamo and Iometer subdirectories to solve the name conflict
+      under case insensitive file system.
+    - Adjusted some variable types to fit 64bit OS and compiler.
+
+Modified: branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/AccessSpecList.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -608,7 +608,7 @@
+ 	name.Format(&quot;Copy of %s&quot;, spec-&gt;name);
+ 	copy_number = 1;
+ 	do {
+-		sprintf(spec-&gt;name, &quot;%s (%d)&quot;, name, copy_number++);
++		snprintf(spec-&gt;name, MAX_NAME, &quot;%s (%d)&quot;, name, copy_number++);
+ 	} while (RefByName(spec-&gt;name) != spec);
+ 
+ 	return spec;
+@@ -1132,7 +1132,7 @@
+ 	// Ensure that names are not duplicated.
+ 	do {
+ 		// We have the current number, so we add 1 for the next number.
+-		sprintf(name, &quot;Untitled %d&quot;, ++next_number);
++		snprintf(name, MAX_NAME, &quot;Untitled %d&quot;, ++next_number);
+ 	}
+ 	while (RefByName(name));
+ }
+@@ -1191,5 +1191,5 @@
+ 	while (RefByName((LPCTSTR) name)) {
+ 		name.Format(&quot;%s %d&quot;, name.Left(name_size), ++spec_number);
+ 	}
+-	sprintf(spec-&gt;name, &quot;%s&quot;, name);
++	snprintf(spec-&gt;name, MAX_NAME, &quot;%s&quot;, name);
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -607,6 +607,10 @@
+ 				// Compare it with Dynamo's version number (will be 0 or uninitialized for 
+ 				// versions before 1998.09.23)
+ 				if (login_msg-&gt;data != iometer_version) {
++					// give the user a message box explaining the problem
++					size_t msg_len = 2 * MAX_VERSION_LENGTH + 100;
++					char errmsg[msg_len];
++
+ 					// versions failed to match...  refuse connection
+ 
+ 					// tell Dynamo that the connection is being refused
+@@ -616,19 +620,16 @@
+ 
+ 					login_port-&gt;Disconnect();
+ 
+-					// give the user a message box explaining the problem
+-					char errmsg[2 * MAX_VERSION_LENGTH + 100];
+-
+ 					if (login_msg-&gt;data &gt; 19970101 &amp;&amp; login_msg-&gt;data &lt; 21001231) {
+ 						year = (int)(login_msg-&gt;data / 10000);
+ 						month = (int)(login_msg-&gt;data / 100) - (year * 100);
+ 						day = login_msg-&gt;data - (month * 100) - (year * 10000);
+ 
+-						sprintf(errmsg,
++						snprintf(errmsg, msg_len,
+ 							&quot;Iometer %s is not compatible with Dynamo %04d.%02d.%02d&quot;,
+ 							m_pVersionStringWithDebug, year, month, day);
+ 					} else {
+-						sprintf(errmsg,
++						snprintf(errmsg, msg_len,
+ 							&quot;Iometer %s is not compatible with Dynamo (unknown version number)&quot;,
+ 							m_pVersionStringWithDebug);
+ 					}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -467,7 +467,7 @@
+ 		while (TRUE) {
+ 			// Form VI NIC name to open.
+ 			vi_spec[count].type = VIClientType;
+-			sprintf(vi_spec[count].name, &quot;%s%i&quot;, vi_nic_name[nic_base], vi_nic_name_no[nic_base]++);
++			snprintf(vi_spec[count].name, MAX_NAME, &quot;%s%i&quot;, vi_nic_name[nic_base], vi_nic_name_no[nic_base]++);
+ 
+ 			// Try opening VI NIC.
+ 			if (!nic.Open(vi_spec[count].name)) {
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -290,7 +290,7 @@
+ 	// &quot;fscanf(... %&lt;nn&gt;s)&quot; has to be &quot;MAX_NAME - 1&quot;
+ #endif
+ 	while ((count &lt; MAX_TARGETS) &amp;&amp; (fscanf(file, &quot;%*d %*d %*d %79s&quot;, devName) == 1)) {
+-		sprintf(paddedDevName, &quot; %s &quot;, devName);
++		snprintf(paddedDevName, MAX_NAME + 2, &quot; %s &quot;, devName);
+ #ifdef _DEBUG
+ 		cout &lt;&lt; __FUNCTION__ &lt;&lt; &quot;: Found device &quot; &lt;&lt; devName &lt;&lt; &quot;\n&quot;;
+ #endif
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerNetware.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -169,7 +169,7 @@
+ #ifdef _DEBUG
+ 			cout &lt;&lt; __FUNCTION__ &lt;&lt; &quot;: Device is not reserved.\n&quot;;
+ #endif
+-			sprintf(disk_name, &quot;[%d]&quot;, next);
++			snprintf(disk_name, 128, &quot;[%d]&quot;, next);
+ 			if (d.Init_Physical(disk_name)) {
+ 				d.spec.type = PhysicalDiskType;
+ 				memcpy(&amp;disk_spec[count], &amp;d.spec, sizeof(Target_Spec));
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerSolaris.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -347,7 +347,7 @@
+ 	memset(base_name, 0, MAX_NAME);
+ 	memset(file_name, 0, MAX_NAME);
+ 	// We don't deal directly with slices cXtXdXsX. Never gets that value.
+-	sprintf(file_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, name);
++	snprintf(file_name, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, name);
+ #ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Reporting disk partitions: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+@@ -391,14 +391,14 @@
+ 				// Do this only once even if you have multiple solaris partitions.
+ 				// Other Solaris parts are invisible through the disk label/vtoc.
+ 				has_solaris_parts = TRUE;
+-				sprintf(file_name, &quot;%ss2&quot;, base_name);
++				snprintf(file_name, MAX_NAME, &quot;%ss2&quot;, base_name);
+ 				if (Report_VTOC_Partitions(file_name, disk_spec, count, logical_count) == TRUE) {
+ 					VTOC_valid = TRUE;
+ 					continue;
+ 				}
+ 			}
+ 
+-			sprintf(file_name, &quot;%sp%d&quot;, base_name, i);
++			snprintf(file_name, MAX_NAME, &quot;%sp%d&quot;, base_name, i);
+ #ifdef _DEBUG
+ 			cout &lt;&lt; &quot;   file_name: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+@@ -549,7 +549,7 @@
+ 	memset(base_name, 0, MAX_NAME);
+ 	memset(file_name, 0, MAX_NAME);
+ 
+-	sprintf(file_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, name);
++	snprintf(file_name, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, name);
+ #ifdef _DEBUG
+ 	cout &lt;&lt; &quot;   Reporting vtoc partitions: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+@@ -666,7 +666,7 @@
+ #ifdef _DEBUG
+ 			cerr &lt;&lt; &quot;NOTE: Overlapping slices : &quot; &lt;&lt; i &lt;&lt; &quot;, &quot; &lt;&lt; j &lt;&lt; endl;
+ #endif
+-			sprintf(temp, &quot;%ss%d&quot;, base_name, j);
++			snprintf(temp, MAX_NAME, &quot;%ss%d&quot;, base_name, j);
+ 			if (Has_File_System(temp, fstype) == TRUE) {
+ 				// this slice 'i' overlaps with an unmounted file system.
+ 				continue;
+@@ -678,7 +678,7 @@
+ 			// else we are ok. overlapping empty slices is just fine.
+ 		}
+ 		// Here we do have VTOC parts to report.
+-		sprintf(file_name, &quot;%ss%d&quot;, base_name, i);
++		snprintf(file_name, MAX_NAME, &quot;%ss%d&quot;, base_name, i);
+ #ifdef _DEBUG
+ 		cout &lt;&lt; &quot;  vtoc  file_name: &quot; &lt;&lt; file_name &lt;&lt; endl &lt;&lt; flush;
+ #endif
+@@ -787,7 +787,7 @@
+ 		// NOTE: EXTRA LOOP TO GRAB WHOLE SLICE if nothing else left.
+ 		for (i = 0; i &lt; this_vtoc.v_nparts; i++) {
+ 			if (this_vtoc.v_part[i].p_tag == V_BACKUP) {
+-				sprintf(file_name, &quot;%ss%d&quot;, base_name, i);
++				snprintf(file_name, MAX_NAME, &quot;%ss%d&quot;, base_name, i);
+ 				if (d.Init_Physical(file_name)) {
+ 					if (d.Init_Physical(file_name))
+ 						// Disk Initialization succeeded,
+@@ -857,8 +857,8 @@
+ 
+ 	// Initialize
+ 	fstype[0] = 0;
+-	sprintf(path, &quot;/dev/rdsk/%s&quot;, file_name);
+-	sprintf(cmd, &quot;/usr/sbin/fstyp %s 2&gt;/dev/null&quot;, path);
++	snprintf(path, MAX_NAME, &quot;/dev/rdsk/%s&quot;, file_name);
++	snprintf(cmd, MAX_NAME, &quot;/usr/sbin/fstyp %s 2&gt;/dev/null&quot;, path);
+ 	if ((pptr = popen(cmd, &quot;r&quot;)) != NULL) {
+ 		// popen succeeded.
+ 		fgets(buf, BUFSIZ, pptr);
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -96,7 +96,7 @@
+ 	// Reporting physical drives.
+ 	while (count &lt; MAX_TARGETS) {
+ 		// See if the physical drive exists.
+-		sprintf(d.spec.name, &quot;%s%i&quot;, PHYSICAL_DISK, drive_number);
++		snprintf(d.spec.name, MAX_NAME, &quot;%s%i&quot;, PHYSICAL_DISK, drive_number);
+ 		strcpy(d.file_name, d.spec.name);
+ 		d.spec.type = PhysicalDiskType;
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -278,12 +278,12 @@
+ BOOL TargetDisk::Init_Logical(char *drive)
+ {
+ 	// Setting spec.name of the drive.
+-	sprintf(spec.name, &quot;%s&quot;, drive);
++	snprintf(spec.name, MAX_NAME, &quot;%s&quot;, drive);
+ 
+ 	if (spec.name[strlen(spec.name) - 1] == ':') {
+-		sprintf(file_name, &quot;%s%s&quot;, spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, &quot;%s%s&quot;, spec.name, TEST_FILE);
+ 	} else {
+-		sprintf(file_name, &quot;%s:%s&quot;, spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, &quot;%s:%s&quot;, spec.name, TEST_FILE);
+ 	}
+ 
+ 	spec.type = LogicalDiskType;
+@@ -309,12 +309,12 @@
+ 		spec.name[p - drive] = 0;
+ 	} else
+ 		// Setting spec.name of the drive.
+-		sprintf(spec.name, &quot;%s&quot;, drive);
++		snprintf(spec.name, MAX_NAME, &quot;%s&quot;, drive);
+ 
+ 	if (spec.name[strlen(spec.name) - 1] == '/') {
+-		sprintf(file_name, &quot;%s%s&quot;, spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, &quot;%s%s&quot;, spec.name, TEST_FILE);
+ 	} else {
+-		sprintf(file_name, &quot;%s/%s&quot;, spec.name, TEST_FILE);
++		snprintf(file_name, MAX_NAME, &quot;%s/%s&quot;, spec.name, TEST_FILE);
+ 	}
+ 
+ 	spec.type = LogicalDiskType;
+@@ -334,8 +334,8 @@
+ BOOL TargetDisk::Init_Logical(char drive)
+ {
+ 	// Setting spec.name of the drive.
+-	sprintf(spec.name, &quot;%c%s&quot;, drive, LOGICAL_DISK);
+-	sprintf(file_name, &quot;%s%s&quot;, spec.name, TEST_FILE);
++	snprintf(spec.name, MAX_NAME, &quot;%c%s&quot;, drive, LOGICAL_DISK);
++	snprintf(file_name, MAX_NAME, &quot;%s%s&quot;, spec.name, TEST_FILE);
+ 
+ 	spec.type = LogicalDiskType;
+ 	size = 0;
+@@ -359,9 +359,9 @@
+ 	// Setting the spec.name of the drive.
+ 	printf(&quot;TargetDisk::Init_Physical: name=%s, mmID=%X\n&quot;, drive, drive1);
+ 	MM_ReturnObjectGenericInfo(drive1, sizeof(struct IOObjectGenericInfoDef), &amp;info);
+-	sprintf(spec.name, &quot;[%d] %s&quot;, drive1, info.name);
++	snprintf(spec.name, MAX_NAME, &quot;[%d] %s&quot;, drive1, info.name);
+ 
+-	sprintf(file_name, &quot;%d&quot;, drive1);
++	snprintf(file_name, MAX_NAME, &quot;%d&quot;, drive1);
+ 
+ 	spec.type = PhysicalDiskType;
+ 	size = 0;
+@@ -387,13 +387,13 @@
+ 		spec.name[p - drive] = 0;
+ 	} else {
+ 		// Setting spec.name of the drive.
+-		sprintf(spec.name, &quot;%s&quot;, drive);
++		snprintf(spec.name, MAX_NAME, &quot;%s&quot;, drive);
+ 	}
+ 
+ 	if (!strstr(spec.name, RAW_DEVICE_DIR))
+-		sprintf(file_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, spec.name);
++		snprintf(file_name, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, spec.name);
+ 	else
+-		sprintf(file_name, &quot;%s&quot;, spec.name);
++		snprintf(file_name, MAX_NAME, &quot;%s&quot;, spec.name);
+ 
+ 	spec.type = PhysicalDiskType;
+ 	size = 0;
+@@ -414,7 +414,7 @@
+ BOOL TargetDisk::Init_Physical(int drive)
+ {
+ 	// Setting the spec.name of the drive.
+-	sprintf(spec.name, &quot;%s%i&quot;, PHYSICAL_DISK, drive);
++	snprintf(spec.name, MAX_NAME, &quot;%s%i&quot;, PHYSICAL_DISK, drive);
+ 	strcpy(file_name, spec.name);
+ 
+ 	spec.type = PhysicalDiskType;
+@@ -1721,7 +1721,7 @@
+ 
+ 	length = strlen(part_name);
+ 	part_name[length - 1] = '0';	// Converting cXtXdXpX to cXtXdXp0
+-	sprintf(disk_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, part_name);
++	snprintf(disk_name, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, part_name);
+ 	fd = open(disk_name, O_RDONLY);
+ 	if (fd &lt; 0) {
+ 		return (0);
+@@ -1752,7 +1752,7 @@
+ 
+ 	length = strlen(part_name);
+ 	part_name[length - 1] = '2';	// Converting cXtXdXsX to cXtXdXs2
+-	sprintf(disk_name, &quot;%s/%s&quot;, RAW_DEVICE_DIR, part_name);
++	snprintf(disk_name, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, part_name);
+ 	fd = open(disk_name, O_RDONLY);
+ 	if (fd &lt; 0) {
+ 		return (0);
+@@ -1775,14 +1775,14 @@
+ 
+ static int getSectorSizeOfPhysDisk(const char *devName)
+ {
+-	char devNameBuf[40];
++	char devNameBuf[MAX_NAME];
+ 	const char *fullDevName;
+ 	int fd, ssz;
+ 
+ 	if (devName[0] == '/') {
+ 		fullDevName = devName;
+ 	} else {
+-		sprintf(devNameBuf, &quot;%s/%s&quot;, RAW_DEVICE_DIR, devName);
++		snprintf(devNameBuf, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, devName);
+ 		fullDevName = devNameBuf;
+ 	}
+ 	if ((fd = open(fullDevName, O_RDWR)) &lt; 0) {
+@@ -1823,7 +1823,7 @@
+ 	if (devName[0] == '/') {
+ 		fullDevName = devName;
+ 	} else {
+-		sprintf(devNameBuf, &quot;%s/%s&quot;, RAW_DEVICE_DIR, devName);
++		snprintf(devNameBuf, MAX_NAME, &quot;%s/%s&quot;, RAW_DEVICE_DIR, devName);
+ 		fullDevName = devNameBuf;
+ 	}
+ 	if ((fd = open(fullDevName, O_RDWR)) &lt; 0) {
+
+Modified: branches/IOMETER-restruct/iometer/src/ManagerList.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/ManagerList.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -499,7 +499,7 @@
+ 	(*file) &lt;&lt; &quot;'Time Stamp&quot; &lt;&lt; endl;
+ 	_ftime(&amp;tb);
+ 	ptm = localtime(&amp;tb.time);
+-	sprintf(acDummy, &quot;%04d-%02d-%02d %02d:%02d:%02d:%003d&quot;, ptm-&gt;tm_year + 1900,
++	snprintf(acDummy, 64, &quot;%04d-%02d-%02d %02d:%02d:%02d:%003d&quot;, ptm-&gt;tm_year + 1900,
+ 		ptm-&gt;tm_mon + 1, ptm-&gt;tm_mday, ptm-&gt;tm_hour, ptm-&gt;tm_min, ptm-&gt;tm_sec, tb.millitm);
+ 	(*file) &lt;&lt; acDummy &lt;&lt; endl;
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -297,7 +297,7 @@
+ 	(*file) &lt;&lt; &quot;'Time Stamp&quot; &lt;&lt; endl;
+ 	_ftime(&amp;tb);
+ 	ptm = localtime(&amp;tb.time);
+-	sprintf(acDummy, &quot;%04d-%02d-%02d %02d:%02d:%02d:%003d&quot;, ptm-&gt;tm_year + 1900,
++	snprintf(acDummy, 64, &quot;%04d-%02d-%02d %02d:%02d:%02d:%003d&quot;, ptm-&gt;tm_year + 1900,
+ 		ptm-&gt;tm_mon + 1, ptm-&gt;tm_mday, ptm-&gt;tm_hour, ptm-&gt;tm_min, ptm-&gt;tm_sec, tb.millitm);
+ 	(*file) &lt;&lt; acDummy &lt;&lt; endl;
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/Worker.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-08-22 14:22:38 UTC (rev 292)
++++ branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-08-22 16:25:01 UTC (rev 293)
+@@ -1131,7 +1131,7 @@
+ 	// Record that I am the client's net_partner and what target it is.
+ 	net_partner-&gt;net_partner = this;
+ 	net_partner-&gt;net_target_index = 0;
+-	sprintf(net_partner-&gt;name, &quot;[%s]&quot;, name);
++	snprintf(net_partner-&gt;name, MAX_WORKER_NAME, &quot;[%s]&quot;, name);
+ 
+ 	// add the new worker to the display - this should be handled by the GUI
+ 	theApp.pView-&gt;m_pWorkerView-&gt;AddWorker(net_partner);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000061.html">[Iometer-svn] r292 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+	<LI>Next message: <A HREF="000063.html">[Iometer-svn] r294 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#62">[ date ]</a>
+              <a href="thread.html#62">[ thread ]</a>
+              <a href="subject.html#62">[ subject ]</a>
+              <a href="author.html#62">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

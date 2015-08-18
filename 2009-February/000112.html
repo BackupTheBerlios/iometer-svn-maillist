@@ -1,0 +1,1102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r346 - in branches/IOMETER-restruct/iometer/src: .	Galileo Pulsar msvc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2009-February/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r346%20-%20in%20branches/IOMETER-restruct/iometer/src%3A%20.%0A%09Galileo%20Pulsar%20msvc&In-Reply-To=%3C200902210041.n1L0fVOX007739%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000113.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r346 - in branches/IOMETER-restruct/iometer/src: .	Galileo Pulsar msvc</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r346%20-%20in%20branches/IOMETER-restruct/iometer/src%3A%20.%0A%09Galileo%20Pulsar%20msvc&In-Reply-To=%3C200902210041.n1L0fVOX007739%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r346 - in branches/IOMETER-restruct/iometer/src: .	Galileo Pulsar msvc">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Sat Feb 21 01:41:31 CET 2009</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000113.html">[Iometer-svn] r347 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#112">[ date ]</a>
+              <a href="thread.html#112">[ thread ]</a>
+              <a href="subject.html#112">[ subject ]</a>
+              <a href="author.html#112">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2009-02-21 01:41:16 +0100 (Sat, 21 Feb 2009)
+New Revision: 346
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+   branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj
+   branches/IOMETER-restruct/iometer/src/msvc/Iometer.sln
+   branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj
+Log:
+Fixed bug in Windows code around software based raid identification. Removed desdevices calls due to porblems. Added 2K device support. 
+
+
+Property changes on: branches/IOMETER-restruct/iometer/src
+___________________________________________________________________
+Name: svn:ignore
+   - *.plg
+*.aps
+*.ncb
+*.opt
+   + *.plg
+*.aps
+*.ncb
+*.opt
+buildchk_wnet_ia64.err
+buildchk_wnet_ia64.log
+buildchk_wnet_ia64.wrn
+buildfre_wlh_amd64.log
+buildfre_wlh_ia64.log
+buildfre_wnet_amd64.log
+buildfre_wnet_ia64.log
+buildfre_wnet_x86.log
+ddk
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2009-02-21 00:41:16 UTC (rev 346)
+@@ -32,7 +32,7 @@
+ 	$(SDK_LIB_PATH)\WSOCK32.LIB	\
+ 	$(SDK_LIB_PATH)\WS2_32.LIB
+ 
+-LINKER_STACKSIZE=-stack:0x80000,0x4000
++LINKER_STACKSIZE=-stack:0x4000000,0x100000
+ 
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2009-02-21 00:41:16 UTC (rev 346)
+@@ -202,8 +202,8 @@
+ // (both, OS family based and common)
+ // ----------------------------------------------------------------------------
+ #if defined(IOMTR_OSFAMILY_WINDOWS)   // Only first, because it is needed here!
+- #define VC_EXTRALEAN
+- #pragma warning (disable: 4242)
++ //#define VC_EXTRALEAN
++ //#pragma warning (disable: 4242)
+  #include &lt;process.h&gt;
+  #include &lt;io.h&gt;
+  #include &lt;direct.h&gt;
+@@ -445,7 +445,7 @@
+                                    // the Solaris 2.6 man page for swapctl(2)
+ #define	MAX_CPUS	      64
+ #define	MAX_WORKERS	      128
+-#define MAX_TARGETS	      512
++#define MAX_TARGETS	      2048
+ #define MAX_NETWORK_NAME      128
+ #define MAX_NUM_INTERFACES    64
+ #define MAX_WORKER_NAME	      128
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2009-02-21 00:41:16 UTC (rev 346)
+@@ -70,17 +70,14 @@
+ // storage structure referenced.
+ //
+ 
+-#if 0
+-// vista/w2k8 wdk adds this intrinsic?? not sure how to deal with it 
+-#if (_WIN32_WINNT &lt; 0x0600)
+-#define __struct_bcount(x)
+-#endif
+-#endif
+-
++#if 0	
++// All this is now covered in the winioctl.h -- assuming you have a recent one
++// Uncomment as necessary.
+ #include &lt;devioctl.h&gt;
+ #include &lt;ntdddisk.h&gt;
+ #include &lt;ntddstor.h&gt;
+ #include &lt;ntddvol.h&gt;
++#endif
+ 
+ int Report_Disks_WinNT(Target_Spec * disk_spec)
+ #else
+@@ -186,21 +183,25 @@
+ 
+ /////////////////////////////////////////////DEFINES///////////////////////////////////////////////
+ 
+-// #define USE_NEW_DISK_VIEW	TRUE
+ // Enables the fanciest disk detection method and falls
+ // back to older methods on older OSes (like win2k/nt).
+ // FALSE will force the plain method always.
+ //
+ // Functionality moved to dynamo_param global member disk_control
++// #define USE_NEW_DISK_VIEW	TRUE
+ 
+ 
+-#define NEST_ORPHAN_DISKS	FALSE
+ // Inject dummy volume in disk wiew hierarchy 
+ // as parent objects to unmounted/unknown disks that 
+ // have valid partitions on them.
+ // FALSE will not, but iometer will control the display of 
+ // these additional physical disks.
++#define NEST_ORPHAN_DISKS	FALSE
+ 
++// Number of non-existant disks to scan before stopping for good.
++#define PHYS_DISK_HOLE_SIZE 512
++
++
+ #define MINUS_ONE 0xffffffff
+ #define LDSTRINGS_BUF_SIZE 256
+ 
+@@ -212,12 +213,31 @@
+ #define GET_STORPROP_PRODUCT_STRINGS(_x) ((char *)_x + ((PSTORAGE_DEVICE_DESCRIPTOR)_x)-&gt;ProductIdOffset)
+ #define GET_STORPROP_REVISION_STRINGS(_x) ((char *)_x + ((PSTORAGE_DEVICE_DESCRIPTOR)_x)-&gt;ProductRevisionOffset)
+ 
++//
++// Disk_Spec.disk_reserved is a 5-DWORD long structure that contains a STORAGE_DEVICE_NUMBER structure 
++// and a pointer tothe VOLUME_DISK_EXTENTS_STRUCTURE; This could be bad if the SDN stucture changes size;
+ #define GET_SDN_PTR(_x) ((PSTORAGE_DEVICE_NUMBER) &amp;_x.disk_reserved[0])
+-#define GET_VDE_PTR(_x) ((PVOLUME_DISK_EXTENTS) &amp;_x.disk_reserved[3])
++#define GET_VDE_PTR(_x) ((PVOLUME_DISK_EXTENTS *) &amp;_x.disk_reserved[3])
+ 
+-#define EQUAL_DEVICE_NUMBERS(_x, _y) (((_x)-&gt;DeviceType == (_y)-&gt;DeviceType) \
+-							       &amp;&amp; ((_x)-&gt;DeviceNumber == (_y)-&gt;DeviceNumber))
++#if 0
++// The above GET_VDE or GET_SDN should be been phrades like this
++#pragma pack(push, 1)
++struct _SDN_VDEPTR
++{
++	STORAGE_DEVICE_NUMBER sdn;
++	PVOLUME_DISK_EXTENTS pvde;
++};
++#pragma pack(pop)
+ 
++#define GET_SDN_PTR(_x) (&amp;((struct _SDN_VDEPTR)_x.disk_reserved).sdn)
++#define GET_VDE_PTRPTR(_x) (&amp;((struct _SDN_VDEPTR)_x.disk_reserved).pvde)
++#endif
++
++#define EQUAL_DEVICE_NUMBERS(_x, _y) ((((PSTORAGE_DEVICE_NUMBER)_x)-&gt;DeviceType == ((PSTORAGE_DEVICE_NUMBER)_y)-&gt;DeviceType) \
++							       &amp;&amp; (((PSTORAGE_DEVICE_NUMBER)_x)-&gt;DeviceNumber == ((PSTORAGE_DEVICE_NUMBER)_y)-&gt;DeviceNumber))
++
++
++
+ /////////////////////////////////////// GLOBAL FUNCTION PROTOTYPES//////////////////////////////
+ 
+ //
+@@ -301,9 +321,6 @@
+ bool GetDiskExtents(char *name, PVOID vde, PULONG size, bool allocate);
+ bool GetStorageProperty(char *name, PVOID in, PULONG size, bool allocate);
+ bool SendIoControl( char *device, DWORD control, LPVOID in,  DWORD size_in, LPVOID out, DWORD size_out);
+-int  GetDosDevices(LPSTR search, LPSTR *source);
+-DosDeviceList GetFilteredDosDevices(LPSTR search);
+-
+ int  MergeVolumesAndRawDisks(Target_Spec *dest, Target_Spec *source, ULONG mid_point, ULONG total, BOOL InsertUnknown);
+ int __cdecl TS_Compare_BasicName(const void *elem1, const void *elem2);
+ int __cdecl TS_Compare_DeviceNumberLogiFirst(const void *elem1, const void *elem2);
+@@ -482,6 +499,8 @@
+ 			qsort( &amp;disk_spec[device_count - net_count], net_count, sizeof(Target_Spec), TS_Compare_BasicName);
+ 
+ #if _DETAILS
++		cout &lt;&lt; &quot;Target_Spec size=&quot; &lt;&lt; sizeof(Target_Spec) &lt;&lt; endl; 
++		cout &lt;&lt; &quot;Data_Message size=&quot; &lt;&lt; sizeof(Data_Message) &lt;&lt; endl;
+ 		cout &lt;&lt; &quot;Number of devices detected: &quot; &lt;&lt; device_count &lt;&lt; endl;
+ #endif
+ 		// Done
+@@ -921,12 +940,15 @@
+ 			continue;
+ 		}
+ 
++		PVOLUME_DISK_EXTENTS *pvde = (PVOLUME_DISK_EXTENTS*) GET_VDE_PTR(d.spec.disk_info);
++		PSTORAGE_DEVICE_NUMBER psdn = GET_SDN_PTR(d.spec.disk_info);
++
+ 		// This allows use to get a unique device number to match against physical disks.
+-		if (!GetDeviceNumber(volume_name, GET_SDN_PTR(d.spec.disk_info)))
++		if (!GetDeviceNumber(volume_name, psdn))
+ 		{
+ 			// if we failed getting a device number, we might have a dynamic sw volume set,
+ 			// so try to get disk extent info as well
+-			if (!GetDiskExtents(volume_name, GET_VDE_PTR(d.spec.disk_info), 0, TRUE)) 
++			if (!GetDiskExtents(volume_name, pvde, 0, TRUE)) 
+ 			{
+ 				cerr &lt;&lt; &quot;ERROR retrieving device number or extents from &quot; 
+ 					 &lt;&lt; path_names &lt;&lt; endl;
+@@ -936,20 +958,28 @@
+ 			}
+ 			else
+ 			{
+-				PVOLUME_DISK_EXTENTS pvde = (PVOLUME_DISK_EXTENTS) GET_VDE_PTR(d.spec.disk_info);
+-				PSTORAGE_DEVICE_NUMBER psdn = GET_SDN_PTR(d.spec.disk_info);
++				//PVOLUME_DISK_EXTENTS pvde = (PVOLUME_DISK_EXTENTS) GET_VDE_PTR(d.spec.disk_info);
++				//PSTORAGE_DEVICE_NUMBER psdn = GET_SDN_PTR(d.spec.disk_info);
++
+ 				// If we have extents, populate the device_number structure
+ 				// with something useful for associating phys to logi disks
+ 				psdn-&gt;DeviceType = FILE_DEVICE_DISK;
+ 
+ 				// the first disk in the volume set will match this value
+-				psdn-&gt;DeviceNumber = pvde-&gt;Extents[0].DiskNumber;
++				psdn-&gt;DeviceNumber = (*pvde)-&gt;Extents[0].DiskNumber;
+ 
+ 				// stash the number of physical disks in this sw volume as a negative partition number
+-				psdn-&gt;PartitionNumber = (ULONG) (-1 * pvde-&gt;NumberOfDiskExtents);
++				psdn-&gt;PartitionNumber = (ULONG) (-1 * (*pvde)-&gt;NumberOfDiskExtents);
+ 			}
+ 		}
+ 
++#if _DETAILS2
++		cout &lt;&lt; &quot;d.spec.disk_info.disk_reserved array: &quot;;
++		for (int i=0; i&lt;5; i++)
++			cout &lt;&lt; i &lt;&lt; &quot;=&quot; &lt;&lt; d.spec.disk_info.disk_reserved[i];
++		cout &lt;&lt; endl;
++#endif
++
+ 		// once init_logical is called, we can overwrite the .name with our &quot;friendly name&quot; version
+ 		strcpy(d.spec.name, path_names);
+ 
+@@ -1163,30 +1193,12 @@
+ 	int	drive_number = 0, number_skipped = 0;
+ 	int count = start_count;
+ 	TargetDisk d;
+-	DosDeviceList dev_list;
++	DosDeviceList dev_list = {0,0};
+ 
+ 	cout &lt;&lt; &quot;Reporting raw disk information...&quot; &lt;&lt; endl;
+ 
+-	// The following parses the DosDevice namespace in order to get the right number of
+-	// raw disks. This deals with physicaldrives that may have holes in their numbering.
+-	// As a result, we can know how many raw disks have been found in advance.
+-	dev_list = GetFilteredDosDevices(&quot;PhysicalDrive&quot;);
+-
+-	for ( int i=0; i &lt; dev_list.num_entries; i++ )
++	for (drive_number=0; count &lt; MAX_TARGETS; drive_number++)
+ 	{
+-		//printf(&quot; %s==&gt;%s\n&quot;, dev_list.list[i].link, dev_list.list[i].target);
+-
+-		if ( count &gt;= MAX_TARGETS )
+-		{
+-			cerr &lt;&lt; &quot;Report_RawDisks: Reached max disk limit, skipping: &quot; &lt;&lt; dev_list.list[i].link &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+-			continue;
+-		}
+-
+-		memset(&amp;d.spec, 0, sizeof(d.spec));
+-
+-		// The last chars in our dev_list link string are the physicaldrive number
+-		drive_number = atoi(&amp;dev_list.list[i].link[strlen(&quot;PhysicalDrive&quot;)]);
+-
+ 		// We already have the string (but w/out \\.\, so regenerate is here.
+ 		sprintf( d.spec.name, &quot;%s%i&quot;, PHYSICAL_DISK, drive_number );
+ 		strcpy( d.file_name, d.spec.name );
+@@ -1195,8 +1207,11 @@
+ 		if ( !d.Open( NULL ) )
+ 		{
+ 			// we should not be here, since we know that all of the disks we are opening exist
+-			cerr &lt;&lt; &quot;Failed opening device &quot; &lt;&lt; d.spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+-			continue; 
++			if (number_skipped == 0)
++				cerr &lt;&lt; &quot;Failed opening device &quot; &lt;&lt; d.spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
++
++			// if open fails, we will fail everything else, so just to a goto here, all else are ok to continue
++			goto DoHoleCheck;
+ 		}
+ 		d.Close( NULL );
+ 
+@@ -1207,8 +1222,8 @@
+ 
+ 		// This is our basic method of associating physical and logical disks, we really
+ 		// need this to work on all disk devices!
+-		PSTORAGE_DEVICE_NUMBER device_number = (PSTORAGE_DEVICE_NUMBER) &amp;d.spec.disk_info.disk_reserved[0];
+-		if (!GetDeviceNumber(d.spec.name, GET_SDN_PTR(d.spec.disk_info)))
++		PSTORAGE_DEVICE_NUMBER psdn = (PSTORAGE_DEVICE_NUMBER) &amp;d.spec.disk_info.disk_reserved[0];
++		if (!GetDeviceNumber(d.spec.name, psdn)) //GET_SDN_PTR(d.spec.disk_info)))
+ 		{
+ 			cerr &lt;&lt; &quot;Failed retrieving device number for &quot; &lt;&lt; d.spec.name &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+ 			continue;
+@@ -1265,6 +1280,11 @@
+ 	#endif
+ 
+ 		count++;
++		continue;
++
++DoHoleCheck:
++		if (++number_skipped == PHYS_DISK_HOLE_SIZE) 
++			break;
+ 	}
+ 
+ 	delete [] dev_list.list;
+@@ -1696,141 +1716,6 @@
+ 	return TRUE;
+ }
+ 
+-// 
+-// GetDosDevices()
+-//
+-// Wrapper around QueryDosDevice() which has a typical but painful buffer allocation rule.
+-// Routine allocates all the required memory, but the caller needs to deallocate source upon
+-// last call. 
+-// Arguments match the first 2 of QueryDosDevice()
+-int GetDosDevices(LPSTR search, LPSTR *source)
+-{
+-	int srcSize = 0, bufSize = 65536;
+-	DWORD errCode;
+-	//LPSTR dest;
+-
+-	while (TRUE)
+-	{
+-		if (*source == NULL) *source = new char[bufSize];
+-
+-		if (*source == NULL)
+-		{
+-			cerr &lt;&lt; &quot;Error allocating memory for dest, error=&quot; &lt;&lt; GetLastError() &lt;&lt; endl;
+-			return 0;
+-		}
+-
+-        srcSize = QueryDosDevice(search, *source, bufSize);
+-		errCode = GetLastError();
+-
+-		if (errCode == ERROR_INSUFFICIENT_BUFFER || errCode == ERROR_MORE_DATA)
+-		{
+-			delete [] *source;
+-        	*source = NULL;
+-        	bufSize *= 2;
+-        	continue;
+-		}
+-        else if (srcSize == 0) 
+-		{
+-			cerr &lt;&lt; &quot;Error querying dos devices, error=&quot; &lt;&lt; errCode &lt;&lt; endl;
+-			if (*source) delete [] *source;
+-			return 0;
+-        }
+-		else
+-		{
+-			//*source = dest;
+-			break;
+-		}
+-	}
+-
+-	return srcSize;
+-}
+-
+-//
+-// GetFilteredDosDevices()
+-//
+-// Another wrapper, but around GetDosDevices. Returns a custom data 
+-// structure that represents a filtered view of the dos devices. For
+-// thoroughness, it reports the symbolic link target of the dos device
+-// and allocates a buffer within the DosDeviceList structure. So,
+-// caller must deallocate the DosDevicesList.list member at the end.
+-// Argument search is any type of string that is matched against the 
+-// symbolic link.
+-DosDeviceList
+-GetFilteredDosDevices(LPSTR search)
+-{
+-    int i, j, status = 1;
+-	int devSize = 0, len = 0;
+-    LPSTR destBuffer = NULL;
+-	LPSTR targetBuffer = NULL;
+-	char *pos, *pos_back;
+-	DosDeviceList dev_list;
+-
+-	len = GetDosDevices(NULL, &amp;destBuffer);
+-
+-	if (!len) 
+-	{
+-		status = 0;
+-		goto cleanup;
+-	}
+-
+-	pos = pos_back = destBuffer;
+-	i = 2;
+-	dev_list.num_entries = 0;
+-
+-	//
+-	// Do 2 loops, one to count the number of entries, and the other to insert them
+-	//
+-	while (i--)
+-	{
+-		j = 0; // reset current item count
+-		while(*pos &amp;&amp; ((pos-destBuffer) &lt; len))
+-		{
+-			if (strstr(pos, search))
+-			{
+-				GetDosDevices(pos, &amp;targetBuffer);
+-
+-				//cout &lt;&lt; &quot;Symbolic link: &quot; &lt;&lt; pos &lt;&lt; &quot; targetted at: &quot; &lt;&lt; targetBuffer &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+-
+-				if (i==0)
+-				{
+-					strcpy(dev_list.list[j].link, pos);
+-					strcpy(dev_list.list[j].target, targetBuffer);
+-				}
+-				j++;
+-			}
+-			while (*pos++);
+-		}
+-		if (i==1) // first iteration
+-		{
+-			dev_list.num_entries = j; // update the count
+-			dev_list.list = new DosDeviceEntry[dev_list.num_entries];
+-
+-			if (dev_list.list == NULL)
+-			{
+-				cerr &lt;&lt; &quot;GetFilteredDosDevices: Error, failed to allocate memory for dev_list, error=&quot; &lt;&lt; GetLastError() &lt;&lt; endl;
+-				status = 0;
+-				goto cleanup;
+-			}
+-		}
+-		pos = pos_back;
+-	}
+-
+-cleanup:
+-
+-	if (destBuffer) 
+-		delete [] destBuffer;
+-	if (targetBuffer) 
+-		delete [] targetBuffer;
+-
+-	if (!status)
+-	{	
+-		cerr &lt;&lt; &quot;GetFilteredDosDevices: Errors found gathering dos devices matching string: &quot; &lt;&lt; search &lt;&lt; &quot;.&quot; &lt;&lt; endl;
+-		dev_list.num_entries = 0;
+-	}
+-		
+-	return dev_list;
+-}
+-
+ // Compares Target_Spec entries for use by qsort routine
+ int
+ __cdecl 
+@@ -1845,9 +1730,18 @@
+ 
+ 	for (ULONG v = 0; v &lt; mid_point; v++)
+ 	{
++
++#ifdef _DETAILS2 
++		cout &lt;&lt; &quot;Parsing &quot; &lt;&lt; source[v].name &lt;&lt; endl;
++#endif
+ 		// skip over used volumes
+ 		if (source[v].type == 0)
++		{
++#ifdef _DETAILS2 
++		cout &lt;&lt; &quot; Skipping.&quot;  &lt;&lt; endl;
++#endif
+ 			continue;
++		}
+ 
+ 		// copy over our volume
+ 		dest[++d] = source[v]; 
+@@ -1857,59 +1751,160 @@
+ 		{
+ 			if (source[r].type == 0) // a cleared entry
+ 				continue;
+-
++#ifdef _DETAILS2 
++			cout &lt;&lt; &quot; Looking for sibling volumes...&quot; &lt;&lt; endl;
++			cout &lt;&lt; &quot; Comparing &quot; &lt;&lt; GET_SDN_PTR(source[v].disk_info)-&gt;DeviceNumber &lt;&lt; &quot; &quot; &lt;&lt; GET_SDN_PTR(source[v].disk_info);
++			cout &lt;&lt; &quot;  to  &quot; &lt;&lt; GET_SDN_PTR(source[r].disk_info)-&gt;DeviceNumber &lt;&lt; &quot; &quot; &lt;&lt; GET_SDN_PTR(source[r].disk_info) &lt;&lt; endl;
++#endif
+ 			if (EQUAL_DEVICE_NUMBERS(GET_SDN_PTR(source[v].disk_info), GET_SDN_PTR(source[r].disk_info)))
+ 			{
++#ifdef _DETAILS2 
++				cout &lt;&lt; &quot; Sibling volume &quot; &lt;&lt; source[v].name &lt;&lt; endl;
++#endif
+ 				// just copy over another volume
+ 				dest[++d] = source[r];
+ 				source[r].type = (TargetType) 0; // null out this volume so we skip it above
+ 			}
+ 		}
+ 
+-		// now search for physical disks matching the device_number structure
+-		for (ULONG r = mid_point; r &lt; total; r++)
++		// Optimization: we know the physical disks are sorted in increasing order; the only 
++		// problem is if there are holes. Could check for easy case first (plus extents) and 
++		// then fall back to slow search.
++
++		int quick_index = mid_point + GET_SDN_PTR(source[v].disk_info)-&gt;DeviceNumber;
++		if (EQUAL_DEVICE_NUMBERS(GET_SDN_PTR(source[v].disk_info), GET_SDN_PTR(source[quick_index].disk_info)))
+ 		{
+-			// skip over used disks
+-			if (source[r].type == 0)
+-				continue;
++			PVOLUME_DISK_EXTENTS *pvde = GET_VDE_PTR(source[v].disk_info);				
++			PSTORAGE_DEVICE_NUMBER psdn = GET_SDN_PTR(source[v].disk_info);;
+ 
+-			if (EQUAL_DEVICE_NUMBERS(GET_SDN_PTR(source[v].disk_info), GET_SDN_PTR(source[r].disk_info)))
++			// update our hierarchy indicator
++			source[quick_index].type = PhysicalDiskTypeHasPartitions;
++
++#ifdef _DETAILS2 
++		cout &lt;&lt; &quot; Quick-matched raw disk &quot; &lt;&lt; source[r].name &lt;&lt; endl;
++#endif
++
++			dest[++d] = source[quick_index];
++			source[quick_index].type = (TargetType) 0;
++
++			if ( *pvde &amp;&amp; ((*pvde)-&gt;NumberOfDiskExtents == (psdn-&gt;PartitionNumber * -1))) // we have multiple physical mappings
+ 			{
+-				PVOLUME_DISK_EXTENTS pvde = GET_VDE_PTR(source[v].disk_info);				
+-				PSTORAGE_DEVICE_NUMBER psdn;
++				//ASSERT(dest[d].disk_info.device_number.DeviceNumber == pvde-&gt;Extents[0].DiskNumber);
+ 
+-				// update our hierarchy indicator
+-				source[r].type = PhysicalDiskTypeHasPartitions;
+-				
+-				dest[++d] = source[r];
+-				source[r].type = (TargetType) 0;
++				// re-scan the raw list for the rest of the extents
++				ULONG e=1;
++				for (ULONG rr = quick_index + 1; 
++					 (rr &lt; total) &amp;&amp; (e &lt; (*pvde)-&gt;NumberOfDiskExtents);
++					 rr++)
++				{
++					if (source[rr].type == 0)
++						continue;
+ 
+-				if (pvde-&gt;NumberOfDiskExtents) // we have multiple physical mappings
++					psdn = GET_SDN_PTR(source[rr].disk_info);
++					// this only works, becuase both raw and extents disk numbers ordered
++					if (psdn-&gt;DeviceType == FILE_DEVICE_DISK &amp;&amp;
++						(psdn-&gt;DeviceNumber == (*pvde)-&gt;Extents[e].DiskNumber))
++					{
++#ifdef _DETAILS2 
++						cout &lt;&lt; &quot;  Quick matched raw disk extent &quot; &lt;&lt; source[rr].name &lt;&lt; endl;
++#endif
++
++						source[rr].type = PhysicalDiskTypeHasPartitions;
++						dest[++d] = source[rr];
++						source[rr].type = (TargetType) 0;
++						e++; // increment e only if we found something, we had better hit all values of e!
++					}
++				}
++
++				if (e &lt; (*pvde)-&gt;NumberOfDiskExtents)
+ 				{
+-					//ASSERT(dest[d].disk_info.device_number.DeviceNumber == pvde-&gt;Extents[0].DiskNumber);
++					cout &lt;&lt; &quot;WARNING: only found &quot; &lt;&lt; e &lt;&lt; &quot; disk extents out of &quot; &lt;&lt;  (*pvde)-&gt;NumberOfDiskExtents &lt;&lt; &quot; for volume.&quot; &lt;&lt; endl;
++					cout &lt;&lt; &quot; Extent disk numbers: &quot;;
++					for (DWORD i=0; i&lt; (*pvde)-&gt;NumberOfDiskExtents; i++)
++						cout &lt;&lt; (*pvde)-&gt;Extents[i].DiskNumber &lt;&lt; &quot;, &quot; ;
++					cout &lt;&lt; endl;
++				}
+ 
+-					// re-scan the raw list for the rest of the extents
+-					for (ULONG rr = mid_point, e=1; 
+-						 (rr &lt; (total - mid_point)) || (e &lt; pvde-&gt;NumberOfDiskExtents);
+-						 rr++)
++				// this delete matches the callee allocated buffer in GetDiskExtents()
++				// iometer does not need it
++				delete [] *pvde;
++			}
++		}
++		else
++		{
++
++			// now search for physical disks matching the device_number structure
++			for (ULONG r = mid_point; r &lt; total; r++)
++			{
++				// skip over used disks
++				if (source[r].type == 0)
++					continue;
++
++	#ifdef _DETAILS2 
++				cout &lt;&lt; &quot; Looking for children raw disks...&quot; &lt;&lt; endl;
++				cout &lt;&lt; &quot; Comparing &quot; &lt;&lt; GET_SDN_PTR(source[v].disk_info)-&gt;DeviceNumber &lt;&lt; &quot; &quot; &lt;&lt; GET_SDN_PTR(source[v].disk_info);
++				cout &lt;&lt; &quot;  to  &quot; &lt;&lt; GET_SDN_PTR(source[r].disk_info)-&gt;DeviceNumber &lt;&lt; &quot; &quot; &lt;&lt; GET_SDN_PTR(source[r].disk_info) &lt;&lt; endl;
++	#endif
++				if (EQUAL_DEVICE_NUMBERS(GET_SDN_PTR(source[v].disk_info), GET_SDN_PTR(source[r].disk_info)))
++				{
++					PVOLUME_DISK_EXTENTS *pvde = GET_VDE_PTR(source[v].disk_info);				
++					PSTORAGE_DEVICE_NUMBER psdn = GET_SDN_PTR(source[v].disk_info);;
++
++					// update our hierarchy indicator
++					source[r].type = PhysicalDiskTypeHasPartitions;
++
++	#ifdef _DETAILS2 
++			cout &lt;&lt; &quot; Matched raw disk &quot; &lt;&lt; source[r].name &lt;&lt; endl;
++	#endif
++
++					dest[++d] = source[r];
++					source[r].type = (TargetType) 0;
++
++					if ( *pvde &amp;&amp; ((*pvde)-&gt;NumberOfDiskExtents == (psdn-&gt;PartitionNumber * -1))) // we have multiple physical mappings
+ 					{
+-						if (source[rr].type == 0)
+-							continue;
++						//ASSERT(dest[d].disk_info.device_number.DeviceNumber == pvde-&gt;Extents[0].DiskNumber);
+ 
+-						psdn = GET_SDN_PTR(source[rr].disk_info);
+-						// this only works, becuase both raw and extents disk numbers ordered
+-						if (psdn-&gt;DeviceType == FILE_DEVICE_DISK &amp;&amp;
+-							(psdn-&gt;DeviceNumber == pvde-&gt;Extents[e].DiskNumber))
++						// re-scan the raw list for the rest of the extents
++						ULONG e=1;
++						for (ULONG rr = mid_point; 
++							 (rr &lt; (total - mid_point)) &amp;&amp; (e &lt; (*pvde)-&gt;NumberOfDiskExtents);
++							 rr++)
+ 						{
+-							source[rr].type = PhysicalDiskTypeHasPartitions;
+-							dest[++d] = source[rr];
+-							source[rr].type = (TargetType) 0;
+-							e++; // increment e only if we found something, we had better hit all values of e!
++							if (source[rr].type == 0)
++								continue;
++
++							psdn = GET_SDN_PTR(source[rr].disk_info);
++							// this only works, becuase both raw and extents disk numbers ordered
++							if (psdn-&gt;DeviceType == FILE_DEVICE_DISK &amp;&amp;
++								(psdn-&gt;DeviceNumber == (*pvde)-&gt;Extents[e].DiskNumber))
++							{
++	#ifdef _DETAILS2 
++								cout &lt;&lt; &quot;  Matched raw disk extent &quot; &lt;&lt; source[rr].name &lt;&lt; endl;
++	#endif
++
++								source[rr].type = PhysicalDiskTypeHasPartitions;
++								dest[++d] = source[rr];
++								source[rr].type = (TargetType) 0;
++								e++; // increment e only if we found something, we had better hit all values of e!
++							}
+ 						}
++
++						if (e &lt; (*pvde)-&gt;NumberOfDiskExtents)
++						{
++							cout &lt;&lt; &quot;WARNING: only found &quot; &lt;&lt; e &lt;&lt; &quot; disk extents out of &quot; &lt;&lt;  (*pvde)-&gt;NumberOfDiskExtents &lt;&lt; &quot; for volume.&quot; &lt;&lt; endl;
++							cout &lt;&lt; &quot; Extent disk numbers: &quot;;
++							for (DWORD i=0; i&lt; (*pvde)-&gt;NumberOfDiskExtents; i++)
++								cout &lt;&lt; (*pvde)-&gt;Extents[i].DiskNumber &lt;&lt; &quot;, &quot; ;
++							cout &lt;&lt; endl;
++						}
++
++						// this delete matches the callee allocated buffer in GetDiskExtents()
++						// iometer does not need it
++						delete [] *pvde;
+ 					}
+-					// this delete matches the callee allocated buffer in GetDiskExtents()
+-					// iometer does not need it
+-					delete [] pvde;
++
++					// if we found a raw disk, we'll have scanned extens, so its ok to break
++					break;
+ 				}
+ 			}
+ 		}
+@@ -1937,6 +1932,9 @@
+ 					// Alter the disk type for iometer's tree view sturctures to work
+ 					source[a].type = PhysicalDiskTypeHasPartitions;
+ 				}
++#ifdef _DETAILS2 
++				cout &lt;&lt; &quot;Found unassociated disk &quot; &lt;&lt; source[a].name &lt;&lt; endl;
++#endif
+ 				dest[++d] = source[a];
+ 			}
+ 		}
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2009-02-21 00:41:16 UTC (rev 346)
+@@ -118,7 +118,7 @@
+ //#define IOVER_FILEVERSION				&quot;2004.07.30-post\0&quot;
+ //#define IOVER_FILEVERSION				&quot;2006.07.27\0&quot;
+ //#define IOVER_FILEVERSION				&quot;2008.03.06\0&quot;
+-#define IOVER_FILEVERSION				&quot;2008.06.18\0&quot;
++#define IOVER_FILEVERSION				&quot;2008.06.18-RC2-2Kdev\0&quot;
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2009-02-21 00:41:16 UTC (rev 346)
+@@ -36,7 +36,7 @@
+ 	$(SDK_LIB_PATH)\VERSION.LIB	\
+ 	$(SDK_LIB_PATH)\WS2_32.LIB
+ 
+-LINKER_STACKSIZE=-stack:0x100000,0x4000
++LINKER_STACKSIZE=-stack:0x4000000,0x100000
+ 
+ SOURCES= ..\ByteOrder.cpp	\
+ 	..\IOAccess.cpp			\
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2009-02-21 00:41:16 UTC (rev 346)
+@@ -536,6 +536,7 @@
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+ 	cout &lt;&lt; &quot;dynamo [/i iometer_computer_name /m manager_computer_name] [/n manager_name]&quot; &lt;&lt; endl;
+ 	cout &lt;&lt; &quot;       [/c cpu_affinity] [/p login_port_number]&quot; &lt;&lt; endl;
++	cout &lt;&lt; &quot;       [force_raw] [no_rdtsc]&quot; &lt;&lt; endl;
+ #elif defined(IOMTR_OS_NETWARE)
+ 	cout &lt;&lt; &quot;dynamo [/i iometer_computer_name /m manager_computer_name] [/n manager_name]&quot; &lt;&lt; endl;
+ 	cout &lt;&lt; &quot;       [/x excluded_volumes] [/c cpu_affinity] [/p login_port_number]&quot; &lt;&lt; endl;
+@@ -600,6 +601,16 @@
+ 	cout &lt;&lt; endl;
+ #endif
+ 
++#if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
++	cout &lt;&lt; &quot;   force_raw - forces dynamo to report all raw disks regardless of partitions&quot; &lt;&lt; endl;
++	cout &lt;&lt; &quot;      contained within them. &quot; &lt;&lt; endl;
++	cout &lt;&lt; endl;
++	cout &lt;&lt; &quot;   no_rdtsc - disables explicit rdtsc use in favor of QueryPeformanceCounter&quot; &lt;&lt; endl;
++	cout &lt;&lt; &quot;      for measuring I/O performance.&quot; &lt;&lt; endl;
++	cout &lt;&lt; &quot;      Only applies to ia64. x86/x64 default to QueryPeformanceCounter.&quot;&lt;&lt; endl;
++	cout &lt;&lt; endl;
++#endif
++
+ 	exit(0);
+ }
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj	2009-02-21 00:41:16 UTC (rev 346)
+@@ -1,10 +1,11 @@
+ &lt;?xml version=&quot;1.0&quot; encoding=&quot;gb2312&quot;?&gt;
+ &lt;VisualStudioProject
+ 	ProjectType=&quot;Visual C++&quot;
+-	Version=&quot;8.00&quot;
++	Version=&quot;9.00&quot;
+ 	Name=&quot;Dynamo&quot;
+ 	ProjectGUID=&quot;{4C1D1FAE-5490-4D9C-9877-38B54E798468}&quot;
+ 	RootNamespace=&quot;Dynamo&quot;
++	TargetFrameworkVersion=&quot;131072&quot;
+ 	&gt;
+ 	&lt;Platforms&gt;
+ 		&lt;Platform
+@@ -83,6 +84,8 @@
+ 				GenerateDebugInformation=&quot;true&quot;
+ 				ProgramDatabaseFile=&quot;$(OutDir)/Dynamo.pdb&quot;
+ 				SubSystem=&quot;1&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 			/&gt;
+ 			&lt;Tool
+ 				Name=&quot;VCALinkTool&quot;
+@@ -103,9 +106,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -173,6 +173,8 @@
+ 				GenerateDebugInformation=&quot;true&quot;
+ 				ProgramDatabaseFile=&quot;$(OutDir)/Dynamo.pdb&quot;
+ 				SubSystem=&quot;1&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;5&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -194,9 +196,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -264,6 +263,8 @@
+ 				GenerateDebugInformation=&quot;true&quot;
+ 				ProgramDatabaseFile=&quot;$(OutDir)/Dynamo.pdb&quot;
+ 				SubSystem=&quot;1&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;17&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -285,9 +286,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -321,7 +319,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+-				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
++				AdditionalIncludeDirectories=&quot;&quot;
+ 				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+@@ -358,6 +356,8 @@
+ 				ProgramDatabaseFile=&quot;$(OutDir)/Dynamo.pdb&quot;
+ 				StripPrivateSymbols=&quot;No&quot;
+ 				SubSystem=&quot;1&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 			/&gt;
+ 			&lt;Tool
+ 				Name=&quot;VCALinkTool&quot;
+@@ -378,9 +378,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -414,8 +411,12 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+-				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
++				EnableIntrinsicFunctions=&quot;false&quot;
++				FavorSizeOrSpeed=&quot;0&quot;
++				AdditionalIncludeDirectories=&quot;&quot;
+ 				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
++				IgnoreStandardIncludePath=&quot;false&quot;
++				GeneratePreprocessedFile=&quot;0&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -449,6 +450,8 @@
+ 				ProgramDatabaseFile=&quot;$(OutDir)/Dynamo.pdb&quot;
+ 				StripPrivateSymbols=&quot;No&quot;
+ 				SubSystem=&quot;1&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;5&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -470,9 +473,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -506,7 +506,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+-				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
++				AdditionalIncludeDirectories=&quot;&quot;
+ 				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+@@ -541,6 +541,8 @@
+ 				ProgramDatabaseFile=&quot;$(OutDir)/Dynamo.pdb&quot;
+ 				StripPrivateSymbols=&quot;No&quot;
+ 				SubSystem=&quot;1&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;17&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -562,9 +564,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Iometer.sln
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Iometer.sln	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/msvc/Iometer.sln	2009-02-21 00:41:16 UTC (rev 346)
+@@ -1,5 +1,5 @@
+-Microsoft Visual Studio Solution File, Format Version 9.00
+-# Visual Studio 2005
++Microsoft Visual Studio Solution File, Format Version 10.00
++# Visual Studio 2008
+ Project(&quot;{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}&quot;) = &quot;Dynamo&quot;, &quot;Dynamo.vcproj&quot;, &quot;{4C1D1FAE-5490-4D9C-9877-38B54E798468}&quot;
+ EndProject
+ Project(&quot;{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}&quot;) = &quot;Iometer&quot;, &quot;Iometer.vcproj&quot;, &quot;{C9557683-0F9B-4A51-86C1-6107E8A345B3}&quot;
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj	2008-10-19 18:29:58 UTC (rev 345)
++++ branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj	2009-02-21 00:41:16 UTC (rev 346)
+@@ -1,11 +1,12 @@
+ &lt;?xml version=&quot;1.0&quot; encoding=&quot;gb2312&quot;?&gt;
+ &lt;VisualStudioProject
+ 	ProjectType=&quot;Visual C++&quot;
+-	Version=&quot;8.00&quot;
++	Version=&quot;9.00&quot;
+ 	Name=&quot;Iometer&quot;
+ 	ProjectGUID=&quot;{C9557683-0F9B-4A51-86C1-6107E8A345B3}&quot;
+ 	RootNamespace=&quot;Iometer&quot;
+ 	Keyword=&quot;MFCProj&quot;
++	TargetFrameworkVersion=&quot;131072&quot;
+ 	&gt;
+ 	&lt;Platforms&gt;
+ 		&lt;Platform
+@@ -89,6 +90,8 @@
+ 				ProgramDatabaseFile=&quot;$(OutDir)/IOmeter.pdb&quot;
+ 				StripPrivateSymbols=&quot;No&quot;
+ 				SubSystem=&quot;2&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 			/&gt;
+ 			&lt;Tool
+ 				Name=&quot;VCALinkTool&quot;
+@@ -109,9 +112,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -182,6 +182,8 @@
+ 				ProgramDatabaseFile=&quot;$(OutDir)/IOmeter.pdb&quot;
+ 				StripPrivateSymbols=&quot;No&quot;
+ 				SubSystem=&quot;2&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;5&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -203,9 +205,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -276,6 +275,8 @@
+ 				ProgramDatabaseFile=&quot;$(OutDir)/IOmeter.pdb&quot;
+ 				StripPrivateSymbols=&quot;No&quot;
+ 				SubSystem=&quot;2&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;17&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -297,9 +298,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -369,6 +367,8 @@
+ 				GenerateDebugInformation=&quot;true&quot;
+ 				ProgramDatabaseFile=&quot;$(OutDir)/IOmeter.pdb&quot;
+ 				SubSystem=&quot;2&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 			/&gt;
+ 			&lt;Tool
+ 				Name=&quot;VCALinkTool&quot;
+@@ -389,9 +389,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -461,6 +458,8 @@
+ 				GenerateDebugInformation=&quot;true&quot;
+ 				ProgramDatabaseFile=&quot;$(OutDir)/IOmeter.pdb&quot;
+ 				SubSystem=&quot;2&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;5&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -482,9 +481,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+@@ -554,6 +550,8 @@
+ 				GenerateDebugInformation=&quot;true&quot;
+ 				ProgramDatabaseFile=&quot;$(OutDir)/IOmeter.pdb&quot;
+ 				SubSystem=&quot;2&quot;
++				RandomizedBaseAddress=&quot;1&quot;
++				DataExecutionPrevention=&quot;0&quot;
+ 				TargetMachine=&quot;17&quot;
+ 			/&gt;
+ 			&lt;Tool
+@@ -575,9 +573,6 @@
+ 				Name=&quot;VCAppVerifierTool&quot;
+ 			/&gt;
+ 			&lt;Tool
+-				Name=&quot;VCWebDeploymentTool&quot;
+-			/&gt;
+-			&lt;Tool
+ 				Name=&quot;VCPostBuildEventTool&quot;
+ 			/&gt;
+ 		&lt;/Configuration&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000113.html">[Iometer-svn] r347 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#112">[ date ]</a>
+              <a href="thread.html#112">[ thread ]</a>
+              <a href="subject.html#112">[ subject ]</a>
+              <a href="author.html#112">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

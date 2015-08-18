@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r255 - branches/IOMETER-restruct/iometer/src/Iometer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-April/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r255%20-%20branches/IOMETER-restruct/iometer/src/Iometer&In-Reply-To=%3C200604272120.k3RLKfOe024836%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000024.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r255 - branches/IOMETER-restruct/iometer/src/Iometer</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r255%20-%20branches/IOMETER-restruct/iometer/src/Iometer&In-Reply-To=%3C200604272120.k3RLKfOe024836%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r255 - branches/IOMETER-restruct/iometer/src/Iometer">cheungming at berlios.de
+       </A><BR>
+    <I>Thu Apr 27 23:20:41 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000024.html">[Iometer-svn] r254 - in branches/IOMETER-restruct/iometer/src: . iomtr_kstat
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#25">[ date ]</a>
+              <a href="thread.html#25">[ thread ]</a>
+              <a href="subject.html#25">[ subject ]</a>
+              <a href="author.html#25">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-04-27 23:20:39 +0200 (Thu, 27 Apr 2006)
+New Revision: 255
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Iometer/sources
+Log:
+The linker under DDK environment didn't find the library in the SDK path, but rather the CRT 
+path.
+
+&quot;I checked and all three architectures build the GUI with this change.
+
+Note that the dynamo build already pulled MSVCPRT from the
+CRT_LIB_PATH, only the Iometer GUI pulled from the SDK_LIB_PATH.&quot;
+
+Fix is from Fabian Tillier &lt;fab AT tillier.net&gt;
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Iometer/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Iometer/sources	2006-04-27 21:15:27 UTC (rev 254)
++++ branches/IOMETER-restruct/iometer/src/Iometer/sources	2006-04-27 21:20:39 UTC (rev 255)
+@@ -21,7 +21,7 @@
+     $(SDK_LIB_PATH)\WINSPOOL.LIB	\
+     $(SDK_LIB_PATH)\SHELL32.LIB		\
+     $(SDK_LIB_PATH)\VERSION.LIB		\
+-    $(SDK_LIB_PATH)\MSVCPRT.LIB
++    $(CRT_LIB_PATH)\MSVCPRT.LIB
+ 
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000024.html">[Iometer-svn] r254 - in branches/IOMETER-restruct/iometer/src: . iomtr_kstat
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#25">[ date ]</a>
+              <a href="thread.html#25">[ thread ]</a>
+              <a href="subject.html#25">[ subject ]</a>
+              <a href="author.html#25">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

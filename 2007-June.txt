@@ -1,0 +1,53 @@
+From cheungming at mail.berlios.de  Fri Jun  8 02:10:46 2007
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 8 Jun 2007 02:10:46 +0200
+Subject: [Iometer-svn] r316 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200706080010.l580AkVJ012022@sheep.berlios.de>
+
+Author: cheungming
+Date: 2007-06-08 02:10:46 +0200 (Fri, 08 Jun 2007)
+New Revision: 316
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+removed O_DIRECT flag as open flag for linux. the O_DIRECT flag prevent >1 outstanding io
+
+hopefully add it back when we have proper aio implementation.
+
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-11-03 01:21:39 UTC (rev 315)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2007-06-08 00:10:46 UTC (rev 316)
+@@ -1283,12 +1283,9 @@
+ {
+ 	// open_flag is a 
+ 	if (IsType(spec.type, LogicalDiskType)) {
+-#if defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_LINUX)
+ 		((struct File *)disk_file)->fd =
+ 		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+-#elif defined(IOMTR_OS_LINUX)
+-		((struct File *)disk_file)->fd =
+-		    open(file_name, O_DIRECT | O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		NXFileOpen(0, (void *)file_name, (NXMode_t) (NX_O_RDWR | NX_O_CREAT | open_flag),
+ 			   &((struct File *)disk_file)->fd);
+@@ -1307,10 +1304,8 @@
+ #warning ===> WARNING: You have to do some coding here to get the port done!
+ #endif
+ 	} else if (IsType(spec.type, PhysicalDiskType)) {
+-#if defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_LINUX)
+ 		((struct File *)disk_file)->fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+-#elif defined(IOMTR_OS_LINUX)
+-		((struct File *)disk_file)->fd = open(file_name, O_DIRECT | O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		((struct File *)disk_file)->fd = NWOpenDevice(atoi(file_name), 0);
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+
+
+

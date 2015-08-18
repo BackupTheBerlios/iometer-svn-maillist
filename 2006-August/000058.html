@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r289%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608212014.k7LKEkNY016490%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000057.html">
+   <LINK REL="Next"  HREF="000059.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r289%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608212014.k7LKEkNY016490%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 21 22:14:46 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000057.html">[Iometer-svn] r288 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+        <LI>Next message: <A HREF="000059.html">[Iometer-svn] r290 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#58">[ date ]</a>
+              <a href="thread.html#58">[ thread ]</a>
+              <a href="subject.html#58">[ subject ]</a>
+              <a href="author.html#58">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-21 22:14:45 +0200 (Mon, 21 Aug 2006)
+New Revision: 289
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoView.h
+Log:
+Patch by Keith Moyer to add a ramp/run time remaining notification to the status bar during appropriate periods.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 19:14:10 UTC (rev 288)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 20:14:45 UTC (rev 289)
+@@ -8,6 +8,8 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
++     status bar during appropriate periods.
+    - Patch by Ming Zhang to support optional display BigMeter when iometer starts.
+    - Patch by Ming Zhang to allow iometer and dynamo use specified port.
+    - Patch by Ming Zhang to fix 2 memory leaks in ICFOpenDialog and ICFSaveDialog
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 19:14:10 UTC (rev 288)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 20:14:45 UTC (rev 289)
+@@ -811,9 +811,10 @@
+ 		return;
+ 	}
+ 	// Waiting ramping up period or signaling to start recording results.
+-	if (m_pPageSetup-&gt;ramp_time)
++	if (m_pPageSetup-&gt;ramp_time) {
+ 		SetTimer(RAMP_TIMER, m_pPageSetup-&gt;ramp_time * 1000, NULL);
+-	else
++		StartRemainNotification(m_pPageSetup-&gt;ramp_time);
++	} else
+ 		StartRecording();
+ 
+ 	// enable Stop and Stop All buttons
+@@ -845,9 +846,40 @@
+ 	// Get update frequency of results display.
+ 	if (timer_delay = m_pPageDisplay-&gt;GetUpdateDelay())
+ 		SetTimer(DISPLAY_TIMER, timer_delay, NULL);
++
++	// Start &quot;remaining&quot; notification.
++	StartRemainNotification(m_pPageSetup-&gt;GetRunTime() / 1000);
+ }
+ 
+ //
++// Start the 'time remaining' notification in the status bar.
++//
++void CGalileoView::StartRemainNotification(int timeRem)
++{
++	SetTimer(NOTE_TIMER, 1000, NULL);
++	noteTime = timeRem;
++	UpdateRemainNotification();
++}
++
++//
++// Update the 'time remaining' notification in the status bar.
++//
++void CGalileoView::UpdateRemainNotification(void)
++{
++	CString note;
++
++	if (!noteTime) {
++		KillTimer(NOTE_TIMER);
++		note = &quot;&quot;;
++ 	} else if (theApp.test_state == TestRecording)
++		note.Format(&quot;Run remaining: %d sec&quot;, noteTime);
++	else
++		note.Format(&quot;Ramp remaining: %d sec&quot;, noteTime);
++	SetStatusBarPaneText(1, note);
++	noteTime--;
++}
++
++//
+ // Prepare drives that need to be prepared.
+ //
+ BOOL CGalileoView::DisksNotPrepared()
+@@ -907,6 +939,10 @@
+ 		StartRecording();
+ 		return;
+ 
++	case NOTE_TIMER:
++		UpdateRemainNotification();
++		return;
++
+ 	case PREPARE_TIMER:
+ 		// See if Dynamo has responded that the drive is prepared.
+ 		if (!theApp.manager_list.GetManager(manager_to_prepare)-&gt;Peek(worker_to_prepare))
+@@ -966,6 +1002,7 @@
+ 	KillTimer(RAMP_TIMER);
+ 	KillTimer(TEST_TIMER);
+ 	KillTimer(DISPLAY_TIMER);
++	KillTimer(NOTE_TIMER);
+ 	theApp.test_state = TestIdle;
+ 	theApp.manager_list.SendActiveManagers(STOP);
+ 
+@@ -2055,6 +2092,15 @@
+ }
+ 
+ //
++// Updating a pane in the status bar with a single notification message.
++//
++void CGalileoView::SetStatusBarPaneText(int paneIndex, CString text)
++{
++	if (theApp.m_wndStatusBar)
++		theApp.m_wndStatusBar.GetStatusBarCtrl().SetText(text, paneIndex, 0);
++}
++
++//
+ // Clearing all information displayed in the status bar.
+ //
+ void CGalileoView::ClearStatusBar()
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.h	2006-08-21 19:14:10 UTC (rev 288)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.h	2006-08-21 20:14:45 UTC (rev 289)
+@@ -63,6 +63,7 @@
+ #define PREPARE_TIMER		2
+ #define RAMP_TIMER		3
+ #define IDLE_TIMER		4
++#define NOTE_TIMER		5
+ 
+ #define DISK_PAGE		0
+ #define NETWORK_PAGE		1
+@@ -147,6 +148,7 @@
+ 
+ 	// Function to set text in the status bar.
+ 	void SetStatusBarText(CString text1 = &quot;&quot;, CString text2 = &quot;&quot;, CString text3 = &quot;&quot;);
++	void SetStatusBarPaneText(int paneIndex = 0, CString text = &quot;&quot;);
+ 	void ClearStatusBar();
+ 	void UpdateTestStatus();
+ 
+@@ -189,6 +191,7 @@
+ 	int manager_to_prepare;
+ 	int worker_to_prepare;
+ 	CString result_file;
++	int noteTime;
+ 
+ 	struct {
+ 		UINT nID;
+@@ -211,6 +214,9 @@
+ 	void SaveAccessSpecs();
+ 	void StartTest();
+ 	void StartRecording();
++	void StartRemainNotification( int timeRem);
++	void UpdateRemainNotification();
++
+       public:
+ 	void StopTest(ReturnVal test_successful);
+       protected:
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000057.html">[Iometer-svn] r288 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+	<LI>Next message: <A HREF="000059.html">[Iometer-svn] r290 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#58">[ date ]</a>
+              <a href="thread.html#58">[ thread ]</a>
+              <a href="subject.html#58">[ subject ]</a>
+              <a href="author.html#58">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

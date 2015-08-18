@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r248 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r248%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200602212053.k1LKrndm011272%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000013.html">
+   <LINK REL="Next"  HREF="000015.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r248 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r248%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200602212053.k1LKrndm011272%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r248 - branches/IOMETER-restruct/iometer/src">cheungming at berlios.de
+       </A><BR>
+    <I>Tue Feb 21 21:53:49 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000013.html">[Iometer-svn] r247 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000015.html">[Iometer-svn] r249 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-02-21 21:53:45 +0100 (Tue, 21 Feb 2006)
+New Revision: 248
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+   branches/IOMETER-restruct/iometer/src/NetTCP.h
+Log:
+Removed WORKAROUND_LISTEN_BUG define and related code. My understanding is that it
+handles the situation that trying to listen multiple times. But will this happen in
+our code at all?
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/NetTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-02-21 01:39:59 UTC (rev 247)
++++ branches/IOMETER-restruct/iometer/src/NetTCP.cpp	2006-02-21 20:53:45 UTC (rev 248)
+@@ -137,10 +137,6 @@
+ 	client_socket = (CONNECTION)&amp;client_fp;
+ 	maxfd = sysconf(_SC_OPEN_MAX);    // the max # of file descriptors that select() handles.
+ 
+-#ifdef WORKAROUND_LISTEN_BUG
+-	listening = FALSE;
+-#endif
+-
+ #endif // IOMTR_OSFAMILY_UNIX
+ 
+ #if defined(IOMTR_OSFAMILY_NETWARE)
+@@ -486,10 +482,6 @@
+ 	// It's ok to listen more than once on a socket.
+ 	// allow only a single connection.
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+-	#ifdef WORKAROUND_LISTEN_BUG
+-	if ( ! listening )
+-	{
+-	#endif // WORKAROUND_LISTEN_BUG
+ 		if ( listen ( fp-&gt;fd, 1 ) != 0 )
+ #elif defined(IOMTR_OSFAMILY_WINDOWS)
+ 		if ( listen ( server_socket, 1 ) != 0 ) 
+@@ -502,12 +494,6 @@
+ 			OutputErrMsg();
+ 			return ReturnError;
+ 		}
+-#if defined(IOMTR_OSFAMILY_UNIX)
+-	#ifdef WORKAROUND_LISTEN_BUG
+-		listening =	TRUE;
+-	}
+-	#endif // WORKAROUND_LISTEN_BUG
+-#endif // IOMTR_OSFAMILY_UNIX
+ 
+ 	// Accept connections to socket.
+ 	#if NETWORK_DETAILS || _DEBUG
+@@ -903,9 +889,6 @@
+ 	if ( close_server )
+ 	{
+ 		s = &amp;server_socket;
+-#if defined(IOMTR_OSFAMILY_UNIX) &amp;&amp; defined(WORKAROUND_LISTEN_BUG)
+-		listening = FALSE;
+-#endif // UNIX &amp;&amp; WORKAROUND_LISTEN_BUG
+ 	}
+ 	else
+ 		s = &amp;client_socket;
+
+Modified: branches/IOMETER-restruct/iometer/src/NetTCP.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/NetTCP.h	2006-02-21 01:39:59 UTC (rev 247)
++++ branches/IOMETER-restruct/iometer/src/NetTCP.h	2006-02-21 20:53:45 UTC (rev 248)
+@@ -137,15 +137,11 @@
+ 	struct File client_fp;	// the client and server sockets on UNIX.
+ 	int maxfd;		// The max nos of fds' for select() call.
+ 
+-#ifdef WORKAROUND_LISTEN_BUG
+-	BOOL listening;		// flag to indicate if a socket is listening or not.
+-#endif				// WORKAROUND_LISTEN_BUG
+-
+ #endif				// IOMTR_OSFAMILY_UNIX
+ 
+       protected:
+ 	// Member Functions.
+-	 ReturnVal CreateSocket(CONNECTION * s);
++	ReturnVal CreateSocket(CONNECTION * s);
+ 	ReturnVal BindSocket(CONNECTION * s, SOCKADDR_IN * address);
+ 	ReturnVal CloseSocket(CONNECTION * s);
+ 	void SetOptions(CONNECTION * s);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000013.html">[Iometer-svn] r247 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000015.html">[Iometer-svn] r249 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#14">[ date ]</a>
+              <a href="thread.html#14">[ thread ]</a>
+              <a href="subject.html#14">[ subject ]</a>
+              <a href="author.html#14">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

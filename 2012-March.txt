@@ -1,0 +1,283 @@
+From bogus@does.not.exist.com  Wed Mar 14 15:07:45 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 14:07:45 -0000
+Subject: No subject
+Message-ID: <mailman.0.1331734067.3598.iometer-svn@lists.berlios.de>
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/PageSetup.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-02-21 01:08:33 UTC (rev 244)
++++ branches/IOMETER-restruct/iometer/src/PageSetup.cpp	2006-02-21 01:27:31 UTC (rev 245)
+@@ -711,6 +711,8 @@
+ 			CheckData(ENetWorkerCount, &net_worker_count, FALSE);
+ 
+ 		GetDlgItemText(ETestName, test_name);
++		// Find all commas and replace with '-'
++		test_name.Replace(',', '-');
+ 	} else {
+ 		// Update all the combo box selections.
+ 		m_CResultType.SetCurSel(result_type);
+
+Modified: branches/IOMETER-restruct/iometer/src/Worker.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-02-21 01:08:33 UTC (rev 244)
++++ branches/IOMETER-restruct/iometer/src/Worker.cpp	2006-02-21 01:27:31 UTC (rev 245)
+@@ -768,26 +768,34 @@
+ 	}
+ 
+ 	for (i = 0; i < target_count; i++) {
++		char PrintName[MAX_NAME], *TheOffendingChar;
++
+ 		if (!IsType(Type(), GenericClientType))
+ 			target = GetTarget(i);
+ 		if (!IsType(target->spec.type, ActiveType))
+ 			continue;
+ 
++		strcpy(PrintName, target->spec.name);
++		TheOffendingChar = PrintName;
++		// convert commas, newlines and cariage returns to spaces so these don't break the .csv output
++		while ((TheOffendingChar = strpbrk(TheOffendingChar, "\n\r,")) != NULL)
++			*TheOffendingChar = ' ';
++
+ 		// Retrieving results for a single target in order to save it to a file.
+ 		if (IsType(target->spec.type, GenericDiskType)) {
+-			(*file) << "DISK" << "," << target->spec.name;
++			(*file) << "DISK" << "," << PrintName;
+ 		} else if (IsType(target->spec.type, TCPClientType)) {
+ 			// Show name as local address >> remote address.
+ 			(*file) << "NETWORK" << "," << manager->name << ":"
+-			    << target->spec.name << " >> "
++			    << PrintName << " >> "
+ 			    << net_partner->manager->name << ":" << target->spec.tcp_info.remote_address;
+ 		} else if (IsType(target->spec.type, VIClientType)) {
+ 			// Show name as local address >> remote address.
+ 			(*file) << "NETWORK" << "," << manager->name << ":"
+-			    << target->spec.name << " >> "
++			    << PrintName << " >> "
+ 			    << net_partner->manager->name << ":" << target->spec.vi_info.remote_nic_name;
+ 		} else {
+-			(*file) << "UNKNOWN" << "," << target->spec.name;
++			(*file) << "UNKNOWN" << "," << PrintName;
+ 		}
+ 
+ 		(*file) << ",,,,"	// space for access spec name, workers, managers and targets running.
+
+
+
+From bogus@does.not.exist.com  Wed Mar 14 15:07:45 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 14:07:45 -0000
+Subject: No subject
+Message-ID: <mailman.1.1331734067.3598.iometer-svn@lists.berlios.de>
+
+  Avoided use of modulo (%) operator by modifying Rand() function.
+Turning on random accesses in Iometer/dynamo was causing floating point
+exception faults very reliably.  Compiled dynamo with -g and set 'ulimit -c
+   unlimited' in order to get core file, and got some info from gdb:
+
+   (gdb) where
+   #0  0x00c8540b in __umoddi3 () from /lib/libgcc_s.so.1
+   #1  0x08050f0a in TargetDisk::Seek ()
+   #2  0x080501fe in Grunt::Do_IOs (this=0xb7f90008) at IOGrunt.cpp:1251
+   #3  0x08050534 in Grunt_Thread_Wrapper (grunt=0xb7f90008) at
+IOGrunt.cpp:992
+   #4  0x00b3eb80 in start_thread () from /lib/libpthread.so.0
+   #5  0x009c0dee in clone () from /lib/libc.so.6
+
+   I believe the __umoddi3() call is the "%" or modulo operator inside
+of this call function:
+         ((TargetDisk *) targets[target_id])->Seek( access_spec.Random(
+                 access_percent,
+                    (unsigned int)targets[target_id]->Rand() % 100 ),
+size,
+                 user_alignment, user_align_mask );
+
+  Found a mail thread on a postsql site that pointed out the tricky
+numeric nature of modulo operator:
+     http://archives.postgresql.org/pgsql-general/2005-05/msg01187.php
+
+And this link:
+     www.nabble.com/Re:-Remainder-(-)-operator-and-GCC-p1412329.html
+
+
+From bogus@does.not.exist.com  Wed Mar 14 15:07:45 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 14:07:45 -0000
+Subject: No subject
+Message-ID: <mailman.2.1331734067.3598.iometer-svn@lists.berlios.de>
+
+I did some changes base on Reed's patch. It is still unclear that if using
+fmodl is a good idea. Though it can eliminate the exception.
+
+Also it is not ok for other OS. Windows+VC can not compile successfully with it.
+
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-03-17 02:12:12 UTC (rev 251)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-03-17 23:20:58 UTC (rev 252)
+@@ -1103,7 +1103,7 @@
+ 			// See if we need to get a new access spec line.  All transactions
+ 			// for the current burst have been sent.
+ 			if (--remaining_transactions_in_burst <= 0) {
+-				access_spec.GetNextBurst(access_percent = (unsigned int)Rand() % 100,
++				access_spec.GetNextBurst(access_percent = (unsigned int)Rand(100),
+ 							 &remaining_transactions_in_burst, &size, &transfer_delay,
+ 							 &user_alignment, &user_align_mask, &reply);
+ 				// Possibly waiting some delay before sending next burst of transfers.
+@@ -1125,7 +1125,7 @@
+ 
+ 			// Determine if the first I/O will be a read or write.
+ 			// (is_read will change when replies are sent)
+-			transaction->is_read = access_spec.Read(access_percent, (unsigned int)target->Rand() % 100);
++			transaction->is_read = access_spec.Read(access_percent, (unsigned int)target->Rand(100));
+ 
+ 			// Set flag to record transaction start time when the transaction actually begins.
+ 			transaction->start_transaction = 0;
+@@ -1141,7 +1141,7 @@
+ 		if (IsType(target->spec.type, GenericDiskType)) {
+ 			((TargetDisk *) targets[target_id])->Seek(access_spec.Random(access_percent,
+ 										     (unsigned int)targets[target_id]->
+-										     Rand() % 100), size,
++										     Rand(100)), size,
+ 								  user_alignment, user_align_mask);
+ 		}
+ 
+@@ -1426,7 +1426,11 @@
+ 	holdrand = seed;
+ }
+ 
+-DWORDLONG Grunt::Rand()
++DWORDLONG Grunt::Rand(DWORDLONG limit)
+ {
+-	return (holdrand = A * holdrand + B);
++#if defined(IOMTR_OSFAMILY_UNIX) && defined(WORKAROUND_MOD_BUG)
++	return ((DWORDLONG)fmodl(holdrand = A * holdrand + B, limit));
++#else
++	return (holdrand = A * holdrand + B) % limit;
++#endif
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.h	2006-03-17 02:12:12 UTC (rev 251)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.h	2006-03-17 23:20:58 UTC (rev 252)
+@@ -217,7 +217,7 @@
+ 
+ 	// Random number generation functions
+ 	void Srand(DWORDLONG seed);
+-	DWORDLONG Rand();
++	DWORDLONG Rand(DWORDLONG limit);
+ 
+ 	// Used by random number generator functions.
+ 	DWORDLONG holdrand;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTarget.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTarget.cpp	2006-03-17 02:12:12 UTC (rev 251)
++++ branches/IOMETER-restruct/iometer/src/IOTarget.cpp	2006-03-17 23:20:58 UTC (rev 252)
+@@ -104,7 +104,11 @@
+ #warning ===> WARNING: You have to do some coding here to get the port done!
+ #endif
+ 
+-DWORDLONG Target::Rand(void)
++DWORDLONG Target::Rand(DWORDLONG limit)
+ {
+-	return (spec.random = A * spec.random + B);
++#if defined(IOMTR_OSFAMILY_UNIX) && defined(WORKAROUND_MOD_BUG)
++	return ((DWORDLONG)fmodl(spec.random = A * spec.random + B, limit));
++#else
++	return (spec.random = A * spec.random + B) % limit;
++#endif
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTarget.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTarget.h	2006-03-17 02:12:12 UTC (rev 251)
++++ branches/IOMETER-restruct/iometer/src/IOTarget.h	2006-03-17 23:20:58 UTC (rev 252)
+@@ -94,7 +94,7 @@
+ 	virtual ReturnVal Read(LPVOID buffer, Transaction * trans) = 0;
+ 	virtual ReturnVal Write(LPVOID buffer, Transaction * trans) = 0;
+ 
+-	virtual DWORDLONG Rand();
++	virtual DWORDLONG Rand(DWORDLONG limit);
+ 
+ 	Target_Spec spec;
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-03-17 02:12:12 UTC (rev 251)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-03-17 23:20:58 UTC (rev 252)
+@@ -1418,11 +1418,7 @@
+ 	// Find out if this is a random seek.
+ 	if (random) {
+ 		// Set the offset to a random location on the disk.
+-#if defined(IOMTR_OSFAMILY_UNIX) && defined(WORKAROUND_MOD_BUG)
+-		offset = starting_position + (DWORDLONG) fmod(Rand(), size);
+-#else
+-		offset = starting_position + Rand() % size;
+-#endif
++		offset = starting_position + Rand(size);
+ 	} else {
+ 		// Adjusting the offset pointer by the last number of bytes successfully transferred.
+ 		offset += (DWORDLONG) bytes_transferred;
+
+
+
+From bogus@does.not.exist.com  Wed Mar 14 15:07:45 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 14:07:45 -0000
+Subject: No subject
+Message-ID: <mailman.3.1331734067.3598.iometer-svn@lists.berlios.de>
+
+Filled the buffer with non-zero data will have impact on certain storage performance test.
+For example, for iSCSI storage and digest enabled, the CRC computation will behave differently.
+
+
+From bogus@does.not.exist.com  Wed Mar 14 15:07:45 2012
+From: bogus@does.not.exist.com ()
+Date: Wed, 14 Mar 2012 14:07:45 -0000
+Subject: No subject
+Message-ID: <mailman.4.1331734067.3598.iometer-svn@lists.berlios.de>
+
+Maybe we could add a command line parameter to specify the data characteristics.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-03-17 23:20:58 UTC (rev 252)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-03-17 23:27:58 UTC (rev 253)
+@@ -510,6 +510,8 @@
+ //
+ BOOL Grunt::Set_Access(const Test_Spec * spec)
+ {
++	char *write_ptr = NULL;
++
+ 	// Check for idle spec.
+ 	if ((idle = (spec->access[0].of_size == IOERROR)))
+ 		return TRUE;
+@@ -598,6 +600,15 @@
+ 	}
+ 
+ 	data_size = access_spec.max_transfer;
++
++	/* Fill write buffer with something non-zero, it can affect the
++	 * rate at which the processor can do crc calculations
++	 */
++	write_ptr = (char *)write_data;
++	while ((unsigned long)write_ptr < ((unsigned long)write_data + data_size)) {
++		*write_ptr++ = (char)Rand(0xff);
++	}
++
+ 	return TRUE;
+ }
+ 
+
+
+

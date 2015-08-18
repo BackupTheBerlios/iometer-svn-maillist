@@ -1,0 +1,713 @@
+From cheungming at mail.berlios.de  Thu Sep  7 15:55:55 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 7 Sep 2006 15:55:55 +0200
+Subject: [Iometer-svn] r301 - in branches/IOMETER-restruct/iometer: . misc
+Message-ID: <200609071355.k87DttrK006668@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-07 15:55:54 +0200 (Thu, 07 Sep 2006)
+New Revision: 301
+
+Added:
+   branches/IOMETER-restruct/iometer/misc/graph.pl
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+added a perl script to draw graph like what Wizard.mdb does. Contributed by Ian Brown.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-26 23:18:57 UTC (rev 300)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-07 13:55:54 UTC (rev 301)
+@@ -141,6 +141,8 @@
+    - Added the initial drop of the DocBook sources of the first part of
+      the Iometer Users Guide (converted from OpenOffice - by James Rogers).
+ - Others:
++   - Added a perl script to draw simple graph like what Wizard.mdb does, a
++     free alternative solution.
+    - Changed the "Help About..." button of the Iometer Wizard to reflect
+      the current status (Open Source,...) of Iometer.
+    - Converted the Iometer Wizard to the file format of the 2000 version
+
+Added: branches/IOMETER-restruct/iometer/misc/graph.pl
+===================================================================
+--- branches/IOMETER-restruct/iometer/misc/graph.pl	2006-08-26 23:18:57 UTC (rev 300)
++++ branches/IOMETER-restruct/iometer/misc/graph.pl	2006-09-07 13:55:54 UTC (rev 301)
+@@ -0,0 +1,284 @@
++#!/usr/bin/perl
++
++# graphing script to use if Access isn't an option.  :)
++# written by Ian Brown for the iometer folks.
++# Version 1.0.0
++
++#if using windows (activestate perl), you must 'ppm install' these dependencies:
++# Time-Local
++# DBD-Chart
++# DBI
++# http://theoryx5.uwinnipeg.ca/ppms/GD.ppd
++# http://theoryx5.uwinnipeg.ca/ppms/GDTextUtil.ppd
++
++#for the *nix folk:
++#perl -MCPAN -eshell
++#  install DBD::Chart
++# or find the rpm/package for your distro
++
++# todo:
++# write a config file that this script can parse instead of asking for user input
++
++use warnings;
++use strict;
++
++use DBI;
++use DBD::Chart;
++
++sub HarvestChoicesFromCSVFile($);
++sub HarvestDataFromCSVFile($$$);
++sub CreateTable($);
++sub InsertData($$);
++sub UpdateData($$$);
++sub GraphData($$$$);
++
++if (@ARGV < 2)
++{
++   die("Usage: graph.pl file1.csv [file2.csv file3.csv] " .
++       "output_graphic_filename_without_extension\n");
++}
++if (@ARGV > 29)
++{
++   die("Sorry, this program can only generate 28 lines per graph due to" .
++       " the limitation of color choices.\n");
++}
++
++my @filenames = @ARGV;
++my $graphicFilename = pop(@filenames);
++
++my @filenameTitles;
++
++for (my $i = 0; $i < @filenames; $i++)
++{
++   if (! -f $filenames[$i])
++   {
++      die "Filename: $filenames[$i] not found.\n";
++   }
++   else
++   {
++      print "Enter in a title for $filenames[$i] (Default is name itself): ";
++      $filenameTitles[$i] = <STDIN>;
++      chomp($filenameTitles[$i]);
++      if ($filenameTitles[$i] eq "")
++      {
++         $filenameTitles[$i] = $filenames[$i];
++         $filenameTitles[$i] =~ s/.csv$//i;
++      }
++      $filenameTitles[$i] = uc($filenameTitles[$i]);
++      $filenameTitles[$i] =~ tr/[A-Z][0-9]/_/c;
++   }
++}
++
++unshift(@filenameTitles, "placeholder");
++my @choices = @{HarvestChoicesFromCSVFile($filenames[0])};
++my $displacement = 2;
++for (my $i = 1 + $displacement; $i < @choices; $i++)
++{
++   print $i - $displacement . ": $choices[$i]\n";   
++}
++
++my $yColumn;
++
++do
++{
++   print "Which # for the y (vertical) column: ";
++   $yColumn = <STDIN>;
++   chomp $yColumn;
++} while ($yColumn !~ m/^\d+$/);
++
++my $xColumn;
++
++do
++{
++   print "Which # for the x (horizontal) column: ";
++   $xColumn = <STDIN>;
++   chomp $xColumn;
++} while ($xColumn !~ m/^\d+$/);
++
++$yColumn+=$displacement;
++$xColumn+=$displacement;
++
++print "What would you like the y-axis to be titled? (Enter for default)\n";
++print "[" . $choices[$yColumn] . "]: ";
++my $yAxisTitle = <STDIN>;
++chomp $yAxisTitle;
++if ($yAxisTitle =~ m/^$/)
++{
++   $yAxisTitle = $choices[$yColumn];
++}
++
++print "What would you like the x-axis to be titled? (Enter for default)\n";
++print "[" . $choices[$xColumn] . "]: ";
++my $xAxisTitle = <STDIN>;
++chomp $xAxisTitle;
++if ($xAxisTitle =~ m/^$/)
++{
++   $xAxisTitle = $choices[$xColumn];
++}
++
++print "What would you like the title to say? (Enter for default)\n";
++print "[" . $yAxisTitle . " vs. " . $xAxisTitle . "]: ";
++my $title = <STDIN>;
++chomp $title;
++if ($title =~ m/^$/)
++{
++   $title = $yAxisTitle . " vs. " . $xAxisTitle;
++}
++
++CreateTable(\@filenameTitles);
++
++my $lineCount = @filenames;
++my $filename = shift(@filenames);
++my $hashRef = HarvestDataFromCSVFile($filename, $yColumn, $xColumn);
++InsertData($hashRef, $lineCount + 1);
++for (my $i = 0; $i < @filenames; $i++)
++{
++   $hashRef = HarvestDataFromCSVFile($filenames[$i], $yColumn, $xColumn);
++   UpdateData($hashRef, $i+2, \@filenameTitles);
++}
++
++my $fileRef = GraphData($yAxisTitle, $xAxisTitle, $lineCount, $title);
++open FILE, ">" . $graphicFilename . ".png";
++binmode(FILE);
++print FILE $$fileRef;
++close FILE;
++
++
++sub HarvestChoicesFromCSVFile($)
++{
++   my $filename = shift;
++   my @choices;
++   open FILE, "<$filename";
++   while (<FILE>)
++   {
++      if ($_ =~ m/^'Results/)
++      {
++         my $choices = <FILE>;
++         @choices = split(/,/, $choices);
++         $choices[0] =~ s/\'//;
++         last;
++      }
++   }
++   close FILE;
++   return \@choices;
++}
++sub HarvestDataFromCSVFile($$$)
++{
++   my $filename = shift;
++   my $yColumn = shift;
++   my $xColumn = shift;
++   my %hash;
++   open FILE, "<$filename";
++   while (<FILE>)
++   {
++      if ($_ =~ m/^ALL/)
++      {
++         my @data = split(/,/, $_);
++         push (@{$hash{'xColumn'}}, $data[$yColumn]);
++         push (@{$hash{'yColumn'}}, $data[$xColumn]);
++      }
++   }
++   close FILE;
++   return \%hash;
++}
++
++BEGIN
++{
++   my $dbh = DBI->connect('dbi:Chart:');
++
++   sub CreateTable($)
++   {
++      my $filenameTitlesRef = shift;
++      
++      my @arrayOfFields;
++      foreach my $title (@{$filenameTitlesRef})
++      {
++         push(@arrayOfFields, "$title DECIMAL");
++      }
++      my $listOfFields = join(", ", @arrayOfFields);
++      my $createTableSql = "CREATE TABLE line ($listOfFields)";
++      my $createTable = $dbh->prepare($createTableSql) or die
++         "Couldn't prepare createTable.  This is almost certainly due to the filename title(s) given.\n" .
++         "SQL COMMAND: $createTableSql\n";   
++      $createTable->execute();
++   }
++   
++   sub InsertData($$)
++   {
++      my $hashRef = shift;
++      my $count = shift;
++      my $valuesQuery = "?, ?";
++      for(my $i = 2; $i < $count; $i++)
++      {
++         $valuesQuery .= ", NULL"
++      }
++      my @yColumn = @{$hashRef->{'xColumn'}};
++      my @xColumn = @{$hashRef->{'yColumn'}};
++      if (@yColumn != @xColumn)
++      {
++         die("xColumn doesn't have the same elements as yColumn.  Corrupt csv?\n");
++      }
++      my $sqlString = "INSERT INTO line VALUES($valuesQuery)";
++      my $insertData = $dbh->prepare( $sqlString)
++         or die "Couldn't prepare insertData.  This normally happens when there was a problem creating the table.\n" .
++         "SQL COMMAND: $sqlString\n";       
++      for (my $i = 0; $i < @yColumn; $i++)
++      {
++         $insertData->execute($xColumn[$i], $yColumn[$i]);
++      }
++   }
++   
++   sub UpdateData($$$)
++   {
++      my $hashRef = shift;
++      my $placeHolder = shift;
++      my $filenameTitlesRef = shift;
++      my @titles = @{$filenameTitlesRef};
++      my @yColumn = @{$hashRef->{'xColumn'}};
++      my @xColumn = @{$hashRef->{'yColumn'}};
++      my $sqlQuery = "UPDATE line set $titles[$placeHolder] = ? where $titles[0] = ?";
++      my $updateData = $dbh->prepare($sqlQuery)
++         or die "Couldn't prepare updateData.  This normally happens when there was a problem creating the table.\n" .
++         "SQL COMMAND: $sqlQuery\n";
++      for (my $i = 0; $i < @yColumn; $i++)
++      {
++         $updateData->execute($yColumn[$i], $xColumn[$i]);
++      }      
++   }
++   
++   sub GraphData($$$$)
++   {
++      my $yColumnName = shift;
++      my $xColumnName = shift;
++      my $numOfLines = shift;
++      my $title = shift;
++      my $buf;
++      my @colors = ('yellow', 'blue', 'red', 'gray', 'dgray', 'black', 
++                     'lblue', 'dblue', 'gold', 'lyellow', 'dyellow',
++                    'lgreen', 'green', 'dgreen', 'lred', 'dred', 'lgray',
++                    'lpurple', 'purple', 'dpurple', 'lorange', 'orange',
++                    'pink', 'dpink', 'marine', 'cyan', 'lbrown', 'dbrown');
++      
++      my $colors;
++      for (my $i = 0; $i < $numOfLines; $i++)
++      {
++         $colors .= $colors[$i] . ", ";
++      }
++      chop($colors);
++      chop($colors);
++      my $graphSql ="SELECT LINEGRAPH FROM line
++        WHERE WIDTH=800 AND HEIGHT=600 AND X_AXIS= ? AND
++        Y_AXIS= ? AND COLOR in ($colors) AND SHAPE='fillcircle' AND
++        SHOWGRID=1 AND SHOWVALUES=0 AND BACKGROUND='white' AND LINEWIDTH=3 AND
++        TITLE=?";
++     my $graphData = $dbh->prepare($graphSql)
++      or die ("Couldn't prepare graphData.  This normally happens when there was a problem inserting the data.\n" .
++              "SQL COMMAND: $graphSql\n"); 
++      $graphData->execute($xColumnName, $yColumnName, $title);
++      $graphData->bind_columns(\$buf);
++      $graphData->fetch();
++      return \$buf;
++   }
++}
++
++
+
+
+
+From cheungming at mail.berlios.de  Thu Sep 14 21:52:16 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 14 Sep 2006 21:52:16 +0200
+Subject: [Iometer-svn] r302 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200609141952.k8EJqG66017337@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-14 21:52:16 +0200 (Thu, 14 Sep 2006)
+New Revision: 302
+
+Modified:
+   branches/IOMETER-restruct/iometer/CREDITS
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+Log:
+updated version tag for RC3.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CREDITS
+===================================================================
+--- branches/IOMETER-restruct/iometer/CREDITS	2006-09-07 13:55:54 UTC (rev 301)
++++ branches/IOMETER-restruct/iometer/CREDITS	2006-09-14 19:52:16 UTC (rev 302)
+@@ -88,3 +88,8 @@
+ E: mingz at ele.uri.edu
+ W: http://www.ele.uri.edu/~mingz
+ D: Co-maintainer.
++
++N: Ian Brown
++E: ian at zestysoft.com
++D: Provided a perl script to generate graphs.
++
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-09-07 13:55:54 UTC (rev 301)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-09-14 19:52:16 UTC (rev 302)
+@@ -116,7 +116,7 @@
+ //#define IOVER_FILEVERSION				"2003.12.16-post\0"
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				"2004.07.30-post\0"
+-#define IOVER_FILEVERSION				"2006.07.27-RC2\0"
++#define IOVER_FILEVERSION				"2006.07.27-RC3\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+
+
+From cheungming at mail.berlios.de  Thu Sep 14 21:54:36 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 14 Sep 2006 21:54:36 +0200
+Subject: [Iometer-svn] r303 - tags
+Message-ID: <200609141954.k8EJsa7X017958@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-14 21:54:36 +0200 (Thu, 14 Sep 2006)
+New Revision: 303
+
+Added:
+   tags/iometer-2006_07_27-RC3/
+Log:
+tagged 2006-07-27 rc3 version.
+
+
+
+Copied: tags/iometer-2006_07_27-RC3 (from rev 302, branches/IOMETER-restruct)
+
+
+
+From cheungming at mail.berlios.de  Thu Sep 21 03:08:16 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 21 Sep 2006 03:08:16 +0200
+Subject: [Iometer-svn] r304 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200609210108.k8L18G9n013152@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-21 03:08:15 +0200 (Thu, 21 Sep 2006)
+New Revision: 304
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+should use BLKSSZGET to get sector size.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-09-14 19:54:36 UTC (rev 303)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-09-21 01:08:15 UTC (rev 304)
+@@ -1788,13 +1788,17 @@
+ 		cerr << "Fail to open device" << endl;
+ 		return 0;
+ 	}
++
++	// still leave old comments here but we should use BLKSSZGET. Sector 
++	// size request should be allowed no matter what.
++	//
+ 	// Use BLKBSZGET here as opposed to BLKSSZGET.  BLKSSZGET returns the
+ 	// true sector size of the physical disk which should be what we want.
+ 	// However, Linux will always use the potential cluster size of the 
+ 	// file system even for raw devices with no file system.  So we use 
+ 	// BLKBSZGET which returns the (potential) file system cluster size.
+ 
+-	if (ioctl(fd, BLKBSZGET, &ssz) < 0) {
++	if (ioctl(fd, BLKSSZGET, &ssz) < 0) {
+ 		cerr << "Fail to get sector size for " << fullDevName << endl;
+ 		close(fd);
+ 		return 0;
+
+
+
+From cheungming at mail.berlios.de  Fri Sep 29 19:03:16 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 29 Sep 2006 19:03:16 +0200
+Subject: [Iometer-svn] r305 -
+	branches/IOMETER-restruct/iometer/misc/Installer
+Message-ID: <200609291703.k8TH3GVr011166@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-29 19:03:15 +0200 (Fri, 29 Sep 2006)
+New Revision: 305
+
+Modified:
+   branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+Log:
+improved the .nsi install script a bit. used defines for const.
+
+Modified: branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+===================================================================
+--- branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-09-21 01:08:15 UTC (rev 304)
++++ branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-09-29 17:03:15 UTC (rev 305)
+@@ -49,11 +49,16 @@
+ 
+ ##### Global settings
+ #------------------------------------------------------------------------------
+-Name "Iometer 2006.05.31"
+ 
+-OutFile "iometer-2006.05.31.win32.i386-setup.exe"
+-InstallDir "$PROGRAMFILES\Iometer.org\Iometer 2006.05.31"
++!define RELDATE "2006.07.27"
++!define PLATF "win32"
++!define ARCH "i386"
+ 
++Name "Iometer ${RELDATE}"
++
++OutFile "iometer-${RELDATE}.${PLATF}.${ARCH}-setup.exe"
++InstallDir "$PROGRAMFILES\Iometer.org\Iometer ${RELDATE}"
++
+ CRCCheck on
+ XPStyle on
+ 
+@@ -126,19 +131,19 @@
+ #------------------------------------------------------------------------------
+ Section "Start Menu Shortcuts" SectionStartMenu
+ 
+-	CreateDirectory "$SMPROGRAMS\Iometer 2006.05.31"
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05.31\Iometer.lnk"                     "$INSTDIR\iometer.exe"   "" "$INSTDIR\iometer.exe"   0
++	CreateDirectory "$SMPROGRAMS\Iometer ${RELDATE}"
++	CreateShortCut  "$SMPROGRAMS\Iometer ${RELDATE}\Iometer.lnk"                     "$INSTDIR\iometer.exe"   "" "$INSTDIR\iometer.exe"   0
+         IfFileExists "$INSTDIR\iometer.pdf"   "" +2
+-		CreateShortCut "$SMPROGRAMS\Iometer 2006.05.31\Iometer Users Guide.lnk"  "$INSTDIR\iometer.pdf"   "" "$INSTDIR\iometer.pdf"   0
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05.31\Import Wizard for MS Access.lnk" "$INSTDIR\Wizard.mdb"    "" "$INSTDIR\Wizard.mdb"    0
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05.31\Uninstall Iometer.lnk"           "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
++		CreateShortCut "$SMPROGRAMS\Iometer ${RELDATE}\Iometer Users Guide.lnk"  "$INSTDIR\iometer.pdf"   "" "$INSTDIR\iometer.pdf"   0
++	CreateShortCut  "$SMPROGRAMS\Iometer ${RELDATE}\Import Wizard for MS Access.lnk" "$INSTDIR\Wizard.mdb"    "" "$INSTDIR\Wizard.mdb"    0
++	CreateShortCut  "$SMPROGRAMS\Iometer ${RELDATE}\Uninstall Iometer.lnk"           "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+ 
+ SectionEnd
+ #------------------------------------------------------------------------------
+ Section "Uninstall"
+   
+-	Delete "$SMPROGRAMS\Iometer 2006.05.31\*.*"
+-	RMDir  "$SMPROGRAMS\Iometer 2006.05.31"
++	Delete "$SMPROGRAMS\Iometer ${RELDATE}\*.*"
++	RMDir  "$SMPROGRAMS\Iometer ${RELDATE}"
+ 
+ 	Delete "$INSTDIR\Iometer.exe"
+ 	Delete "$INSTDIR\Dynamo.exe"
+
+
+
+From cheungming at mail.berlios.de  Fri Sep 29 20:21:24 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 29 Sep 2006 20:21:24 +0200
+Subject: [Iometer-svn] r306 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200609291821.k8TILOgW001522@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-29 20:21:24 +0200 (Fri, 29 Sep 2006)
+New Revision: 306
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoGlobals.cpp
+Log:
+fixed a potential memory leak.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoGlobals.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoGlobals.cpp	2006-09-29 17:03:15 UTC (rev 305)
++++ branches/IOMETER-restruct/iometer/src/GalileoGlobals.cpp	2006-09-29 18:21:24 UTC (rev 306)
+@@ -116,8 +116,11 @@
+ 
+ 		//Create a copy of the error message string - thread must delete.
+ 		CString *pErrorMessage = new CString(errmsg);
++		CWinThread *p;
+ 
+-		(void)AfxBeginThread(MessageBoxThread, (LPVOID) pErrorMessage);
++		p = AfxBeginThread(MessageBoxThread, (LPVOID) pErrorMessage);
++		if (!p)
++			delete pErrorMessage;
+ 	}
+ }
+ 
+
+
+
+From cheungming at mail.berlios.de  Fri Sep 29 20:29:30 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 29 Sep 2006 20:29:30 +0200
+Subject: [Iometer-svn] r307 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200609291829.k8TITUtt002174@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-29 20:29:30 +0200 (Fri, 29 Sep 2006)
+New Revision: 307
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+Log:
+allow dynamo to connect iometer when iometer is started with a non-default port.
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-29 18:21:24 UTC (rev 306)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-29 18:29:30 UTC (rev 307)
+@@ -8,6 +8,8 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to allow dynamo connect to iometer when iometer started
++     with a specified non-default port.
+    - Patch by Ming Zhang to fix recv() return value processing error in Peek();
+    - Patch by Ming Zhang to allocate memory under Linux as 4KB aligned.
+    - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-09-29 18:21:24 UTC (rev 306)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-09-29 18:29:30 UTC (rev 307)
+@@ -276,8 +276,8 @@
+ 	// contains any spaces, but the "start" command (NEW_WORKER_COMMAND) assumes the
+ 	// first quoted argument is the window title, so we must provide it twice.
+ 	new_manager_command_line_format = (CString) NEW_WORKER_COMMAND
+-	    + "\"" + iometer_path + NEW_WORKER_EXECUTABLE + "%s\"" + " "
+-	    + "\"" + iometer_path + NEW_WORKER_EXECUTABLE + "\"%s";
++	    + "\"" + iometer_path + NEW_WORKER_EXECUTABLE + "%s%s\"" + " "
++	    + "\"" + iometer_path + NEW_WORKER_EXECUTABLE + "\"%s%s";
+ 
+ 	if (cmdline.GetConfigFile().IsEmpty()) {
+ #ifndef	_DEBUG
+@@ -411,12 +411,15 @@
+ void CGalileoApp::LaunchDynamo(const CString & mgr_name /* ="" */ )
+ {
+ 	CString cmd;
++	CString portparam;
+ 
+ 	// Make sure the formatting string was initialized.
+ 	ASSERT(!theApp.new_manager_command_line_format.IsEmpty());
+ 
++	portparam.Format(" /p %d ", cmdline.GetLoginportnumber());
++
+ 	// Create a string with the appropriate command line parameters.
+-	cmd.Format(new_manager_command_line_format, mgr_name, mgr_name);
++	cmd.Format(new_manager_command_line_format, mgr_name, portparam, mgr_name, portparam);
+ 
+ 	// Launch Dynamo.
+ 	system(cmd);
+@@ -527,8 +530,6 @@
+ 
+ 			// create and open the port
+ 			login_port_number = theApp.cmdline.GetLoginportnumber();
+-			if (!login_port_number)
+-				login_port_number = WELL_KNOWN_TCP_PORT;
+  
+ 			login_port = new PortTCP(FALSE);	// asynchronous port
+ 			if (!login_port->Create(NULL, NULL, 0, login_port_number)) {
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-09-29 18:21:24 UTC (rev 306)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-09-29 18:29:30 UTC (rev 307)
+@@ -290,7 +290,8 @@
+ 	m_sResultFile = "";
+ 	m_iTimeout = -1;
+ 	m_bSwitches = FALSE;
+-	ErrorMessage("Error processing the command line.  " + errmsg);
++	//ErrorMessage("Error processing the command line.  " + errmsg);
++	MessageBox(NULL, "Error processing the command line.  " + errmsg, "Iometer", 0);
+ }
+ 
+ CString CGalileoCmdLine::GetConfigFile()
+@@ -313,7 +314,10 @@
+ 
+ int CGalileoCmdLine::GetLoginportnumber()
+ {
+-	return m_iLoginportnumber;
++	if (m_iLoginportnumber)
++		return m_iLoginportnumber;
++	else
++		return WELL_KNOWN_TCP_PORT;
+ }
+ 
+ BOOL CGalileoCmdLine::GetShowBigmeter()
+
+
+
+From cheungming at mail.berlios.de  Fri Sep 29 21:12:28 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 29 Sep 2006 21:12:28 +0200
+Subject: [Iometer-svn] r308 - in branches/IOMETER-restruct/iometer: . src
+Message-ID: <200609291912.k8TJCSOb005596@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-29 21:12:28 +0200 (Fri, 29 Sep 2006)
+New Revision: 308
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+Log:
+updated version tag for 2006-07-27 final release.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-29 18:29:30 UTC (rev 307)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-29 19:12:28 UTC (rev 308)
+@@ -4,7 +4,7 @@
+ 
+ 
+ 
+-ChangeLog (IOMETER2 - 2006.mm.dd):
++ChangeLog (IOMETER2 - 2006.07.27):
+ ==================================
+ 
+ - Applied patches:
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-09-29 18:29:30 UTC (rev 307)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-09-29 19:12:28 UTC (rev 308)
+@@ -116,7 +116,7 @@
+ //#define IOVER_FILEVERSION				"2003.12.16-post\0"
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				"2004.07.30-post\0"
+-#define IOVER_FILEVERSION				"2006.07.27-RC3\0"
++#define IOVER_FILEVERSION				"2006.07.27\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+
+
+From cheungming at mail.berlios.de  Fri Sep 29 22:59:14 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 29 Sep 2006 22:59:14 +0200
+Subject: [Iometer-svn] r309 - tags
+Message-ID: <200609292059.k8TKxEPp013866@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-09-29 22:59:14 +0200 (Fri, 29 Sep 2006)
+New Revision: 309
+
+Added:
+   tags/iometer-2006_07_27/
+Log:
+tagged 2006-07-27 version.
+
+
+
+Copied: tags/iometer-2006_07_27 (from rev 308, branches/IOMETER-restruct)
+
+
+

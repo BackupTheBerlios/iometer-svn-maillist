@@ -1,0 +1,410 @@
+From vedrand at mail.berlios.de  Sat May  3 02:33:11 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Sat, 3 May 2008 02:33:11 +0200
+Subject: [Iometer-svn] r318 - branches/IOMETER-restruct/iometer/src/Galileo
+Message-ID: <200805030033.m430XBY6017585@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-05-03 02:32:32 +0200 (Sat, 03 May 2008)
+New Revision: 318
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+Log:
+Updated for Vista WLK
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-04-15 17:48:26 UTC (rev 317)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-05-03 00:32:32 UTC (rev 318)
+@@ -2,29 +2,37 @@
+ TARGETPATH=OBJ
+ TARGETTYPE=PROGRAM
+ 
+-MSC_WARNING_LEVEL=/W3 /WX
+ USE_MFC=1
++USE_STL=1 		# requires to use revision stl70 unless using nolibs
+ USE_NATIVE_EH=1
+-BROWSER_INFO=1
+-
++USE_LIBCMT=1
+ UMTYPE=windows
+ 
+-INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS  
+-#-D_DETAILS -DDEBUG -D_DEBUG
+- 
++MSC_WARNING_LEVEL=/W2
++#/W3 /WX
+ 
+-TARGETLIBS= $(SDK_LIB_PATH)\KERNEL32.LIB \
+-    $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\WSOCK32.LIB		\
+-    $(SDK_LIB_PATH)\WS2_32.LIB		\
+-    $(SDK_LIB_PATH)\COMCTL32.LIB	\
+-    $(SDK_LIB_PATH)\VERSION.LIB		\
+-#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
+-#	$(SDK_LIB_PATH)\MFC42D.LIB		\
+-    $(CRT_LIB_PATH)\MSVCPRT.LIB		\
+-	$(MFC_LIB_PATH)\MFCS42.LIB
++#        newer DDKS have some SDK components
++#        |                new for Vista DDK, ok to use stl70
++#        |                |                          still requires headers from the real SDK
++#        |                |                          |
++INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE; ..
+ 
++C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -D_DETAILS -DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN 
++# -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
++# -DFORCE_STRUCT_ALIGN (structure member alignment)
++# -D_DETAILS (for more verbosity)
++# -D_DEBUG (for normal debug)
++# -DDEBUG (for DEBUG_NEW only)
++# -DUSING_DDK (not needed with vista ddk)
++
++
++TARGETLIBS=$(SDK_LIB_PATH)\COMCTL32.LIB	\
++	$(SDK_LIB_PATH)\VERSION.LIB	\
++	$(SDK_LIB_PATH)\WSOCK32.LIB	\
++	$(SDK_LIB_PATH)\WS2_32.LIB
++
++LINKER_STACKSIZE=-stack:0x80000,0x4000
++
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+ 	..\BigMeter.cpp			\
+
+
+
+From vedrand at mail.berlios.de  Sat May  3 02:33:57 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Sat, 3 May 2008 02:33:57 +0200
+Subject: [Iometer-svn] r319 - branches/IOMETER-restruct/iometer/src/Pulsar
+Message-ID: <200805030033.m430Xv0E017619@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-05-03 02:33:41 +0200 (Sat, 03 May 2008)
+New Revision: 319
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+Log:
+Update for Vista WLK.
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-05-03 00:32:32 UTC (rev 318)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-05-03 00:33:41 UTC (rev 319)
+@@ -3,33 +3,40 @@
+ TARGETTYPE=PROGRAM
+ 
+ USE_MFC=1
++USE_STL=1		# requires to use revision stl70 unless using nolibs
+ USE_NATIVE_EH=1
+-
+-BROWSER_INFO=1
+-
++USE_LIBCMT=1
+ UMTYPE=console
+ UMENTRY=main
+ 
+-MSC_WARNING_LEVEL=/W3 /WX
++MSC_WARNING_LEVEL=/W2
++#/W3 /WX
+ 
+-INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS -DIMPORT_NEW_FUNCS 
+-#-D_DETAILS
+-  
+ 
+-TARGETLIBS=$(SDK_LIB_PATH)\KERNEL32.LIB \
+-    $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\WSOCK32.LIB		\
+-    $(SDK_LIB_PATH)\WS2_32.LIB		\
+-    $(SDK_LIB_PATH)\VERSION.LIB		\
+-    $(CRT_LIB_PATH)\MSVCPRT.LIB		\
+-	$(MFC_LIB_PATH)\MFCS42.LIB		\
+-#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
+-#	$(SDK_LIB_PATH)\MFC42D.LIB		\
+-    $(SDK_LIB_PATH)\SETUPAPI.LIB	\
+-	$(SDK_LIB_PATH)\NETAPI32.LIB
++#        newer DDKS have some SDK components
++#        |                new for Vista DDK, ok to use stl70
++#        |                |                          still requires headers from the real SDK
++#        |                |                          |
++INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE;..
+ 
++C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -D_DETAILS -DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
++# -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
++# -DFORCE_STRUCT_ALIGN (structure member alignment)
++# -D_DETAILS (for more verbosity)
++# -D_DEBUG (for normal debug)
++# -DDEBUG (for DEBUG_NEW only)
++# -DUSING_DDK (not needed with vista ddk)
+ 
++TARGETLIBS=$(SDK_LIB_PATH)\KERNEL32.LIB	\
++	$(SDK_LIB_PATH)\MSWSOCK.LIB	\
++	$(SDK_LIB_PATH)\NETAPI32.LIB	\
++	$(SDK_LIB_PATH)\SETUPAPI.LIB	\
++	$(SDK_LIB_PATH)\USER32.lib	\
++	$(SDK_LIB_PATH)\VERSION.LIB	\
++	$(SDK_LIB_PATH)\WS2_32.LIB
++
++LINKER_STACKSIZE=-stack:0x100000,0x4000
++
+ SOURCES= ..\ByteOrder.cpp	\
+ 	..\IOAccess.cpp			\
+ 	..\IOCompletionQ.cpp	\
+
+
+
+From vedrand at mail.berlios.de  Sat May  3 02:43:05 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Sat, 3 May 2008 02:43:05 +0200
+Subject: [Iometer-svn] r321 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200805030043.m430h55x018349@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-05-03 02:43:01 +0200 (Sat, 03 May 2008)
+New Revision: 321
+
+Added:
+   branches/IOMETER-restruct/iometer/src/pack8.h
+   branches/IOMETER-restruct/iometer/src/unpack8.h
+Log:
+Compiler pre-processor support for structure packing. Needs work for some OSes.
+
+Added: branches/IOMETER-restruct/iometer/src/pack8.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/pack8.h	2008-05-03 00:40:09 UTC (rev 320)
++++ branches/IOMETER-restruct/iometer/src/pack8.h	2008-05-03 00:43:01 UTC (rev 321)
+@@ -0,0 +1,60 @@
++/* ######################################################################### */
++/* ##                                                                     ## */
++/* ##  pack8.h		                                                  ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++/* ##                                                                     ## */
++/* ##  Job .......: Implements structurep packing                         ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++/* ##                                                                     ## */
++/* ##  Remarks ...: <none>                                                ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++/* ##                                                                     ## */
++/* ##  Intel Open Source License                                          ## */
++/* ##                                                                     ## */
++/* ##  Copyright (c) 2001 Intel Corporation                               ## */
++/* ##  All rights reserved.                                               ## */
++/* ##  Redistribution and use in source and binary forms, with or         ## */
++/* ##  without modification, are permitted provided that the following    ## */
++/* ##  conditions are met:                                                ## */
++/* ##                                                                     ## */
++/* ##  Redistributions of source code must retain the above copyright     ## */
++/* ##  notice, this list of conditions and the following disclaimer.      ## */
++/* ##                                                                     ## */
++/* ##  Redistributions in binary form must reproduce the above copyright  ## */
++/* ##  notice, this list of conditions and the following disclaimer in    ## */
++/* ##  the documentation and/or other materials provided with the         ## */
++/* ##  distribution.                                                      ## */
++/* ##                                                                     ## */
++/* ##  Neither the name of the Intel Corporation nor the names of its     ## */
++/* ##  contributors may be used to endorse or promote products derived    ## */
++/* ##  from this software without specific prior written permission.      ## */
++/* ##                                                                     ## */
++/* ##  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND             ## */
++/* ##  CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,      ## */
++/* ##  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF           ## */
++/* ##  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE           ## */
++/* ##  DISCLAIMED. IN NO EVENT SHALL THE INTEL OR ITS  CONTRIBUTORS BE    ## */
++/* ##  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,   ## */
++/* ##  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,           ## */
++/* ##  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,    ## */
++/* ##  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY    ## */
++/* ##  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR     ## */
++/* ##  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT    ## */
++/* ##  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY    ## */
++/* ##  OF SUCH DAMAGE.                                                    ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++
++
++//
++// Anything included after this file will have the following byte alignment
++//
++
++#if (defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_UNIX))
++#pragma pack(push, 8)
++#else
++#error ===> You must include an 8-byte structure packing/alignment directive.
++#endif
+\ No newline at end of file
+
+Added: branches/IOMETER-restruct/iometer/src/unpack8.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/unpack8.h	2008-05-03 00:40:09 UTC (rev 320)
++++ branches/IOMETER-restruct/iometer/src/unpack8.h	2008-05-03 00:43:01 UTC (rev 321)
+@@ -0,0 +1,60 @@
++/* ######################################################################### */
++/* ##                                                                     ## */
++/* ##  unpack8.h	                                                  ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++/* ##                                                                     ## */
++/* ##  Job .......: Undoes structure packing                		  ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++/* ##                                                                     ## */
++/* ##  Remarks ...: <none>                                                ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++/* ##                                                                     ## */
++/* ##  Intel Open Source License                                          ## */
++/* ##                                                                     ## */
++/* ##  Copyright (c) 2001 Intel Corporation                               ## */
++/* ##  All rights reserved.                                               ## */
++/* ##  Redistribution and use in source and binary forms, with or         ## */
++/* ##  without modification, are permitted provided that the following    ## */
++/* ##  conditions are met:                                                ## */
++/* ##                                                                     ## */
++/* ##  Redistributions of source code must retain the above copyright     ## */
++/* ##  notice, this list of conditions and the following disclaimer.      ## */
++/* ##                                                                     ## */
++/* ##  Redistributions in binary form must reproduce the above copyright  ## */
++/* ##  notice, this list of conditions and the following disclaimer in    ## */
++/* ##  the documentation and/or other materials provided with the         ## */
++/* ##  distribution.                                                      ## */
++/* ##                                                                     ## */
++/* ##  Neither the name of the Intel Corporation nor the names of its     ## */
++/* ##  contributors may be used to endorse or promote products derived    ## */
++/* ##  from this software without specific prior written permission.      ## */
++/* ##                                                                     ## */
++/* ##  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND             ## */
++/* ##  CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,      ## */
++/* ##  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF           ## */
++/* ##  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE           ## */
++/* ##  DISCLAIMED. IN NO EVENT SHALL THE INTEL OR ITS  CONTRIBUTORS BE    ## */
++/* ##  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,   ## */
++/* ##  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,           ## */
++/* ##  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,    ## */
++/* ##  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY    ## */
++/* ##  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR     ## */
++/* ##  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT    ## */
++/* ##  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY    ## */
++/* ##  OF SUCH DAMAGE.                                                    ## */
++/* ##                                                                     ## */
++/* ## ------------------------------------------------------------------- ## */
++
++
++//
++// Anything included before this file will have the prior byte alignment
++//
++
++#if (defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_UNIX))
++#pragma pack(pop)
++#else
++#error ==> You must UNDO the 8-byte structure packing/alignment directive.
++#endif
+
+
+
+From vedrand at mail.berlios.de  Sat May  3 02:45:35 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Sat, 3 May 2008 02:45:35 +0200
+Subject: [Iometer-svn] r322 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200805030045.m430jZpP018456@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-05-03 02:45:31 +0200 (Sat, 03 May 2008)
+New Revision: 322
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/ByteOrder.cpp
+   branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp
+   branches/IOMETER-restruct/iometer/src/ICF_ifstream.h
+Log:
+New disk detection (windows) and iometer disk nesting; enabled 64bit and per thread affinity; added support for structure packing; tweaked dynamo cmdline support (Windows)
+
+Modified: branches/IOMETER-restruct/iometer/src/ByteOrder.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ByteOrder.cpp	2008-05-03 00:43:01 UTC (rev 321)
++++ branches/IOMETER-restruct/iometer/src/ByteOrder.cpp	2008-05-03 00:45:31 UTC (rev 322)
+@@ -354,7 +354,9 @@
+ 			}
+ 			// Now re-order the other stuff.
+ 			reorder(var.data.targets[i].queue_depth);
++#ifndef USE_NEW_DISCOVERY_MECHANISM // part of the bitwise char
+ 			reorder(var.data.targets[i].test_connection_rate);
++#endif
+ 			reorder(var.data.targets[i].trans_per_conn);
+ 			reorder(var.data.targets[i].random);
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp	2008-05-03 00:43:01 UTC (rev 321)
++++ branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp	2008-05-03 00:45:31 UTC (rev 322)
+@@ -328,6 +328,47 @@
+ 	return TRUE;
+ }
+ 
++BOOL ICF_ifstream::ExtractFirstInt64(CString & string, __int64 &number)
++{
++	const CString backup_string = string;
++	CString substring;
++	int pos;
++
++	number = 0;
++
++	if ((pos = string.FindOneOf("-1234567890")) == -1) {
++		ErrorMessage("File is improperly formatted.  Expected an " "integer value.");
++		return FALSE;
++	}
++	// Cleave off everything before the first number.
++	string = string.Right(string.GetLength() - pos);
++
++	substring = string.SpanIncluding("-1234567890");	// get the int as a string
++	string = string.Right(string.GetLength() - substring.GetLength());
++
++	// If there are any negative signs after the first character, fail.
++	if (substring.Right(substring.GetLength() - 1).Find('-') != -1) {
++		ErrorMessage("File is improperly formatted.  An integer value "
++			     "has a negative sign in the middle or on the end of it.");
++		string = backup_string;	// restore string's old value
++		return FALSE;
++	}
++
++	number = _atoi64((LPCTSTR) substring);
++
++	// Prepare string for further processing.  Eat whitespace.
++	string.TrimLeft();
++
++	// If there's a trailing comma, eat it.
++	if (!string.IsEmpty() && string.GetAt(0) == ',')
++		string = string.Right(string.GetLength() - 1);
++
++	// Eat any space following the comma.
++	string.TrimLeft();
++
++	return TRUE;
++}
++
+ BOOL ICF_ifstream::ExtractFirstIntVersion(CString & string, int &number)
+ {
+ 	const CString backup_string = string;
+
+Modified: branches/IOMETER-restruct/iometer/src/ICF_ifstream.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICF_ifstream.h	2008-05-03 00:43:01 UTC (rev 321)
++++ branches/IOMETER-restruct/iometer/src/ICF_ifstream.h	2008-05-03 00:45:31 UTC (rev 322)
+@@ -101,6 +101,7 @@
+ 	BOOL GetPair(CString & key, CString & value);
+ 
+ 	static BOOL ExtractFirstInt(CString & string, int &number);
++	static BOOL ExtractFirstInt64(CString & string, __int64 &number);
+ 	static BOOL ExtractFirstIntVersion(CString & string, int &number);
+ 	static CString ExtractFirstToken(CString & string, BOOL spaces = FALSE);
+ };
+
+
+

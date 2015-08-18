@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r279 - in branches/IOMETER-restruct/iometer/src:	Galileo Pulsar
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r279%20-%20in%20branches/IOMETER-restruct/iometer/src%3A%0A%09Galileo%20Pulsar&In-Reply-To=%3C200608160057.k7G0vYFF002201%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000047.html">
+   <LINK REL="Next"  HREF="000049.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r279 - in branches/IOMETER-restruct/iometer/src:	Galileo Pulsar</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r279%20-%20in%20branches/IOMETER-restruct/iometer/src%3A%0A%09Galileo%20Pulsar&In-Reply-To=%3C200608160057.k7G0vYFF002201%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r279 - in branches/IOMETER-restruct/iometer/src:	Galileo Pulsar">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug 16 02:57:34 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000047.html">[Iometer-svn] r278 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000049.html">[Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-16 02:57:29 +0200 (Wed, 16 Aug 2006)
+New Revision: 279
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo/makefile
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+   branches/IOMETER-restruct/iometer/src/Pulsar/makefile
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+Log:
+minor fixes on windows ddk compile.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/makefile
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/makefile	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Galileo/makefile	2006-08-16 00:57:29 UTC (rev 279)
+@@ -19,5 +19,5 @@
+ !elseif &quot;$(_BUILDARCH)&quot; == &quot;AMD64&quot;
+ C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN64 -DIOMTR_CPU_X86_64
+ !else
+-C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386 
++C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386
+ !endif
+\ No newline at end of file
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2006-08-16 00:57:29 UTC (rev 279)
+@@ -4,24 +4,26 @@
+ 
+ MSC_WARNING_LEVEL=/W3 /WX
+ USE_MFC=1
+-USE_CRTDLL=1
++USE_NATIVE_EH=1
+ BROWSER_INFO=1
+ 
++UMTYPE=windows
++
+ INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSING_DDK
+-LINKER_OPTIDATA=$(LINKER_OPTIDATA) /STACK:0xc0000,0x2000
++C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS  
++#-D_DETAILS -DDEBUG -D_DEBUG
++ 
+ 
+ TARGETLIBS= $(SDK_LIB_PATH)\KERNEL32.LIB \
+     $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\ADVAPI32.LIB	\
+     $(SDK_LIB_PATH)\WSOCK32.LIB		\
+     $(SDK_LIB_PATH)\WS2_32.LIB		\
+     $(SDK_LIB_PATH)\COMCTL32.LIB	\
+-    $(SDK_LIB_PATH)\GDI32.LIB		\
+-    $(SDK_LIB_PATH)\WINSPOOL.LIB	\
+-    $(SDK_LIB_PATH)\SHELL32.LIB		\
+     $(SDK_LIB_PATH)\VERSION.LIB		\
+-    $(CRT_LIB_PATH)\MSVCPRT.LIB
++#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
++#	$(SDK_LIB_PATH)\MFC42D.LIB		\
++    $(CRT_LIB_PATH)\MSVCPRT.LIB		\
++	$(MFC_LIB_PATH)\MFCS42.LIB
+ 
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+@@ -36,7 +38,6 @@
+ 	..\ICFSaveDialog.cpp		\
+ 	..\IOGlobals.cpp		\
+ 	..\IOPort.cpp			\
+-#	..\IOPortPipe.cpp		\
+ 	..\IOPortTCP.cpp		\
+ 	..\Iotime.cpp			\
+ 	..\LegalBox.cpp			\
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/makefile
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/makefile	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/makefile	2006-08-16 00:57:29 UTC (rev 279)
+@@ -19,5 +19,5 @@
+ !elseif &quot;$(_BUILDARCH)&quot; == &quot;AMD64&quot;
+ C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN64 -DIOMTR_CPU_X86_64
+ !else
+-C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386 
++C_DEFINES=$(C_DEFINES) -DIOMTR_OSFAMILY_WINDOWS -DIOMTR_OS_WIN32 -DIOMTR_CPU_I386
+ !endif
+\ No newline at end of file
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2006-08-15 00:20:48 UTC (rev 278)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2006-08-16 00:57:29 UTC (rev 279)
+@@ -2,46 +2,45 @@
+ TARGETPATH=OBJ
+ TARGETTYPE=PROGRAM
+ 
+-MSC_WARNING_LEVEL=/W3 /WX
+ USE_MFC=1
+-USE_CRTDLL=1
++USE_NATIVE_EH=1
++
+ BROWSER_INFO=1
+ 
+-INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSING_DDK -D_AFX_NO_RICHEDIT_SUPPORT
+-LINKER_OPTIDATA=$(LINKER_OPTIDATA) /STACK:0xc0000,0x2000
+-
+ UMTYPE=console
+ UMENTRY=main
+ 
++MSC_WARNING_LEVEL=/W3 /WX
++
++INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
++C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS -DIMPORT_NEW_FUNCS 
++#-D_DETAILS
++  
++
+ TARGETLIBS=$(SDK_LIB_PATH)\KERNEL32.LIB \
+-   $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\ADVAPI32.LIB	\
++    $(SDK_LIB_PATH)\USER32.LIB		\
+     $(SDK_LIB_PATH)\WSOCK32.LIB		\
+     $(SDK_LIB_PATH)\WS2_32.LIB		\
+-    $(SDK_LIB_PATH)\COMCTL32.LIB	\
+-    $(SDK_LIB_PATH)\GDI32.LIB		\
+-    $(SDK_LIB_PATH)\WINSPOOL.LIB	\
+-    $(SDK_LIB_PATH)\COMDLG32.LIB	\
+-    $(SDK_LIB_PATH)\SHELL32.LIB		\
+     $(SDK_LIB_PATH)\VERSION.LIB		\
+     $(CRT_LIB_PATH)\MSVCPRT.LIB		\
+-    $(SDK_LIB_PATH)\SETUPAPI.LIB
++	$(MFC_LIB_PATH)\MFCS42.LIB		\
++#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
++#	$(SDK_LIB_PATH)\MFC42D.LIB		\
++    $(SDK_LIB_PATH)\SETUPAPI.LIB	\
++	$(SDK_LIB_PATH)\NETAPI32.LIB
+ 
+ 
+-SOURCES= ..\ByteOrder.cpp		\
++SOURCES= ..\ByteOrder.cpp	\
+ 	..\IOAccess.cpp			\
+-	..\IOCompletionQ.cpp		\
+-#	..\IOCq.cpp			\
++	..\IOCompletionQ.cpp	\
+ 	..\IOCQAIO.cpp			\
+ 	..\IOCQVI.cpp			\
+ 	..\IOGlobals.cpp		\
+ 	..\IOGrunt.cpp			\
+ 	..\IOManager.cpp		\
+ 	..\IOManagerWin.cpp		\
+-	..\IOPerformance.cpp		\
++	..\IOPerformance.cpp	\
+ 	..\IOPort.cpp			\
+-#	..\IOPortPipe.cpp		\
+ 	..\IOPortTCP.cpp		\
+ 	..\IOTarget.cpp			\
+ 	..\IOTargetDisk.cpp		\
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000047.html">[Iometer-svn] r278 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000049.html">[Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#48">[ date ]</a>
+              <a href="thread.html#48">[ thread ]</a>
+              <a href="subject.html#48">[ subject ]</a>
+              <a href="author.html#48">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

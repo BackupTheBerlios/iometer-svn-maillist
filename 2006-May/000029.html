@@ -1,0 +1,736 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r259 - in branches/IOMETER-restruct/iometer/src: . Debug
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-May/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r259%20-%20in%20branches/IOMETER-restruct/iometer/src%3A%20.%20Debug&In-Reply-To=%3C200605161422.k4GEMb6j009200%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000028.html">
+   <LINK REL="Next"  HREF="000030.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r259 - in branches/IOMETER-restruct/iometer/src: . Debug</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r259%20-%20in%20branches/IOMETER-restruct/iometer/src%3A%20.%20Debug&In-Reply-To=%3C200605161422.k4GEMb6j009200%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r259 - in branches/IOMETER-restruct/iometer/src: . Debug">cheungming at berlios.de
+       </A><BR>
+    <I>Tue May 16 16:22:37 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000028.html">[Iometer-svn] r258 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000030.html">[Iometer-svn] r260 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#29">[ date ]</a>
+              <a href="thread.html#29">[ thread ]</a>
+              <a href="subject.html#29">[ subject ]</a>
+              <a href="author.html#29">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-05-16 16:22:36 +0200 (Tue, 16 May 2006)
+New Revision: 259
+
+Added:
+   branches/IOMETER-restruct/iometer/src/Dynamo.vcproj
+   branches/IOMETER-restruct/iometer/src/Iometer.sln
+   branches/IOMETER-restruct/iometer/src/Iometer.suo
+   branches/IOMETER-restruct/iometer/src/Iometer.vcproj
+Modified:
+   branches/IOMETER-restruct/iometer/src/Debug/
+Log:
+added some VS.net project management files.
+
+
+Property changes on: branches/IOMETER-restruct/iometer/src/Debug
+___________________________________________________________________
+Name: svn:ignore
+   - *.sbr
+*.pch
+*.ilk
+*.res
+*.pdb
+*.idb
+   + *.sbr
+*.pch
+*.ilk
+*.res
+*.pdb
+*.idb
+BuildLog.htm
+
+
+Added: branches/IOMETER-restruct/iometer/src/Dynamo.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Dynamo.vcproj	2006-05-16 14:18:57 UTC (rev 258)
++++ branches/IOMETER-restruct/iometer/src/Dynamo.vcproj	2006-05-16 14:22:36 UTC (rev 259)
+@@ -0,0 +1,205 @@
++&lt;?xml version=&quot;1.0&quot; encoding = &quot;gb2312&quot;?&gt;
++&lt;VisualStudioProject
++	ProjectType=&quot;Visual C++&quot;
++	Version=&quot;7.00&quot;
++	Name=&quot;Dynamo&quot;
++	SccProjectName=&quot;&quot;
++	SccLocalPath=&quot;&quot;&gt;
++	&lt;Platforms&gt;
++		&lt;Platform
++			Name=&quot;Win32&quot;/&gt;
++	&lt;/Platforms&gt;
++	&lt;Configurations&gt;
++		&lt;Configuration
++			Name=&quot;Debug|Win32&quot;
++			OutputDirectory=&quot;.\Debug&quot;
++			IntermediateDirectory=&quot;.\Debug&quot;
++			ConfigurationType=&quot;1&quot;
++			UseOfMFC=&quot;0&quot;
++			ATLMinimizesCRunTimeLibraryUsage=&quot;FALSE&quot;
++			CharacterSet=&quot;2&quot;&gt;
++			&lt;Tool
++				Name=&quot;VCCLCompilerTool&quot;
++				Optimization=&quot;0&quot;
++				PreprocessorDefinitions=&quot;IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_DEBUG,_CONSOLE&quot;
++				BasicRuntimeChecks=&quot;3&quot;
++				RuntimeLibrary=&quot;1&quot;
++				PrecompiledHeaderFile=&quot;.\Debug/Dynamo.pch&quot;
++				AssemblerListingLocation=&quot;.\Debug/&quot;
++				ObjectFile=&quot;.\Debug/&quot;
++				ProgramDataBaseFileName=&quot;.\Debug/&quot;
++				BrowseInformation=&quot;1&quot;
++				WarningLevel=&quot;3&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				DebugInformationFormat=&quot;4&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCCustomBuildTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCLinkerTool&quot;
++				AdditionalOptions=&quot;/MACHINE:I386&quot;
++				AdditionalDependencies=&quot;ws2_32.lib mswsock.lib version.lib&quot;
++				OutputFile=&quot;.\Debug/Dynamo.exe&quot;
++				LinkIncremental=&quot;1&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				GenerateDebugInformation=&quot;TRUE&quot;
++				ProgramDatabaseFile=&quot;.\Debug/Dynamo.pdb&quot;
++				SubSystem=&quot;1&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCMIDLTool&quot;
++				TypeLibraryName=&quot;.\Debug/Dynamo.tlb&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPostBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreLinkEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCResourceCompilerTool&quot;
++				PreprocessorDefinitions=&quot;_DEBUG,_PULSAR_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386&quot;
++				Culture=&quot;1033&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebServiceProxyGeneratorTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebDeploymentTool&quot;/&gt;
++		&lt;/Configuration&gt;
++		&lt;Configuration
++			Name=&quot;Release|Win32&quot;
++			OutputDirectory=&quot;.\Release&quot;
++			IntermediateDirectory=&quot;.\Release&quot;
++			ConfigurationType=&quot;1&quot;
++			UseOfMFC=&quot;0&quot;
++			ATLMinimizesCRunTimeLibraryUsage=&quot;FALSE&quot;
++			CharacterSet=&quot;2&quot;&gt;
++			&lt;Tool
++				Name=&quot;VCCLCompilerTool&quot;
++				InlineFunctionExpansion=&quot;1&quot;
++				PreprocessorDefinitions=&quot;IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_CONSOLE&quot;
++				StringPooling=&quot;TRUE&quot;
++				RuntimeLibrary=&quot;0&quot;
++				EnableFunctionLevelLinking=&quot;TRUE&quot;
++				UsePrecompiledHeader=&quot;2&quot;
++				PrecompiledHeaderFile=&quot;.\Release/Dynamo.pch&quot;
++				AssemblerListingLocation=&quot;.\Release/&quot;
++				ObjectFile=&quot;.\Release/&quot;
++				ProgramDataBaseFileName=&quot;.\Release/&quot;
++				WarningLevel=&quot;3&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCCustomBuildTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCLinkerTool&quot;
++				AdditionalOptions=&quot;/MACHINE:I386&quot;
++				AdditionalDependencies=&quot;ws2_32.lib mswsock.lib version.lib&quot;
++				OutputFile=&quot;.\Release/Dynamo.exe&quot;
++				LinkIncremental=&quot;1&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				ProgramDatabaseFile=&quot;.\Release/Dynamo.pdb&quot;
++				SubSystem=&quot;1&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCMIDLTool&quot;
++				TypeLibraryName=&quot;.\Release/Dynamo.tlb&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPostBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreLinkEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCResourceCompilerTool&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386&quot;
++				Culture=&quot;1033&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebServiceProxyGeneratorTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebDeploymentTool&quot;/&gt;
++		&lt;/Configuration&gt;
++	&lt;/Configurations&gt;
++	&lt;Files&gt;
++		&lt;Filter
++			Name=&quot;Source Files&quot;
++			Filter=&quot;cpp;c;cxx;rc;def;r;odl;idl;hpj;bat&quot;&gt;
++			&lt;File
++				RelativePath=&quot;.\ByteOrder.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOAccess.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOCQAIO.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOCQVI.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOCompletionQ.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOGlobals.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOGrunt.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOManager.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOManagerWin.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPerformance.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPort.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPortTCP.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTarget.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTargetDisk.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTargetTCP.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTargetVI.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTime.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOVIPL.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\NetTCP.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\NetVI.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Network.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Pulsar.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Pulsar.rc&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\VINic.cpp&quot;&gt;
++			&lt;/File&gt;
++		&lt;/Filter&gt;
++		&lt;Filter
++			Name=&quot;Header Files&quot;
++			Filter=&quot;h;hpp;hxx;hm;inl&quot;&gt;
++		&lt;/Filter&gt;
++		&lt;Filter
++			Name=&quot;Resource Files&quot;
++			Filter=&quot;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe&quot;&gt;
++		&lt;/Filter&gt;
++	&lt;/Files&gt;
++	&lt;Globals&gt;
++	&lt;/Globals&gt;
++&lt;/VisualStudioProject&gt;
+
+Added: branches/IOMETER-restruct/iometer/src/Iometer.sln
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Iometer.sln	2006-05-16 14:18:57 UTC (rev 258)
++++ branches/IOMETER-restruct/iometer/src/Iometer.sln	2006-05-16 14:22:36 UTC (rev 259)
+@@ -0,0 +1,27 @@
++Microsoft Visual Studio Solution File, Format Version 7.00
++Project(&quot;{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}&quot;) = &quot;Dynamo&quot;, &quot;Dynamo.vcproj&quot;, &quot;{4C1D1FAE-5490-4D9C-9877-38B54E798468}&quot;
++EndProject
++Project(&quot;{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}&quot;) = &quot;Iometer&quot;, &quot;Iometer.vcproj&quot;, &quot;{C9557683-0F9B-4A51-86C1-6107E8A345B3}&quot;
++EndProject
++Global
++	GlobalSection(SolutionConfiguration) = preSolution
++		ConfigName.0 = Debug
++		ConfigName.1 = Release
++	EndGlobalSection
++	GlobalSection(ProjectDependencies) = postSolution
++	EndGlobalSection
++	GlobalSection(ProjectConfiguration) = postSolution
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Debug.ActiveCfg = Debug|Win32
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Debug.Build.0 = Debug|Win32
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Release.ActiveCfg = Release|Win32
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Release.Build.0 = Release|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Debug.ActiveCfg = Debug|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Debug.Build.0 = Debug|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Release.ActiveCfg = Release|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Release.Build.0 = Release|Win32
++	EndGlobalSection
++	GlobalSection(ExtensibilityGlobals) = postSolution
++	EndGlobalSection
++	GlobalSection(ExtensibilityAddIns) = postSolution
++	EndGlobalSection
++EndGlobal
+
+Added: branches/IOMETER-restruct/iometer/src/Iometer.suo
+===================================================================
+(Binary files differ)
+
+
+Property changes on: branches/IOMETER-restruct/iometer/src/Iometer.suo
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: branches/IOMETER-restruct/iometer/src/Iometer.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Iometer.vcproj	2006-05-16 14:18:57 UTC (rev 258)
++++ branches/IOMETER-restruct/iometer/src/Iometer.vcproj	2006-05-16 14:22:36 UTC (rev 259)
+@@ -0,0 +1,382 @@
++&lt;?xml version=&quot;1.0&quot; encoding = &quot;gb2312&quot;?&gt;
++&lt;VisualStudioProject
++	ProjectType=&quot;Visual C++&quot;
++	Version=&quot;7.00&quot;
++	Name=&quot;Iometer&quot;
++	SccProjectName=&quot;&quot;
++	SccLocalPath=&quot;&quot;
++	Keyword=&quot;MFCProj&quot;&gt;
++	&lt;Platforms&gt;
++		&lt;Platform
++			Name=&quot;Win32&quot;/&gt;
++	&lt;/Platforms&gt;
++	&lt;Configurations&gt;
++		&lt;Configuration
++			Name=&quot;Release|Win32&quot;
++			OutputDirectory=&quot;.\Release&quot;
++			IntermediateDirectory=&quot;.\Release&quot;
++			ConfigurationType=&quot;1&quot;
++			UseOfMFC=&quot;1&quot;
++			ATLMinimizesCRunTimeLibraryUsage=&quot;FALSE&quot;
++			CharacterSet=&quot;2&quot;&gt;
++			&lt;Tool
++				Name=&quot;VCCLCompilerTool&quot;
++				InlineFunctionExpansion=&quot;1&quot;
++				PreprocessorDefinitions=&quot;IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_GALILEO_&quot;
++				StringPooling=&quot;TRUE&quot;
++				RuntimeLibrary=&quot;0&quot;
++				EnableFunctionLevelLinking=&quot;TRUE&quot;
++				UsePrecompiledHeader=&quot;2&quot;
++				PrecompiledHeaderFile=&quot;.\Release/Iometer.pch&quot;
++				AssemblerListingLocation=&quot;.\Release/&quot;
++				ObjectFile=&quot;.\Release/&quot;
++				ProgramDataBaseFileName=&quot;.\Release/&quot;
++				WarningLevel=&quot;3&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCCustomBuildTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCLinkerTool&quot;
++				AdditionalOptions=&quot;/MACHINE:I386&quot;
++				AdditionalDependencies=&quot;Ws2_32.lib Mswsock.lib Version.lib&quot;
++				OutputFile=&quot;.\Release/Iometer.exe&quot;
++				LinkIncremental=&quot;1&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				IgnoreDefaultLibraryNames=&quot;msvcrt.lib&quot;
++				ProgramDatabaseFile=&quot;.\Release/Iometer.pdb&quot;
++				SubSystem=&quot;2&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCMIDLTool&quot;
++				MkTypLibCompatible=&quot;TRUE&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				TargetEnvironment=&quot;1&quot;
++				TypeLibraryName=&quot;.\Release/Iometer.tlb&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPostBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreLinkEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCResourceCompilerTool&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386&quot;
++				Culture=&quot;1033&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebServiceProxyGeneratorTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebDeploymentTool&quot;/&gt;
++		&lt;/Configuration&gt;
++		&lt;Configuration
++			Name=&quot;Debug|Win32&quot;
++			OutputDirectory=&quot;.\Debug&quot;
++			IntermediateDirectory=&quot;.\Debug&quot;
++			ConfigurationType=&quot;1&quot;
++			UseOfMFC=&quot;1&quot;
++			ATLMinimizesCRunTimeLibraryUsage=&quot;FALSE&quot;
++			CharacterSet=&quot;2&quot;&gt;
++			&lt;Tool
++				Name=&quot;VCCLCompilerTool&quot;
++				Optimization=&quot;0&quot;
++				PreprocessorDefinitions=&quot;_DEBUG,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_DETAILS,_GALILEO_&quot;
++				BasicRuntimeChecks=&quot;3&quot;
++				RuntimeLibrary=&quot;1&quot;
++				PrecompiledHeaderFile=&quot;.\Debug/Iometer.pch&quot;
++				AssemblerListingLocation=&quot;.\Debug/&quot;
++				ObjectFile=&quot;.\Debug/&quot;
++				ProgramDataBaseFileName=&quot;.\Debug/&quot;
++				BrowseInformation=&quot;1&quot;
++				WarningLevel=&quot;3&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				DebugInformationFormat=&quot;4&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCCustomBuildTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCLinkerTool&quot;
++				AdditionalOptions=&quot;/MACHINE:I386&quot;
++				AdditionalDependencies=&quot;Ws2_32.lib Mswsock.lib Version.lib&quot;
++				OutputFile=&quot;.\Debug/Iometer.exe&quot;
++				LinkIncremental=&quot;1&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				GenerateDebugInformation=&quot;TRUE&quot;
++				ProgramDatabaseFile=&quot;.\Debug/Iometer.pdb&quot;
++				SubSystem=&quot;2&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCMIDLTool&quot;
++				PreprocessorDefinitions=&quot;_DEBUG&quot;
++				MkTypLibCompatible=&quot;TRUE&quot;
++				SuppressStartupBanner=&quot;TRUE&quot;
++				TargetEnvironment=&quot;1&quot;
++				TypeLibraryName=&quot;.\Debug/Iometer.tlb&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPostBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreBuildEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCPreLinkEventTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCResourceCompilerTool&quot;
++				PreprocessorDefinitions=&quot;_DEBUG,_GALILEO_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386&quot;
++				Culture=&quot;1033&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebServiceProxyGeneratorTool&quot;/&gt;
++			&lt;Tool
++				Name=&quot;VCWebDeploymentTool&quot;/&gt;
++		&lt;/Configuration&gt;
++	&lt;/Configurations&gt;
++	&lt;Files&gt;
++		&lt;Filter
++			Name=&quot;Source Files&quot;
++			Filter=&quot;cpp;c;cxx;rc;def;r;odl;idl;hpj;bat&quot;&gt;
++			&lt;File
++				RelativePath=&quot;.\AccessDialog.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\AccessSpecList.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\BigMeter.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoApp.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoCmdLine.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoDoc.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoGlobals.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoView.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ICFOpenDialog.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ICFSaveDialog.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ICF_ifstream.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOAccess.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOGlobals.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPort.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPortTCP.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTime.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\LegalBox.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\MainFrm.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Manager.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ManagerList.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ManagerMap.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\MeterCtrl.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageAccess.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageDisk.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageDisplay.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageNetwork.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageSetup.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\StdAfx.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\TextDisplay.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\WaitingForManagers.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Worker.cpp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\WorkerView.cpp&quot;&gt;
++			&lt;/File&gt;
++		&lt;/Filter&gt;
++		&lt;Filter
++			Name=&quot;Header Files&quot;
++			Filter=&quot;h;hpp;hxx;hm;inl&quot;&gt;
++			&lt;File
++				RelativePath=&quot;.\AccessDialog.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\AccessSpecList.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\BigMeter.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoApp.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoCmdLine.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoDefs.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoDoc.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\GalileoView.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ICFOpenDialog.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ICFSaveDialog.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ICF_ifstream.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOAccess.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOCommon.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPort.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOPortTCP.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOSTREAM&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTest.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOTransfers.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\IOVersion.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ISTREAM&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\LegalBox.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\MainFrm.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Manager.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ManagerList.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\ManagerMap.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\MeterCtrl.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\OSTREAM&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageAccess.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageDisk.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageDisplay.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageNetwork.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageSetup.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\PageTarget.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\StdAfx.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\TextDisplay.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\WaitingForManagers.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Worker.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\WorkerView.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\vipl.h&quot;&gt;
++			&lt;/File&gt;
++		&lt;/Filter&gt;
++		&lt;Filter
++			Name=&quot;Resource Files&quot;
++			Filter=&quot;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe&quot;&gt;
++			&lt;File
++				RelativePath=&quot;.\res\Galileo.ico&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\Galileo.rc&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\res\GalileoDoc.ico&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\res\Iometer.rc2&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\res\LED.bmp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\res\access.bmp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\resource.h&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\res\ticons.bmp&quot;&gt;
++			&lt;/File&gt;
++			&lt;File
++				RelativePath=&quot;.\res\wicons.bmp&quot;&gt;
++			&lt;/File&gt;
++		&lt;/Filter&gt;
++	&lt;/Files&gt;
++	&lt;Globals&gt;
++	&lt;/Globals&gt;
++&lt;/VisualStudioProject&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000028.html">[Iometer-svn] r258 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000030.html">[Iometer-svn] r260 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#29">[ date ]</a>
+              <a href="thread.html#29">[ thread ]</a>
+              <a href="subject.html#29">[ subject ]</a>
+              <a href="author.html#29">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

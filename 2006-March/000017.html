@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r251 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-March/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r251%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200603170212.k2H2CjKI010408%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000016.html">
+   <LINK REL="Next"  HREF="000018.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r251 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r251%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200603170212.k2H2CjKI010408%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r251 - branches/IOMETER-restruct/iometer/src">cheungming at berlios.de
+       </A><BR>
+    <I>Fri Mar 17 03:12:45 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000016.html">[Iometer-svn] r250 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000018.html">[Iometer-svn] r252 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-03-17 03:12:12 +0100 (Fri, 17 Mar 2006)
+New Revision: 251
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+Log:
+&quot;Christensen, ReedX K&quot; &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">reedx.k.christensen at intel.com</A>&gt;
+
+Added a printf notice when a port connection is made.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-03-17 02:00:22 UTC (rev 250)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-03-17 02:12:12 UTC (rev 251)
+@@ -450,6 +450,8 @@
+ 	}
+ 	while (retval != 0);
+ 
++	printf(&quot;Successful PortTCP::Connect\n  - port name: %s\n&quot;, name);
++
+ 	return TRUE;
+ }
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000016.html">[Iometer-svn] r250 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000018.html">[Iometer-svn] r252 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#17">[ date ]</a>
+              <a href="thread.html#17">[ thread ]</a>
+              <a href="subject.html#17">[ subject ]</a>
+              <a href="author.html#17">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

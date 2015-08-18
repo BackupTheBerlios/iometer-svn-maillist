@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r316 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2007-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r316%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200706080010.l580AkVJ012022%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r316 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r316%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200706080010.l580AkVJ012022%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r316 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Jun  8 02:10:46 CEST 2007</I>
+    <P><UL>
+        
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#85">[ date ]</a>
+              <a href="thread.html#85">[ thread ]</a>
+              <a href="subject.html#85">[ subject ]</a>
+              <a href="author.html#85">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2007-06-08 02:10:46 +0200 (Fri, 08 Jun 2007)
+New Revision: 316
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+removed O_DIRECT flag as open flag for linux. the O_DIRECT flag prevent &gt;1 outstanding io
+
+hopefully add it back when we have proper aio implementation.
+
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-11-03 01:21:39 UTC (rev 315)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2007-06-08 00:10:46 UTC (rev 316)
+@@ -1283,12 +1283,9 @@
+ {
+ 	// open_flag is a 
+ 	if (IsType(spec.type, LogicalDiskType)) {
+-#if defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_LINUX)
+ 		((struct File *)disk_file)-&gt;fd =
+ 		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+-#elif defined(IOMTR_OS_LINUX)
+-		((struct File *)disk_file)-&gt;fd =
+-		    open(file_name, O_DIRECT | O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		NXFileOpen(0, (void *)file_name, (NXMode_t) (NX_O_RDWR | NX_O_CREAT | open_flag),
+ 			   &amp;((struct File *)disk_file)-&gt;fd);
+@@ -1307,10 +1304,8 @@
+ #warning ===&gt; WARNING: You have to do some coding here to get the port done!
+ #endif
+ 	} else if (IsType(spec.type, PhysicalDiskType)) {
+-#if defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_LINUX)
+ 		((struct File *)disk_file)-&gt;fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+-#elif defined(IOMTR_OS_LINUX)
+-		((struct File *)disk_file)-&gt;fd = open(file_name, O_DIRECT | O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		((struct File *)disk_file)-&gt;fd = NWOpenDevice(atoi(file_name), 0);
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#85">[ date ]</a>
+              <a href="thread.html#85">[ thread ]</a>
+              <a href="subject.html#85">[ subject ]</a>
+              <a href="author.html#85">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

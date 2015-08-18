@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r268 - branches/IOMETER-restruct/iometer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r268%20-%20branches/IOMETER-restruct/iometer&In-Reply-To=%3C200607272118.k6RLIAZ2032694%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000037.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r268 - branches/IOMETER-restruct/iometer</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r268%20-%20branches/IOMETER-restruct/iometer&In-Reply-To=%3C200607272118.k6RLIAZ2032694%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r268 - branches/IOMETER-restruct/iometer">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Thu Jul 27 23:18:10 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000037.html">[Iometer-svn] r267 - in branches/IOMETER-restruct/iometer/src: .	Debug Release
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#38">[ date ]</a>
+              <a href="thread.html#38">[ thread ]</a>
+              <a href="subject.html#38">[ subject ]</a>
+              <a href="author.html#38">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-07-27 23:18:07 +0200 (Thu, 27 Jul 2006)
+New Revision: 268
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+updated CHANGELOG. should keep it sync with code.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-07-27 14:48:24 UTC (rev 267)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-07-27 21:18:07 UTC (rev 268)
+@@ -4,10 +4,23 @@
+ 
+ 
+ 
+-ChangeLog (IOMETER2 - 2005.mm.dd):
++ChangeLog (IOMETER2 - 2006.mm.dd):
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to exclude the disk if can not detect the disk size
++     information under Linux.
++   - Patch by Fabian Tillier to fix DDK path.
++   - Patch by Christensen ReedX K to update iomtr_kstat module with newer
++     2.6.x kernel.
++   - Patch by Christensen ReedX K to use O_DIRECT as default for Linux.
++   - Patch by Ming Zhang to use sysconf for processor count.
++   - Patch by Ming Zhang to use unify method for version string.
++   - Patch by Saner Pool to filter invalid commas, new line, and cariage
++     return in .csv output.
++   - By Ganderson, initialize iocq structure member for all platform.
++   - By Rick Altherr, fixed the Mac OSX compile.
++   - By Ming Zhang, fixed the Windows compile broken by MacOS port.
+    - #1239881 : iometer-2004.07.30-post.DS1.Rick002OsXPortTry2.patch by
+      Rick Altherr (Patch that implements the Mac OS X / PPC port).
+    - #1186329 : iometer-2004.07.30-post.DS1.Rick001AioCancelTry2.patch by
+@@ -97,6 +110,10 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
++   - Added new VS project management file for VS.net.
++   - Various cleanup to remove compile warning with new version GCC.
++   - Removed wrongly included IOManageSolario.o from Makefile-Linux.ppc.
++   - Indent all source code to have better code style.
+    - Renamed Makefile-Solaris.Sparc into Makefile-Solaris.sparc
+    - Modified an #ifdef in IOPerformanceLinux.cpp to make it work for
+      the XScale processor as well.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000037.html">[Iometer-svn] r267 - in branches/IOMETER-restruct/iometer/src: .	Debug Release
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#38">[ date ]</a>
+              <a href="thread.html#38">[ thread ]</a>
+              <a href="subject.html#38">[ subject ]</a>
+              <a href="author.html#38">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

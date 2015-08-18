@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r341 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r341%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200808191622.m7JGMoj4011443%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000104.html">
+   <LINK REL="Next"  HREF="000106.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r341 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r341%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200808191622.m7JGMoj4011443%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r341 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 19 18:22:50 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000104.html">[Iometer-svn] r338 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000106.html">[Iometer-svn] r342 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2008-08-19 18:22:49 +0200 (Tue, 19 Aug 2008)
+New Revision: 341
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+Log:
+try to fix OSX compile. no resouce to test at all...
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2008-08-14 01:30:32 UTC (rev 340)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2008-08-19 16:22:49 UTC (rev 341)
+@@ -276,7 +276,7 @@
+ #if defined(IOMTR_OS_SOLARIS)
+ 	// Calculate processor_speed_to_nsecs for use in rdtsc.c
+ 	// Note that this works only for MHz CPUs. For GHz CPUs the divisor will change.
+-	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].processor_speed / 1000000000;
++	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].timer_resolution / 1000000000;
+ #else
+ #warning ===&gt; WARNING: You have to do some coding here to get the port done!
+ #endif
+@@ -286,7 +286,7 @@
+ 	// Calculate processor_speed_to_nsecs for use in rdtsc.c
+ 	// This is multiplied by the timestamp in nanosecs
+ 	// That gives (time in ns) * (proc speed in HZ) / 1000000000 = time in cpu cycles
+-	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].processor_speed / 1000000000;
++	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].timer_resolution / 1000000000;
+ #elif defined(IOMTR_OS_LINUX)
+ 	// nop
+ #else
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000104.html">[Iometer-svn] r338 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000106.html">[Iometer-svn] r342 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#105">[ date ]</a>
+              <a href="thread.html#105">[ thread ]</a>
+              <a href="subject.html#105">[ subject ]</a>
+              <a href="author.html#105">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,217 @@
+From cheungming at mail.berlios.de  Wed Jul 19 03:34:41 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 19 Jul 2006 03:34:41 +0200
+Subject: [Iometer-svn] r264 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200607190134.k6J1YfXS030184@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-07-19 03:34:26 +0200 (Wed, 19 Jul 2006)
+New Revision: 264
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+Solaris does not support O_DIRECT yet. So need to be separated from Linux on open().
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-05-16 15:17:39 UTC (rev 263)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-07-19 01:34:26 UTC (rev 264)
+@@ -1286,8 +1286,11 @@
+ 	if (IsType(spec.type, LogicalDiskType)) {
+ 		// Ignore errors that occur if trying to open a floppy or CD-ROM with
+ 		// nothing in the drive.
+-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS)
+ 		((struct File *)disk_file)->fd =
++		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
++#elif defined(IOMTR_OS_LINUX)
++		((struct File *)disk_file)->fd =
+ 		    open(file_name, O_DIRECT | O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		NXFileOpen(0, (void *)file_name, (NXMode_t) (NX_O_RDWR | NX_O_CREAT | open_flag),
+@@ -1305,7 +1308,9 @@
+ #warning ===> WARNING: You have to do some coding here to get the port done!
+ #endif
+ 	} else if (IsType(spec.type, PhysicalDiskType)) {
+-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS)
++		((struct File *)disk_file)->fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
++#elif defined(IOMTR_OS_LINUX)
+ 		((struct File *)disk_file)->fd = open(file_name, O_DIRECT | O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		((struct File *)disk_file)->fd = NWOpenDevice(atoi(file_name), 0);
+
+
+
+From cheungming at mail.berlios.de  Thu Jul 27 02:55:43 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 27 Jul 2006 02:55:43 +0200
+Subject: [Iometer-svn] r265 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200607270055.k6R0thRQ026956@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-07-27 02:55:34 +0200 (Thu, 27 Jul 2006)
+New Revision: 265
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+Log:
+updated the IOVER_FILEVERSION for rc1 version.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-07-19 01:34:26 UTC (rev 264)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-07-27 00:55:34 UTC (rev 265)
+@@ -117,7 +117,7 @@
+ //#define IOVER_FILEVERSION				"2003.12.16-post\0"
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				"2004.07.30-post\0"
+-#define IOVER_FILEVERSION				"2006.05.31\0"
++#define IOVER_FILEVERSION				"2006.07.27-RC1\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+
+
+From cheungming at mail.berlios.de  Thu Jul 27 03:04:01 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 27 Jul 2006 03:04:01 +0200
+Subject: [Iometer-svn] r266 - tags
+Message-ID: <200607270104.k6R141Fk028606@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-07-27 03:03:57 +0200 (Thu, 27 Jul 2006)
+New Revision: 266
+
+Added:
+   tags/iometer-2006_07_27-RC1/
+Log:
+tag for 2006-07-27RC1
+
+Copied: tags/iometer-2006_07_27-RC1 (from rev 265, branches/IOMETER-restruct)
+
+
+
+From cheungming at mail.berlios.de  Thu Jul 27 16:48:25 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 27 Jul 2006 16:48:25 +0200
+Subject: [Iometer-svn] r267 - in branches/IOMETER-restruct/iometer/src: .
+	Debug Release
+Message-ID: <200607271448.k6REmP6R003504@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-07-27 16:48:24 +0200 (Thu, 27 Jul 2006)
+New Revision: 267
+
+Removed:
+   branches/IOMETER-restruct/iometer/src/.cvsignore
+   branches/IOMETER-restruct/iometer/src/Debug/.cvsignore
+   branches/IOMETER-restruct/iometer/src/Release/.cvsignore
+Log:
+removed useless .cvsignore files.
+
+
+
+Deleted: branches/IOMETER-restruct/iometer/src/.cvsignore
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/.cvsignore	2006-07-27 01:03:57 UTC (rev 266)
++++ branches/IOMETER-restruct/iometer/src/.cvsignore	2006-07-27 14:48:24 UTC (rev 267)
+@@ -1,5 +0,0 @@
+-*.plg
+-*.aps
+-*.ncb
+-*.opt
+-
+
+Deleted: branches/IOMETER-restruct/iometer/src/Debug/.cvsignore
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Debug/.cvsignore	2006-07-27 01:03:57 UTC (rev 266)
++++ branches/IOMETER-restruct/iometer/src/Debug/.cvsignore	2006-07-27 14:48:24 UTC (rev 267)
+@@ -1,6 +0,0 @@
+-*.sbr
+-*.pch
+-*.ilk
+-*.res
+-*.pdb
+-*.idb
+
+Deleted: branches/IOMETER-restruct/iometer/src/Release/.cvsignore
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Release/.cvsignore	2006-07-27 01:03:57 UTC (rev 266)
++++ branches/IOMETER-restruct/iometer/src/Release/.cvsignore	2006-07-27 14:48:24 UTC (rev 267)
+@@ -1,6 +0,0 @@
+-*.sbr
+-*.pch
+-*.ilk
+-*.res
+-*.pdb
+-*.idb
+
+
+
+From cheungming at mail.berlios.de  Thu Jul 27 23:18:10 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Thu, 27 Jul 2006 23:18:10 +0200
+Subject: [Iometer-svn] r268 - branches/IOMETER-restruct/iometer
+Message-ID: <200607272118.k6RLIAZ2032694@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-07-27 23:18:07 +0200 (Thu, 27 Jul 2006)
+New Revision: 268
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+updated CHANGELOG. should keep it sync with code.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-07-27 14:48:24 UTC (rev 267)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-07-27 21:18:07 UTC (rev 268)
+@@ -4,10 +4,23 @@
+ 
+ 
+ 
+-ChangeLog (IOMETER2 - 2005.mm.dd):
++ChangeLog (IOMETER2 - 2006.mm.dd):
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to exclude the disk if can not detect the disk size
++     information under Linux.
++   - Patch by Fabian Tillier to fix DDK path.
++   - Patch by Christensen ReedX K to update iomtr_kstat module with newer
++     2.6.x kernel.
++   - Patch by Christensen ReedX K to use O_DIRECT as default for Linux.
++   - Patch by Ming Zhang to use sysconf for processor count.
++   - Patch by Ming Zhang to use unify method for version string.
++   - Patch by Saner Pool to filter invalid commas, new line, and cariage
++     return in .csv output.
++   - By Ganderson, initialize iocq structure member for all platform.
++   - By Rick Altherr, fixed the Mac OSX compile.
++   - By Ming Zhang, fixed the Windows compile broken by MacOS port.
+    - #1239881 : iometer-2004.07.30-post.DS1.Rick002OsXPortTry2.patch by
+      Rick Altherr (Patch that implements the Mac OS X / PPC port).
+    - #1186329 : iometer-2004.07.30-post.DS1.Rick001AioCancelTry2.patch by
+@@ -97,6 +110,10 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
++   - Added new VS project management file for VS.net.
++   - Various cleanup to remove compile warning with new version GCC.
++   - Removed wrongly included IOManageSolario.o from Makefile-Linux.ppc.
++   - Indent all source code to have better code style.
+    - Renamed Makefile-Solaris.Sparc into Makefile-Solaris.sparc
+    - Modified an #ifdef in IOPerformanceLinux.cpp to make it work for
+      the XScale processor as well.
+
+
+

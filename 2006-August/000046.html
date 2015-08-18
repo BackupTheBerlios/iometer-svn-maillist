@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r277 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r277%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608150019.k7F0J8LH004102%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000045.html">
+   <LINK REL="Next"  HREF="000047.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r277 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r277%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200608150019.k7F0J8LH004102%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r277 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Tue Aug 15 02:19:08 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000045.html">[Iometer-svn] r276 - branches/IOMETER-restruct/iometer
+</A></li>
+        <LI>Next message: <A HREF="000047.html">[Iometer-svn] r278 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#46">[ date ]</a>
+              <a href="thread.html#46">[ thread ]</a>
+              <a href="subject.html#46">[ subject ]</a>
+              <a href="author.html#46">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-15 02:19:01 +0200 (Tue, 15 Aug 2006)
+New Revision: 277
+
+Added:
+   branches/IOMETER-restruct/iometer/src/Makefile-OSX.all
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp
+Log:
+minor fix to get Mac OSX port compiled and ran ok. It support both PPC and Intel architectures.
+
+Contributed by Julio Ng.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp	2006-08-08 01:07:18 UTC (rev 276)
++++ branches/IOMETER-restruct/iometer/src/IOManagerOSX.cpp	2006-08-15 00:19:01 UTC (rev 277)
+@@ -179,7 +179,7 @@
+ 		if (KERN_SUCCESS != kernResult) {
+ 			// If anything fails, we play it safe and just claim it has partitions
+ 			result = TRUE;
+-		} else if (NULL == iter) {
++		} else if (!iter) {
+ 			result = true;
+ 		} else {
+ 			service = IOIteratorNext(iter);
+@@ -188,7 +188,7 @@
+ 			// a single io_service_t
+ 			IOObjectRelease(iter);
+ 
+-			if (NULL == service) {
++			if (!service) {
+ 				result = TRUE;
+ 			} else {
+ 				// retrieve the Whole property
+
+Copied: branches/IOMETER-restruct/iometer/src/Makefile-OSX.all (from rev 276, branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc)
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-OSX.ppc	2006-08-08 01:07:18 UTC (rev 276)
++++ branches/IOMETER-restruct/iometer/src/Makefile-OSX.all	2006-08-15 00:19:01 UTC (rev 277)
+@@ -0,0 +1,138 @@
++###############################################################################
++##                                                                           ##
++##  Dynamo / Makefile-OSX.ppc                                                ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Job .......: The Makefile for the Mac OS X on PowerPC variant.           ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Intel Open Source License                                                ##
++##                                                                           ##
++##  Copyright (c) 2005 Apple Computer, Inc.                                  ##
++##  All rights reserved.                                                     ##
++##  Redistribution and use in source and binary forms, with or without       ##
++##  modification, are permitted provided that the following conditions       ##
++##  are met:                                                                 ##
++##                                                                           ##
++##     Redistributions of source code must retain the above copyright        ##
++##     notice, this list of conditions and the following disclaimer.         ##
++##                                                                           ##
++##     Redistributions in binary form must reproduce the above               ##
++##     copyright notice, this list of conditions and the following           ##
++##     disclaimer in the documentation and/or other materials provided       ##
++##     with the distribution.                                                ##
++##                                                                           ##
++##     Neither the name of Apple Computer nor the names of its               ##
++##     contributors may be used to endorse or promote products derived       ##
++##     from this software without specific prior written permission.         ##
++##                                                                           ##
++##  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS      ##
++##  &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT        ##
++##  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS        ##
++##  FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE        ##
++##  OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,      ##
++##  SPECIAL, EXEPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT          ##
++##  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF         ##
++##  USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED          ##
++##  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT              ##
++##  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING           ##
++##  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       ##
++##  POSSIBILITY OF SUCH DAMAGE.                                              ##
++##                                                                           ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Remarks ...: &lt;none&gt;                                                      ##
++##                                                                           ##
++## ------------------------------------------------------------------------- ##
++##                                                                           ##
++##  Changes ...: 2003-08-04 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">raltherr at apple.com</A>)                             ##
++##               - File created                                              ##
++##                                                                           ##
++###############################################################################
++.MAKE_VERSION: VERSION-1.0
++
++# un-comment out .IGNORE to suppress error messages and not stop make on errors.
++#.IGNORE:
++.SUFFIXES: .cpp .c .o
++
++CC=gcc
++CXX=g++
++RM=/bin/rm -f
++MV=/bin/mv
++TOUCH=/usr/bin/touch
++STRIP=/usr/ccs/bin/strip
++
++
++
++# Some common definitions used.
++# Note 1) -DWORKAROUND_MOD_BUG can be dropped if -O is used in place of -g in CFLAGS
++# Note 2) -DIOMTR_SETTING_OVERRIDE_FS controls inclusion of destructive dynamo code.
++# Note 3) -D_DETAILS=1 -D_DEBUG=1 enables maximum debug information
++#
++CFLAGS= -O \
++        -Wall \
++	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_OSX \
++	-DIOMTR_CPU_PPC \
++	-DNO_DYNAMO_VI \
++        -D_REENTRANT \
++        -DNOMINMAX
++
++
++
++# LIBS GO HERE
++LIBS= -lpthread -framework Carbon -framework IOKit
++
++# OBJECTS GO HERE
++OBJECTS= IOGlobals.o \
++         Pulsar.o \
++         IOManager.o IOManagerLinux.o IOManagerSolaris.o IOManagerOSX.o \
++         IOGrunt.o \
++         IOTarget.o IOTargetDisk.o IOTargetTCP.o \
++         IOPort.o IOPortTCP.o \
++         Network.o NetTCP.o \
++         ByteOrder.o \
++         IOPerformance.o IOPerformanceOSX.o \
++         IOTime.o \
++         IOCQAIO.o IOCompletionQ.o \
++         IOAccess.o
++
++
++
++# Make Rules
++help:
++	@echo
++	@echo &quot;Please pick one of the listed targets:&quot;
++	@echo                                                              
++	@echo &quot;   all       Build the binaries&quot;
++	@echo &quot;   dynamo    Build the dynamo binary&quot;
++	@echo &quot;   iometer   Build the iometer binary (not supported) *&quot;
++	@echo &quot;   clean     Remove old binaries and object files&quot;
++	@echo                                                              
++	@echo &quot;   * = The Iometer GUI is so far only available for MS Windows,&quot; 
++	@echo &quot;       but you can use it to control dynamo's running on Linux.&quot; 
++	@echo                                                              
++
++all: dynamo
++
++dynamo: $(OBJECTS)
++	$(CXX) $(CFLAGS) -o dynamo $(OBJECTS) $(LIBS)
++
++clean:
++	$(RM) $(OBJECTS) dynamo
++
++install:
++	echo &quot;Not Supported.&quot;
++
++iometer:
++	echo &quot;Not Supported.&quot;
++
++.cpp.o:
++	$(CXX) $(CFLAGS) -c $&lt;
++
++.c.o:
++	$(CC) $(CFLAGS) -c $&lt;
++
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000045.html">[Iometer-svn] r276 - branches/IOMETER-restruct/iometer
+</A></li>
+	<LI>Next message: <A HREF="000047.html">[Iometer-svn] r278 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#46">[ date ]</a>
+              <a href="thread.html#46">[ thread ]</a>
+              <a href="subject.html#46">[ subject ]</a>
+              <a href="author.html#46">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

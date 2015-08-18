@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] Fw: latest dynamo src/binary for Linux (FC6)
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-December/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20Fw%3A%20latest%20dynamo%20src/binary%20for%20Linux%20%28FC6%29&In-Reply-To=%3C359466.90889.qm%40web53008.mail.re2.yahoo.com%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000110.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] Fw: latest dynamo src/binary for Linux (FC6)</H1>
+    <B>Robert Feldman</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20Fw%3A%20latest%20dynamo%20src/binary%20for%20Linux%20%28FC6%29&In-Reply-To=%3C359466.90889.qm%40web53008.mail.re2.yahoo.com%3E"
+       TITLE="[Iometer-svn] Fw: latest dynamo src/binary for Linux (FC6)">rfeldman94306 at yahoo.com
+       </A><BR>
+    <I>Thu Dec  4 05:51:46 CET 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000110.html">[Iometer-svn] latest dynamo src/binary for Linux (FC6)
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#111">[ date ]</a>
+              <a href="thread.html#111">[ thread ]</a>
+              <a href="subject.html#111">[ subject ]</a>
+              <a href="author.html#111">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>I should also mention that I have specified a mounted Linux filesystem as iometer target. The reason is that I am characterizing/tuning perf of a single-drive notebook platform. Created 4G Linux partition on same drive as boot partition; created fs in the 4G parition; mounted under /DYNOTEST. Dynamo did create /DYNOTEST/iobw.tst as expected, yielded expected results for qd=1.
+
+So, what do I need to do to get dynamo to correctly generate high qd load on this platform?
+
+Thanks,
+Robert
+
+
+--- On Wed, 12/3/08, Robert Feldman &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">rfeldman94306 at yahoo.com</A>&gt; wrote:
+
+&gt;<i> From: Robert Feldman &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">rfeldman94306 at yahoo.com</A>&gt;
+</I>&gt;<i> Subject: latest dynamo src/binary for Linux (FC6)
+</I>&gt;<i> To: <A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">iometer-svn at lists.berlios.de</A>
+</I>&gt;<i> Date: Wednesday, December 3, 2008, 8:25 PM
+</I>&gt;<i> I am trying to download the latest-n-greatest dynamo
+</I>&gt;<i> src/binary for Linux (FC6). 
+</I>&gt;<i> Ran into a problem with iometer-2006_07_27.linux.i386
+</I>&gt;<i> package: unable to increase avgqu-sz (avg queue depth
+</I>&gt;<i> reported by iostat) above 1 range, although iomter gui
+</I>&gt;<i> (windows-based) specifies qd=1,4,16,64. Also tried multiple
+</I>&gt;<i> (eg., 8, 16) iometer workers - avgqu-sz gets stuck at 2. 
+</I>&gt;<i> 
+</I>&gt;<i> Load/throughput correspondingly low compared to windows on
+</I>&gt;<i> same config.
+</I>&gt;<i> Removed O_DIRECT from open() in IOTargetDisk.cpp,
+</I>&gt;<i> recompiled dynamo, same pblem.
+</I>&gt;<i> 
+</I>&gt;<i> Looks like fix has already been checked into dynamo src.
+</I>&gt;<i> Tried &quot;svn co
+</I>&gt;<i> <A HREF="svn://svn.berlios.de/iometer/iometer/branches/IOMETER-restruct">svn://svn.berlios.de/iometer/iometer/branches/IOMETER-restruct</A>
+</I>&gt;<i> svn: Can't connect to host 'svn.berlios.de':
+</I>&gt;<i> Connection refused
+</I>&gt;<i> 
+</I>&gt;<i> Would like to download latest-n-greatest bits as soon as
+</I>&gt;<i> possible, both src and executable (if available).
+</I>&gt;<i> 
+</I>&gt;<i> Any help on this would be greatly appreciated.
+</I>&gt;<i> 
+</I>&gt;<i> Thanks,
+</I>&gt;<i> Robert
+</I>
+
+      
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000110.html">[Iometer-svn] latest dynamo src/binary for Linux (FC6)
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#111">[ date ]</a>
+              <a href="thread.html#111">[ thread ]</a>
+              <a href="subject.html#111">[ subject ]</a>
+              <a href="author.html#111">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

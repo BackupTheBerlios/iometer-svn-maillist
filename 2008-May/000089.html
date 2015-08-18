@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r322 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-May/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r322%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200805030045.m430jZpP018456%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000088.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r322 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r322%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200805030045.m430jZpP018456%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r322 - branches/IOMETER-restruct/iometer/src">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Sat May  3 02:45:35 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000088.html">[Iometer-svn] r321 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-05-03 02:45:31 +0200 (Sat, 03 May 2008)
+New Revision: 322
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/ByteOrder.cpp
+   branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp
+   branches/IOMETER-restruct/iometer/src/ICF_ifstream.h
+Log:
+New disk detection (windows) and iometer disk nesting; enabled 64bit and per thread affinity; added support for structure packing; tweaked dynamo cmdline support (Windows)
+
+Modified: branches/IOMETER-restruct/iometer/src/ByteOrder.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ByteOrder.cpp	2008-05-03 00:43:01 UTC (rev 321)
++++ branches/IOMETER-restruct/iometer/src/ByteOrder.cpp	2008-05-03 00:45:31 UTC (rev 322)
+@@ -354,7 +354,9 @@
+ 			}
+ 			// Now re-order the other stuff.
+ 			reorder(var.data.targets[i].queue_depth);
++#ifndef USE_NEW_DISCOVERY_MECHANISM // part of the bitwise char
+ 			reorder(var.data.targets[i].test_connection_rate);
++#endif
+ 			reorder(var.data.targets[i].trans_per_conn);
+ 			reorder(var.data.targets[i].random);
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp	2008-05-03 00:43:01 UTC (rev 321)
++++ branches/IOMETER-restruct/iometer/src/ICF_ifstream.cpp	2008-05-03 00:45:31 UTC (rev 322)
+@@ -328,6 +328,47 @@
+ 	return TRUE;
+ }
+ 
++BOOL ICF_ifstream::ExtractFirstInt64(CString &amp; string, __int64 &amp;number)
++{
++	const CString backup_string = string;
++	CString substring;
++	int pos;
++
++	number = 0;
++
++	if ((pos = string.FindOneOf(&quot;-1234567890&quot;)) == -1) {
++		ErrorMessage(&quot;File is improperly formatted.  Expected an &quot; &quot;integer value.&quot;);
++		return FALSE;
++	}
++	// Cleave off everything before the first number.
++	string = string.Right(string.GetLength() - pos);
++
++	substring = string.SpanIncluding(&quot;-1234567890&quot;);	// get the int as a string
++	string = string.Right(string.GetLength() - substring.GetLength());
++
++	// If there are any negative signs after the first character, fail.
++	if (substring.Right(substring.GetLength() - 1).Find('-') != -1) {
++		ErrorMessage(&quot;File is improperly formatted.  An integer value &quot;
++			     &quot;has a negative sign in the middle or on the end of it.&quot;);
++		string = backup_string;	// restore string's old value
++		return FALSE;
++	}
++
++	number = _atoi64((LPCTSTR) substring);
++
++	// Prepare string for further processing.  Eat whitespace.
++	string.TrimLeft();
++
++	// If there's a trailing comma, eat it.
++	if (!string.IsEmpty() &amp;&amp; string.GetAt(0) == ',')
++		string = string.Right(string.GetLength() - 1);
++
++	// Eat any space following the comma.
++	string.TrimLeft();
++
++	return TRUE;
++}
++
+ BOOL ICF_ifstream::ExtractFirstIntVersion(CString &amp; string, int &amp;number)
+ {
+ 	const CString backup_string = string;
+
+Modified: branches/IOMETER-restruct/iometer/src/ICF_ifstream.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/ICF_ifstream.h	2008-05-03 00:43:01 UTC (rev 321)
++++ branches/IOMETER-restruct/iometer/src/ICF_ifstream.h	2008-05-03 00:45:31 UTC (rev 322)
+@@ -101,6 +101,7 @@
+ 	BOOL GetPair(CString &amp; key, CString &amp; value);
+ 
+ 	static BOOL ExtractFirstInt(CString &amp; string, int &amp;number);
++	static BOOL ExtractFirstInt64(CString &amp; string, __int64 &amp;number);
+ 	static BOOL ExtractFirstIntVersion(CString &amp; string, int &amp;number);
+ 	static CString ExtractFirstToken(CString &amp; string, BOOL spaces = FALSE);
+ };
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000088.html">[Iometer-svn] r321 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#89">[ date ]</a>
+              <a href="thread.html#89">[ thread ]</a>
+              <a href="subject.html#89">[ subject ]</a>
+              <a href="author.html#89">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,125 @@
+From vedrand at mail.berlios.de  Fri Sep  5 18:19:38 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 5 Sep 2008 18:19:38 +0200
+Subject: [Iometer-svn] r343 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200809051619.m85GJc0B027053@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-09-05 18:19:32 +0200 (Fri, 05 Sep 2008)
+New Revision: 343
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+Log:
+Buffer management fix for Windows disk discovery.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-08-27 14:09:27 UTC (rev 342)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-09-05 16:19:32 UTC (rev 343)
+@@ -1700,43 +1700,44 @@
+ // GetDosDevices()
+ //
+ // Wrapper around QueryDosDevice() which has a typical but painful buffer allocation rule.
+-// Routine allocates all the required memory, but the caller needs to deallocate source. 
++// Routine allocates all the required memory, but the caller needs to deallocate source upon
++// last call. 
+ // Arguments match the first 2 of QueryDosDevice()
+ int GetDosDevices(LPSTR search, LPSTR *source)
+ {
+ 	int srcSize = 0, bufSize = 65536;
+ 	DWORD errCode;
+-	LPSTR dest;
++	//LPSTR dest;
+ 
+ 	while (TRUE)
+ 	{
+-		dest = new char[bufSize];
++		if (*source == NULL) *source = new char[bufSize];
+ 
+-		if (dest == NULL)
++		if (*source == NULL)
+ 		{
+ 			cerr << "Error allocating memory for dest, error=" << GetLastError() << endl;
+ 			return 0;
+ 		}
+ 
+-        srcSize = QueryDosDevice(search, dest, bufSize);
+-
++        srcSize = QueryDosDevice(search, *source, bufSize);
+ 		errCode = GetLastError();
+ 
+ 		if (errCode == ERROR_INSUFFICIENT_BUFFER || errCode == ERROR_MORE_DATA)
+ 		{
+-			delete [] dest;
+-        	dest = NULL;
++			delete [] *source;
++        	*source = NULL;
+         	bufSize *= 2;
+         	continue;
+ 		}
+         else if (srcSize == 0) 
+ 		{
+ 			cerr << "Error querying dos devices, error=" << errCode << endl;
++			if (*source) delete [] *source;
+ 			return 0;
+         }
+ 		else
+ 		{
+-			*source = dest;
++			//*source = dest;
+ 			break;
+ 		}
+ 	}
+@@ -1752,7 +1753,7 @@
+ // thoroughness, it reports the symbolic link target of the dos device
+ // and allocates a buffer within the DosDeviceList structure. So,
+ // caller must deallocate the DosDevicesList.list member at the end.
+-// Argument search is any type of string that is matchee against the 
++// Argument search is any type of string that is matched against the 
+ // symbolic link.
+ DosDeviceList
+ GetFilteredDosDevices(LPSTR search)
+@@ -1782,7 +1783,7 @@
+ 	while (i--)
+ 	{
+ 		j = 0; // reset current item count
+-		while(pos && ((pos-destBuffer) < len))
++		while(*pos && ((pos-destBuffer) < len))
+ 		{
+ 			if (strstr(pos, search))
+ 			{
+
+
+
+From vedrand at mail.berlios.de  Fri Sep  5 18:24:28 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 5 Sep 2008 18:24:28 +0200
+Subject: [Iometer-svn] r344 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200809051624.m85GOS5N027376@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-09-05 18:24:25 +0200 (Fri, 05 Sep 2008)
+New Revision: 344
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOMessage.h
+Log:
+Fix structure packing macro usage
+
+Modified: branches/IOMETER-restruct/iometer/src/IOMessage.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOMessage.h	2008-09-05 16:19:32 UTC (rev 343)
++++ branches/IOMETER-restruct/iometer/src/IOMessage.h	2008-09-05 16:24:25 UTC (rev 344)
+@@ -147,7 +147,7 @@
+ 
+ struct Data_Message {
+ 	int count;		// Number of data items in the message.
+-#ifdef FORCE_STRUCT_ALIGN
++#ifndef FORCE_STRUCT_ALIGN
+ 	char pad[4];		// coz of Solaris - NT differences
+ #endif
+ 	Message_Data data;	// Detailed data sent with the data message.
+
+
+

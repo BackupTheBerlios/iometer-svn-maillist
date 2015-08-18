@@ -1,0 +1,86 @@
+From cheungming at mail.berlios.de  Sun Oct 19 20:29:59 2008
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Sun, 19 Oct 2008 20:29:59 +0200
+Subject: [Iometer-svn] r345 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200810191829.m9JITxKb032111@sheep.berlios.de>
+
+Author: cheungming
+Date: 2008-10-19 20:29:58 +0200 (Sun, 19 Oct 2008)
+New Revision: 345
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.h
+Log:
+fixed compile warnings with gcc 4.2.3 in Ubuntu Linux 8.04
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOManagerLinux.cpp	2008-10-19 18:29:58 UTC (rev 345)
+@@ -101,8 +101,6 @@
+ #include <arpa/inet.h>
+ #include <assert.h>
+ 
+-static char *mnttab;
+-
+ #define USED_DEVS_MAX_SIZE (4 * 1024)
+ 
+ /**********************************************************************
+@@ -120,6 +118,7 @@
+ 	TargetDisk d;
+ 	int count = 0;
+ 	char usedDevs[USED_DEVS_MAX_SIZE + 1];
++	const char *mnttab;
+ 
+ 	usedDevs[0] = '\0';
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2008-10-19 18:29:58 UTC (rev 345)
+@@ -158,7 +158,7 @@
+ int Performance::Get_Processor_Count(void)
+ {
+ 	char buf[4096];
+-	char *p = "processor\t:";
++	const char *p = "processor\t:";
+ 	int i = 0;
+ 	size_t res, j;
+ 	FILE *cpuinfo;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2008-10-19 18:29:58 UTC (rev 345)
+@@ -934,7 +934,7 @@
+ //
+ // Utility function to close a socket.  socket_name parameter is used only for debugging outputs.
+ //
+-BOOL PortTCP::CloseSocket(SOCKET * s, char *socket_name)
++BOOL PortTCP::CloseSocket(SOCKET * s, const char *socket_name)
+ {
+ 	if (*s == (int)INVALID_SOCKET) {
+ #if PORT_DETAILS || _DETAILS
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.h	2008-09-05 16:24:25 UTC (rev 344)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.h	2008-10-19 18:29:58 UTC (rev 345)
+@@ -154,7 +154,7 @@
+ 	static unsigned int sockets_in_use;
+ 
+ 	// private functions used only by PortTCP
+-	BOOL CloseSocket(SOCKET * s, char *socket_name);	// utility function
++	BOOL CloseSocket(SOCKET * s, const char *socket_name);	// utility function
+ 	DWORDLONG SynchReceive(LPVOID data, DWORD size = MESSAGE_SIZE);
+ 	DWORDLONG SynchSend(LPVOID data, DWORD size = MESSAGE_SIZE);
+ 
+
+
+

@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r307 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r307%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200609291829.k8TITUtt002174%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000075.html">
+   <LINK REL="Next"  HREF="000077.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r307 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r307%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200609291829.k8TITUtt002174%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r307 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 29 20:29:30 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000075.html">[Iometer-svn] r306 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000077.html">[Iometer-svn] r308 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-09-29 20:29:30 +0200 (Fri, 29 Sep 2006)
+New Revision: 307
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+Log:
+allow dynamo to connect iometer when iometer is started with a non-default port.
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-29 18:21:24 UTC (rev 306)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-29 18:29:30 UTC (rev 307)
+@@ -8,6 +8,8 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to allow dynamo connect to iometer when iometer started
++     with a specified non-default port.
+    - Patch by Ming Zhang to fix recv() return value processing error in Peek();
+    - Patch by Ming Zhang to allocate memory under Linux as 4KB aligned.
+    - Patch by Keith Moyer to add a ramp/run time remaining notification to the 
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-09-29 18:21:24 UTC (rev 306)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-09-29 18:29:30 UTC (rev 307)
+@@ -276,8 +276,8 @@
+ 	// contains any spaces, but the &quot;start&quot; command (NEW_WORKER_COMMAND) assumes the
+ 	// first quoted argument is the window title, so we must provide it twice.
+ 	new_manager_command_line_format = (CString) NEW_WORKER_COMMAND
+-	    + &quot;\&quot;&quot; + iometer_path + NEW_WORKER_EXECUTABLE + &quot;%s\&quot;&quot; + &quot; &quot;
+-	    + &quot;\&quot;&quot; + iometer_path + NEW_WORKER_EXECUTABLE + &quot;\&quot;%s&quot;;
++	    + &quot;\&quot;&quot; + iometer_path + NEW_WORKER_EXECUTABLE + &quot;%s%s\&quot;&quot; + &quot; &quot;
++	    + &quot;\&quot;&quot; + iometer_path + NEW_WORKER_EXECUTABLE + &quot;\&quot;%s%s&quot;;
+ 
+ 	if (cmdline.GetConfigFile().IsEmpty()) {
+ #ifndef	_DEBUG
+@@ -411,12 +411,15 @@
+ void CGalileoApp::LaunchDynamo(const CString &amp; mgr_name /* =&quot;&quot; */ )
+ {
+ 	CString cmd;
++	CString portparam;
+ 
+ 	// Make sure the formatting string was initialized.
+ 	ASSERT(!theApp.new_manager_command_line_format.IsEmpty());
+ 
++	portparam.Format(&quot; /p %d &quot;, cmdline.GetLoginportnumber());
++
+ 	// Create a string with the appropriate command line parameters.
+-	cmd.Format(new_manager_command_line_format, mgr_name, mgr_name);
++	cmd.Format(new_manager_command_line_format, mgr_name, portparam, mgr_name, portparam);
+ 
+ 	// Launch Dynamo.
+ 	system(cmd);
+@@ -527,8 +530,6 @@
+ 
+ 			// create and open the port
+ 			login_port_number = theApp.cmdline.GetLoginportnumber();
+-			if (!login_port_number)
+-				login_port_number = WELL_KNOWN_TCP_PORT;
+  
+ 			login_port = new PortTCP(FALSE);	// asynchronous port
+ 			if (!login_port-&gt;Create(NULL, NULL, 0, login_port_number)) {
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-09-29 18:21:24 UTC (rev 306)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-09-29 18:29:30 UTC (rev 307)
+@@ -290,7 +290,8 @@
+ 	m_sResultFile = &quot;&quot;;
+ 	m_iTimeout = -1;
+ 	m_bSwitches = FALSE;
+-	ErrorMessage(&quot;Error processing the command line.  &quot; + errmsg);
++	//ErrorMessage(&quot;Error processing the command line.  &quot; + errmsg);
++	MessageBox(NULL, &quot;Error processing the command line.  &quot; + errmsg, &quot;Iometer&quot;, 0);
+ }
+ 
+ CString CGalileoCmdLine::GetConfigFile()
+@@ -313,7 +314,10 @@
+ 
+ int CGalileoCmdLine::GetLoginportnumber()
+ {
+-	return m_iLoginportnumber;
++	if (m_iLoginportnumber)
++		return m_iLoginportnumber;
++	else
++		return WELL_KNOWN_TCP_PORT;
+ }
+ 
+ BOOL CGalileoCmdLine::GetShowBigmeter()
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000075.html">[Iometer-svn] r306 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000077.html">[Iometer-svn] r308 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#76">[ date ]</a>
+              <a href="thread.html#76">[ thread ]</a>
+              <a href="subject.html#76">[ subject ]</a>
+              <a href="author.html#76">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

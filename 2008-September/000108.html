@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r344 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-September/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r344%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200809051624.m85GOS5N027376%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000107.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r344 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r344%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200809051624.m85GOS5N027376%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r344 - branches/IOMETER-restruct/iometer/src">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep  5 18:24:28 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000107.html">[Iometer-svn] r343 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-09-05 18:24:25 +0200 (Fri, 05 Sep 2008)
+New Revision: 344
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOMessage.h
+Log:
+Fix structure packing macro usage
+
+Modified: branches/IOMETER-restruct/iometer/src/IOMessage.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOMessage.h	2008-09-05 16:19:32 UTC (rev 343)
++++ branches/IOMETER-restruct/iometer/src/IOMessage.h	2008-09-05 16:24:25 UTC (rev 344)
+@@ -147,7 +147,7 @@
+ 
+ struct Data_Message {
+ 	int count;		// Number of data items in the message.
+-#ifdef FORCE_STRUCT_ALIGN
++#ifndef FORCE_STRUCT_ALIGN
+ 	char pad[4];		// coz of Solaris - NT differences
+ #endif
+ 	Message_Data data;	// Detailed data sent with the data message.
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000107.html">[Iometer-svn] r343 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#108">[ date ]</a>
+              <a href="thread.html#108">[ thread ]</a>
+              <a href="subject.html#108">[ subject ]</a>
+              <a href="author.html#108">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

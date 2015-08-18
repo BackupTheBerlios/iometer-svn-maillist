@@ -1,0 +1,1225 @@
+From vedrand at mail.berlios.de  Wed Jun 18 06:32:31 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Wed, 18 Jun 2008 06:32:31 +0200
+Subject: [Iometer-svn] r323 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200806180432.m5I4WVFe001074@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-18 06:32:26 +0200 (Wed, 18 Jun 2008)
+New Revision: 323
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+Log:
+Minor fix for physical drive detection.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-05-03 00:45:31 UTC (rev 322)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-18 04:32:26 UTC (rev 323)
+@@ -1183,8 +1183,8 @@
+ 
+ 		memset(&d.spec, 0, sizeof(d.spec));
+ 
+-		// The last char in our dev_list link string is the physicaldrive number
+-		drive_number = atoi(&dev_list.list[i].link[strlen(dev_list.list[i].link) - 1]);
++		// The last chars in our dev_list link string are the physicaldrive number
++		drive_number = atoi(&dev_list.list[i].link[strlen("PhysicalDrive")]);
+ 
+ 		// We already have the string (but w/out \\.\, so regenerate is here.
+ 		sprintf( d.spec.name, "%s%i", PHYSICAL_DISK, drive_number );
+
+
+
+From vedrand at mail.berlios.de  Wed Jun 18 08:01:55 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Wed, 18 Jun 2008 08:01:55 +0200
+Subject: [Iometer-svn] r324 - branches/IOMETER-restruct/iometer/src/Galileo
+Message-ID: <200806180601.m5I61tbF000677@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-18 08:01:51 +0200 (Wed, 18 Jun 2008)
+New Revision: 324
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+Log:
+Revised binary destination.
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-06-18 04:32:26 UTC (rev 323)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-06-18 06:01:51 UTC (rev 324)
+@@ -1,5 +1,5 @@
+ TARGETNAME=IOMETER
+-TARGETPATH=OBJ
++TARGETPATH=..\ddk\$(DDKBUILDENV)
+ TARGETTYPE=PROGRAM
+ 
+ USE_MFC=1
+@@ -17,7 +17,7 @@
+ #        |                |                          |
+ INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE; ..
+ 
+-C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -D_DETAILS -DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN 
++C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM
+ # -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
+ # -DFORCE_STRUCT_ALIGN (structure member alignment)
+ # -D_DETAILS (for more verbosity)
+
+
+
+From vedrand at mail.berlios.de  Wed Jun 18 08:02:15 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Wed, 18 Jun 2008 08:02:15 +0200
+Subject: [Iometer-svn] r325 - branches/IOMETER-restruct/iometer/src/Pulsar
+Message-ID: <200806180602.m5I62E5I000912@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-18 08:02:12 +0200 (Wed, 18 Jun 2008)
+New Revision: 325
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+Log:
+Revised binary destination.
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-06-18 06:01:51 UTC (rev 324)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-06-18 06:02:12 UTC (rev 325)
+@@ -1,5 +1,5 @@
+ TARGETNAME=DYNAMO
+-TARGETPATH=OBJ
++TARGETPATH=..\ddk\$(DDKBUILDENV)
+ TARGETTYPE=PROGRAM
+ 
+ USE_MFC=1
+@@ -19,7 +19,7 @@
+ #        |                |                          |
+ INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE;..
+ 
+-C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -D_DETAILS -DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
++C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM
+ # -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
+ # -DFORCE_STRUCT_ALIGN (structure member alignment)
+ # -D_DETAILS (for more verbosity)
+
+
+
+From vedrand at mail.berlios.de  Thu Jun 19 08:44:02 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Thu, 19 Jun 2008 08:44:02 +0200
+Subject: [Iometer-svn] r327 - branches/IOMETER-restruct/iometer/src/Pulsar
+Message-ID: <200806190644.m5J6i2pb007893@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-19 08:43:59 +0200 (Thu, 19 Jun 2008)
+New Revision: 327
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+Log:
+Added compile time flags for structure alignment and cpu affinity
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-06-18 06:05:49 UTC (rev 326)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-06-19 06:43:59 UTC (rev 327)
+@@ -19,9 +19,10 @@
+ #        |                |                          |
+ INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE;..
+ 
+-C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM
++C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM -DIOMTR_SETTING_CPU_AFFINITY -DFORCE_STRUCT_ALIGN 
+ # -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
+ # -DFORCE_STRUCT_ALIGN (structure member alignment)
++# -DIOMTR_SETTING_CPU_AFFINITY (turns on cpu affinity code
+ # -D_DETAILS (for more verbosity)
+ # -D_DEBUG (for normal debug)
+ # -DDEBUG (for DEBUG_NEW only)
+
+
+
+From vedrand at mail.berlios.de  Thu Jun 19 08:44:51 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Thu, 19 Jun 2008 08:44:51 +0200
+Subject: [Iometer-svn] r328 - branches/IOMETER-restruct/iometer/src/msvc
+Message-ID: <200806190644.m5J6ipEu007932@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-19 08:44:48 +0200 (Thu, 19 Jun 2008)
+New Revision: 328
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj
+   branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj
+Log:
+Added compile time flags for structure alignment and cleaned up the environment some more.
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj	2008-06-19 06:43:59 UTC (rev 327)
++++ branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj	2008-06-19 06:44:48 UTC (rev 328)
+@@ -50,7 +50,7 @@
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+ 				AdditionalIncludeDirectories="..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api"
+-				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS"
++				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile="$(IntDir)/Dynamo.pch"
+@@ -140,7 +140,7 @@
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+ 				AdditionalIncludeDirectories="..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api"
+-				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS"
++				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile="$(IntDir)/Dynamo.pch"
+@@ -231,7 +231,7 @@
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+ 				AdditionalIncludeDirectories="..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api"
+-				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS"
++				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile="$(IntDir)/Dynamo.pch"
+@@ -322,7 +322,7 @@
+ 				Name="VCCLCompilerTool"
+ 				InlineFunctionExpansion="1"
+ 				AdditionalIncludeDirectories="..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api"
+-				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_CONSOLE"
++				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE"
+ 				StringPooling="true"
+ 				RuntimeLibrary="0"
+ 				EnableFunctionLevelLinking="true"
+@@ -415,7 +415,7 @@
+ 				Name="VCCLCompilerTool"
+ 				InlineFunctionExpansion="1"
+ 				AdditionalIncludeDirectories="..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api"
+-				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_CONSOLE"
++				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE"
+ 				StringPooling="true"
+ 				RuntimeLibrary="0"
+ 				EnableFunctionLevelLinking="true"
+@@ -507,7 +507,7 @@
+ 				Name="VCCLCompilerTool"
+ 				InlineFunctionExpansion="1"
+ 				AdditionalIncludeDirectories="..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api"
+-				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_CONSOLE"
++				PreprocessorDefinitions="_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE"
+ 				StringPooling="true"
+ 				RuntimeLibrary="0"
+ 				EnableFunctionLevelLinking="true"
+@@ -674,138 +674,6 @@
+ 			Filter="h;hpp;hxx;hm;inl"
+ 			>
+ 			<File
+-				RelativePath="..\AccessDialog.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\AccessSpecList.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\BigMeter.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\GalileoApp.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\GalileoCmdLine.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\GalileoDefs.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\GalileoDoc.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\GalileoView.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\ICF_ifstream.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\ICFOpenDialog.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\ICFSaveDialog.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\IOAccess.h"
+ 				>
+ 			</File>
+@@ -882,30 +750,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\LegalBox.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\MainFrm.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\Manager.h"
+ 				>
+ 			</File>
+@@ -950,114 +794,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\PageAccess.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\PageDisk.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\PageDisplay.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\PageNetwork.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\PageSetup.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\PageTarget.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\resource.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\StdAfx.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\TextDisplay.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\unpack8.h"
+ 				>
+ 			</File>
+@@ -1070,33 +806,9 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\WaitingForManagers.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\Worker.h"
+ 				>
+ 			</File>
+-			<File
+-				RelativePath="..\WorkerView.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+ 		</Filter>
+ 		<Filter
+ 			Name="Resource Files"
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj	2008-06-19 06:43:59 UTC (rev 327)
++++ branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj	2008-06-19 06:44:48 UTC (rev 328)
+@@ -53,7 +53,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				InlineFunctionExpansion="1"
+-				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE"
++				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE"
+ 				StringPooling="true"
+ 				RuntimeLibrary="0"
+ 				EnableFunctionLevelLinking="true"
+@@ -147,7 +147,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				InlineFunctionExpansion="1"
+-				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE"
++				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE"
+ 				StringPooling="true"
+ 				RuntimeLibrary="0"
+ 				EnableFunctionLevelLinking="true"
+@@ -241,7 +241,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				InlineFunctionExpansion="1"
+-				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE"
++				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE"
+ 				StringPooling="true"
+ 				RuntimeLibrary="0"
+ 				EnableFunctionLevelLinking="true"
+@@ -336,7 +336,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+-				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG"
++				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile=".\$(ConfigurationName)\obj\$(PlatformName)/IOmeter.pch"
+@@ -428,7 +428,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+-				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG"
++				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile=".\$(ConfigurationName)\obj\$(PlatformName)/IOmeter.pch"
+@@ -521,7 +521,7 @@
+ 			<Tool
+ 				Name="VCCLCompilerTool"
+ 				Optimization="0"
+-				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG"
++				PreprocessorDefinitions="_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG"
+ 				BasicRuntimeChecks="3"
+ 				RuntimeLibrary="1"
+ 				PrecompiledHeaderFile=".\$(ConfigurationName)\obj\$(PlatformName)/IOmeter.pch"
+@@ -775,90 +775,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\IOCQ.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOCQAIO.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOCQVI.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOGrunt.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOManager.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOMessage.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOPerformance.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\IOPort.h"
+ 				>
+ 			</File>
+@@ -867,54 +783,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\IOTarget.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOTargetDisk.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOTargetTCP.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\IOTargetVI.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\IOTest.h"
+ 				>
+ 			</File>
+@@ -927,18 +795,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\IOVIPL.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\LegalBox.h"
+ 				>
+ 			</File>
+@@ -963,42 +819,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\NetTCP.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\NetVI.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\Network.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\ostream64.h"
+ 				>
+ 			</File>
+@@ -1031,18 +851,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\PulsarRC.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\StdAfx.h"
+ 				>
+ 			</File>
+@@ -1055,30 +863,6 @@
+ 				>
+ 			</File>
+ 			<File
+-				RelativePath="..\VINic.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+-				RelativePath="..\vipl.h"
+-				>
+-				<FileConfiguration
+-					Name="Release|Win32"
+-					ExcludedFromBuild="true"
+-					>
+-					<Tool
+-						Name="VCCustomBuildTool"
+-					/>
+-				</FileConfiguration>
+-			</File>
+-			<File
+ 				RelativePath="..\WaitingForManagers.h"
+ 				>
+ 			</File>
+
+
+
+From vedrand at mail.berlios.de  Thu Jun 19 08:45:13 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Thu, 19 Jun 2008 08:45:13 +0200
+Subject: [Iometer-svn] r329 - branches/IOMETER-restruct/iometer/src/Galileo
+Message-ID: <200806190645.m5J6jDw5008018@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-19 08:45:11 +0200 (Thu, 19 Jun 2008)
+New Revision: 329
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+Log:
+Added compile time flags for structure alignment and cpu affinity
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-06-19 06:44:48 UTC (rev 328)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-06-19 06:45:11 UTC (rev 329)
+@@ -17,9 +17,10 @@
+ #        |                |                          |
+ INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE; ..
+ 
+-C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM
++C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM -DIOMTR_SETTING_CPU_AFFINITY -DFORCE_STRUCT_ALIGN 
+ # -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
+ # -DFORCE_STRUCT_ALIGN (structure member alignment)
++# -DIOMTR_SETTING_CPU_AFFINITY (turns on cpu affinity code
+ # -D_DETAILS (for more verbosity)
+ # -D_DEBUG (for normal debug)
+ # -DDEBUG (for DEBUG_NEW only)
+
+
+
+From vedrand at mail.berlios.de  Thu Jun 19 08:48:51 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Thu, 19 Jun 2008 08:48:51 +0200
+Subject: [Iometer-svn] r330 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200806190648.m5J6mp7p008111@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-06-19 08:48:45 +0200 (Thu, 19 Jun 2008)
+New Revision: 330
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOTest.h
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+Final touches for 2008.06.18 release.
+-comment updates and ifdefs for other OSes
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -670,8 +670,9 @@
+ 			// We have a match for our index, so set the affinity for the thread
+ #if defined(IOMTR_OSFAMILY_WINDOWS)
+ 			SetThreadAffinityMask(GetCurrentThread(), effective_affinity);
+-//#else if
+-			// must do something here
++#else
++#error ===> ERROR: You have to add affinity code here
++
+ #endif
+ 
+ #ifdef _DETAILS
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -52,6 +52,7 @@
+ /* ##               - Rewrote adding support for volume mount point       ## */
+ /* ##                 better raw disk and network share detection         ## */
+ /* ##               - Added new TargetType for chaining disks in Iometer  ## */
++/* ##                 see comments in iotest.h                            ## */
+ /* ##               2004-04-15 (lamontcranston41 at yahoo.com)               ## */
+ /* ##               - Moved Report_Disks() from IOManager.cpp to here.    ## */
+ /* ##               - Initial drop.                                       ## */
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTest.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTest.h	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOTest.h	2008-06-19 06:48:45 UTC (rev 330)
+@@ -107,14 +107,18 @@
+ 
+ #ifdef USE_NEW_DISCOVERY_MECHANISM
+ 	// 
+-	// By tagging the raw disk with this type tells iometer to chain
++	// Optional TODO for other OSes.
++	//
++
++	// By tagging the raw disk with this type tells iometer GUI to chain
+ 	// it under the preceding logical disk. This means, that following
+ 	// a logical disk you would insert a physical disk with this type
+-	// if you wanted iometer to display it. For a software raid, you 
+-	// would insert all of the disks belonging to that logical disk.
++	// if you wanted iometer to associate them. For a software raid, you 
++	// would insert all of the disks belonging to that logical disk with this
++	// type.
+ 	//
+ 	// If you have multiple striped partitions over the same group of 
+-	// physical disks, it is up to you if you duplicate the physical
++	// physical disks, it is up to you if you duplicate the same physical
+ 	// disks after every logical disk, or just show them once.
+ 	//
+ 	PhysicalDiskTypeHasPartitions = 0x8C100000, 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -48,7 +48,10 @@
+ /* ##                                                                     ## */
+ /* ## ------------------------------------------------------------------- ## */
+ /* ##                                                                     ## */
+-/* ##  Changes ...: 2005-04-18 (raltherr at apple.com)                       ## */
++/* ##  Changes ...: 2008-06-18 (vedrand at yahoo.com)                        ## */
++/* ##               -redesigned the code to support multiple timers       ## */
++/* ##                for Windows - needs work for others (comments below) ## */
++/* ##               2005-04-18 (raltherr at apple.com)                       ## */
+ /* ##               - Support for MacOS X                                 ## */
+ /* ##               2005-01-12 (henryx.w.tieman at intel.com)                ## */
+ /* ##               - Added code for Linux on Intel Itanium (ia64).       ## */
+@@ -333,7 +336,7 @@
+ //
+ 
+ // Abstract the OS high perf counter/frequency, so other OSs can use the 
+-// rdtsc_freq and timer_* code. These 2 are just wrappers around 
++// rdtsc_freq and timer_* code below. These 2 are just wrappers around 
+ // QueryPerfCounter/Frequency
+ 
+ LONGLONG oshpc()
+@@ -402,25 +405,40 @@
+ //
+ // COMMON TIMER CODE
+ //
+-// Assumes the timer conventions as defined by the above windows section.
++
++// !!!!Delete/modify this ifdef once other OSes have implemented similar fuctionality!!!
++#if defined(IOMTR_OSFAMILY_WINDOWS)
++// !!!!Delete/modify this ifdef once other OSes have implemented similar fuctionality!!!
++
++//
++// Please follow the timer conventions as defined by the above windows section.
++//
+ // Summary:
+ // 1. TimerType controls the runtime type of the timer. Each OS needs to instantiate 
+ //    a TimerType of type timer_type and set its default. 
+-// 2. timer_value and timer_frequency() (below) are top level routines that mind TimerType
++// 2. timer_value and timer_frequency() (below) then become the top level routines 
++//    that mind TimerType global.
+ // 3. timer_type enum in iocommon.h and timer_value()/timer_frequeny() need to be 
+-//    modified for any new timer added. 
++//    in sync for any new timer(s) defined
+ // 4. Define a {timer_name}() and {timer_name}_freq() functions for a desired timer 
+-// 5. oshpc() and oshpc_freq() are minimum no matter what counter they really expose
+-// 6. rdtsc() becomes an optional timer, and rdtsc_freq (below) would use it 
++//    e.g. rtc() rtc_freq(), rdtsc_freq is the only exception -- see below
++// 5. oshpc() and oshpc_freq() are the minimum ones that need be defined, however they should
++//    not rely on rdtsc. i.e. use another type of timer. If rdtsc is not really using the real
++//    rdtsc, do not even define rdtsc and set the default timer_type accordingly
++// 6. rdtsc() becomes an optional timer, and rdtsc_freq (below) would calculate its frequency 
+ //
++// Note, the function naming convention move to timer_value was done because some
++// implementations did not really use rdtsc, which was the original function name. So if your OS
++// defines timer_value, it really needs to be renamed to reflects its behavior. And for all 
++// timers besides rdtsc, you also need to define a corresponding frequency function.
+ 
+-#if defined(IOMTR_OSFAMILY_WINDOWS)
+ 
+-// __int64 rdtsc_freq()
++
++// LONGLONG rdtsc_freq()
+ //
+ // The main problem is that TSC/ITC frequency may not match the internal 
+ // processor clock, so we derive it here based on another known counter--
+-// oshpc() in this case. 
++// oshpc() in this case. The default counter required for all this to work.
+ // While ding that, we can also detect speed stepping but not 100% reliably.
+ //
+ // Note: -assumes we are running on one processor; caller should affinitize. 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2008-06-19 06:48:45 UTC (rev 330)
+@@ -117,7 +117,8 @@
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				"2004.07.30-post\0"
+ //#define IOVER_FILEVERSION				"2006.07.27\0"
+-#define IOVER_FILEVERSION				"2008.03.06\0"
++//#define IOVER_FILEVERSION				"2008.03.06\0"
++#define IOVER_FILEVERSION				"2008.06.18\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -289,7 +289,6 @@
+ 	if (!affinity_mask) {
+ 		affinity_mask = 1;
+ 	}
+-	// not &affinity_mask, MSDN API Doc error.
+ 	res = SetProcessAffinityMask(GetCurrentProcess(), affinity_mask);
+ 	if (!res) {
+ 		res = GetLastError();
+@@ -361,7 +360,7 @@
+ #else
+ #error ===> ERROR: You have to set default affinity values here
+ 	// TODO for non-Windows
+-	param.cpu_affinity = 1; // get the current affinity value
++	param.cpu_affinity = 1; // get the current process affinity mask
+ #endif
+ #endif // IOMTR_SETTING_CPU_AFFINITY
+ 
+@@ -787,10 +786,10 @@
+ 				else
+ 					sscanf(argv[I],"%I64d", &tempMask);
+ 
+-#if defined(IOMTR_OSFAMILY_WINDOWS)
++#if defined (IOMTR_SETTING_CPU_AFFINITY)
++
+ 				// TODO for non-Windows
+-				// Until someone initializes the param.cpu_affinity (above) to the 
+-				// current affinity mask for other OSs, this stays for Windows only
++				// This will not work if you ignored initializing cpu_affinity above
+ 				if ((tempMask & param->cpu_affinity) != tempMask)
+ 				{
+ 					cerr << "Warning: Invalid cpu_affinity mask specified, ignoring." << endl;
+
+
+
+From cheungming at mail.berlios.de  Fri Jun 27 03:13:39 2008
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 27 Jun 2008 03:13:39 +0200
+Subject: [Iometer-svn] r331 - branches/IOMETER-restruct/iometer
+Message-ID: <200806270113.m5R1Ddcu021138@sheep.berlios.de>
+
+Author: cheungming
+Date: 2008-06-27 03:13:38 +0200 (Fri, 27 Jun 2008)
+New Revision: 331
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+updated CHANGELOG for 08 release.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-19 06:48:45 UTC (rev 330)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-27 01:13:38 UTC (rev 331)
+@@ -3,7 +3,51 @@
+ ----+----|----+----|----+----|----+----|----+----|----+----|----+----|----+----|
+ 
+ 
++ChangeLog (IOMETER2 - 2008.06.18rc1):
++==================================
+ 
++-All of the following changes pertain to Windows. Infrastructure is in place to
++ enable this for other OSes but some coding is still required
++ -The following defines must be turned on for successful compatibility with the
++  IOMeter GUI: USE_NEW_DISCOVERY_MECHANISM, FORCE_STRUCT_ALIGN (more info below)
++
++-New disk detection and common structure changes (USE_NEW_DISCOVERY_MECHANISM)
++ -volume mount point support
++ -improved raw disk detection and soft raid awareness
++ -improved networking detection
++ -backwards compatiblity for older versions of Windows
++ -new display names for disks in Iometer GUI (e.g. inquiry info for raw disks)
++ -display raw disks with partitions using /force_raw option in dynamo
++  -iometer hierarchically chains raw disks to corresponding volumes if any
++  -other OSes need to do some coding to enable this, else works as before
++
++-Abstracted timer code
++ -added speed step detection
++ -default timer for x86 is Windows high-perf counter (Intel)
++ -Win64 attempts the TSC first and falls back to high-perf counter
++  -use /no_rdtsc in dynamo to disable the use of TSC and force high-perf cntr
++ -other OSes need to do some coding to enable this, else works as before
++
++-CPU affinity (IOMTR_SETTING_CPU_AFFINITY)
++ -existing cmdline option trims the affinity set to whatever you specify
++ -each worker is now affinitized to a single CPU
++ -CPUs are round robined within a given affinity mask
++ -other OSes need to do some coding to enable, else default behavior
++
++-Full 64bit disk sizes supported 
++ -including specifying start offset in GUI
++
++-Structure packing (FORCE_STRUCT_ALIGN)
++ -structure are 8byte aligned with compiler directive
++ -should not need padding members for compatibility for other OSes
++
++-Project/solution files
++ -created new Visual Studio 2005 solution files in \msvc
++  -binaries get deposited within there
++ -ddk binaries will end up in \ddk once you run the first build
++
++
++
+ ChangeLog (IOMETER2 - 200X.XX.XX):
+ ==================================
+ 
+
+
+
+From cheungming at mail.berlios.de  Mon Jun 30 23:58:17 2008
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Mon, 30 Jun 2008 23:58:17 +0200
+Subject: [Iometer-svn] r332 - branches/IOMETER-restruct/iometer
+Message-ID: <200806302158.m5ULwHW6022728@sheep.berlios.de>
+
+Author: cheungming
+Date: 2008-06-30 23:58:16 +0200 (Mon, 30 Jun 2008)
+New Revision: 332
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/CREDITS
+Log:
+updated CHANGELOG and CREDITS
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-27 01:13:38 UTC (rev 331)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-30 21:58:16 UTC (rev 332)
+@@ -54,7 +54,11 @@
+ - New features:
+    - Added a simple INSTALL file about how to install iometer and dynamo on 
+      various platforms.
+-
++   - Patch by Kris Murray and Allen Wayne from Intel on randomizing the written
++     data. The previous implementation of writing 0's causes an un-desired side-effect 
++     on some media, especially flash-based devices. The writing of random data 
++     creates a realistic workload for these new devices. (Also data patten will have impact
++     on protocol like iSCSI as well).
+ - Bug fixes:
+    - Patch by Ming Zhang to fix the way to get CPU utilization statistics under
+      Linux.
+
+Modified: branches/IOMETER-restruct/iometer/CREDITS
+===================================================================
+--- branches/IOMETER-restruct/iometer/CREDITS	2008-06-27 01:13:38 UTC (rev 331)
++++ branches/IOMETER-restruct/iometer/CREDITS	2008-06-30 21:58:16 UTC (rev 332)
+@@ -93,3 +93,8 @@
+ E: ian at zestysoft.com
+ D: Provided a perl script to generate graphs.
+ 
++N: Kris Murray and Allen Wayne
++C: INTEL
++D: Added code to randomize the written data. Also initial drop
++   of the new timer code on Windows platform.
++
+
+
+

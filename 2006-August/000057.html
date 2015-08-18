@@ -1,0 +1,212 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r288 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r288%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608211914.k7LJEEXF027791%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000056.html">
+   <LINK REL="Next"  HREF="000058.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r288 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r288%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608211914.k7LJEEXF027791%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r288 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Mon Aug 21 21:14:14 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000056.html">[Iometer-svn] r287 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+        <LI>Next message: <A HREF="000058.html">[Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-21 21:14:10 +0200 (Mon, 21 Aug 2006)
+New Revision: 288
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/Galileo.rc
+   branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+Log:
+added support for optional display Bigmeter when iometer starts.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-21 19:14:10 UTC (rev 288)
+@@ -8,6 +8,7 @@
+ ==================================
+ 
+ - Applied patches:
++   - Patch by Ming Zhang to support optional display BigMeter when iometer starts.
+    - Patch by Ming Zhang to allow iometer and dynamo use specified port.
+    - Patch by Ming Zhang to fix 2 memory leaks in ICFOpenDialog and ICFSaveDialog
+      class.
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo.rc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-08-21 19:14:10 UTC (rev 288)
+@@ -1011,7 +1011,7 @@
+     ID_FILE_SAVE_AS         &quot;Save the active document with a new name\nSave As&quot;
+     IDS_OPEN_DIALOG_TITLE   &quot;Open Test Configuration File&quot;
+     IDS_SAVE_DIALOG_TITLE   &quot;Save Test Configuration File&quot;
+-    IDS_CMDLINE_SYNTAX      &quot;SYNTAX\niometer\niometer /?\niometer config_file [result_file [timeout_value]]\niometer [/c config_file] [/r results_file] [/t timeout_value]\n\n    ? - show Iometer version number and command line syntax\n\n    config_file - the name of the Iometer configuration file to restore\n\twhen Iometer starts (must be a valid .icf file)\n\n    results_file - the name of a writable text file to which the test\n\tresults should be appended.  If the file doesn't exist, it will be\n\tcreated.\n\n    timeout_value - the number of seconds to wait for managers to log in\n\twhen restoring a config file.\n\n    port_number - the port number iometer listens on.\n\n    If both config_file and results_file are specified, Iometer will\n    attempt to run the test in batch mode, requiring no user intervention\n    to load the config file, start the tests, stop the tests (if a run time\n    was specified in the Test Setup tab), and close Iometer.  Batch mode\n    can !
+ be canceled by aborting the manager waiting list dialog or by\n    manually stopping a test while it is running.&quot;
++    IDS_CMDLINE_SYNTAX      &quot;SYNTAX\niometer\niometer /?\niometer config_file [result_file [timeout_value]]\niometer [/c config_file] [/r results_file] [/t timeout_value] [/p port] [/m 1]\n\n    ? - show Iometer version number and command line syntax\n\n    config_file - the name of the Iometer configuration file to restore\n\twhen Iometer starts (must be a valid .icf file)\n\n    results_file - the name of a writable text file to which the test\n\tresults should be appended.  If the file doesn't exist, it will be\n\tcreated.\n\n    timeout_value - the number of seconds to wait for managers to log in\n\twhen restoring a config file.\n\n    port_number - the port number iometer listens on.\n\n    specify /m option will have BigMeter shown automatically.\n\n    If both config_file and results_file are specified, Iometer will\n    attempt to run the test in batch mode, requiring no user intervention\n    to load the config file, start the tests, stop the tests (if a run time\n!
+     was specified in the Test Setup tab), and close Iometer.  Batch mode\n    can be canceled by aborting the manager waiting list dialog or by\n    manually stopping a test while it is running.&quot;
+     IDS_VERSION_OUTPUT      &quot;Version %s &quot;
+ END
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoApp.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoApp.cpp	2006-08-21 19:14:10 UTC (rev 288)
+@@ -194,7 +194,7 @@
+ 	//
+ 	// iometer ?
+ 	// iometer [config_file [result_file [timeout_value]]]
+-	// iometer [/c config_file] [/r results_file] [/t timeout_value] [/p port_number]
++	// iometer [/c config_file] [/r results_file] [/t timeout_value] [/p port_number] [/m 1]
+ 	//
+ 	//    ? - show Iometer version number and command line syntax
+ 	//
+@@ -210,6 +210,9 @@
+ 	//
+ 	//    port_number - allow iometer listen on this port instead of default port.
+ 	//
++	//    specify /m option will have BigMeter shown automatically. The 
++	//       parameter must be 1.
++	//
+ 	//    If both config_file and results_file are specified, Iometer will
+ 	//    attempt to run the test in batch mode, requiring no user intervention
+ 	//    to load the config file, start the tests, stop the tests (if a run time
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.cpp	2006-08-21 19:14:10 UTC (rev 288)
+@@ -89,7 +89,7 @@
+ const char CGalileoCmdLine::DefaultConfigFile[] = &quot;iometer.icf&quot;;
+ 
+ CGalileoCmdLine::CGalileoCmdLine():m_bSwitches(FALSE), m_bFail(FALSE),
+-m_sConfigFile(&quot;&quot;), m_sResultFile(&quot;&quot;), m_iTimeout(-1), m_bOverrideBatch(FALSE), m_iLoginportnumber(0)
++m_sConfigFile(&quot;&quot;), m_sResultFile(&quot;&quot;), m_iTimeout(-1), m_bOverrideBatch(FALSE), m_iLoginportnumber(0), m_bShowBigmeter(FALSE)
+ {
+ }
+ 
+@@ -190,6 +190,18 @@
+ 				Fail(&quot;P switch should be followed by a valid port value (1-65535).&quot;);
+ 			}
+ 			return;
++			// Check if need to show Bigmeter automatically
++		case 'M':
++			if (m_bShowBigmeter == TRUE)	// has it already been set?
++			{
++				Fail(&quot;Show Bigmeter parameter was specified more than once.&quot;);
++			} else {
++				int i = atoi(pszParam);
++
++				if (i == 1)
++					m_bShowBigmeter = TRUE;
++			}
++			return;
+ 		default:
+ 			{
+ 				char tmpary[2] = { last_switch, 0 };
+@@ -304,6 +316,11 @@
+ 	return m_iLoginportnumber;
+ }
+ 
++BOOL CGalileoCmdLine::GetShowBigmeter()
++{
++	return m_bShowBigmeter;
++}
++
+ //
+ // Is Iometer in batch mode?
+ //
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoCmdLine.h	2006-08-21 19:14:10 UTC (rev 288)
+@@ -74,6 +74,7 @@
+ 	CString GetResultFile();
+ 	int GetTimeout();
+ 	int GetLoginportnumber();
++	BOOL GetShowBigmeter();
+ 
+ 	// Interactive mode is the normal mode of operation for Iometer.
+ 	// If the user specifies both the config file and the results file
+@@ -103,6 +104,7 @@
+ 	CString m_sResultFile;	// the specified result file
+ 	int m_iTimeout;		// the specified timeout value
+ 	int m_iLoginportnumber; // the specified port number
++	BOOL m_bShowBigmeter;// automatically show bigmeter
+ 
+ 	BOOL m_bOverrideBatch;	// if set, forces IsBatchMode to return FALSE
+ };
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 18:08:39 UTC (rev 287)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-08-21 19:14:10 UTC (rev 288)
+@@ -797,6 +797,10 @@
+ 
+ 	m_pPageDisplay-&gt;Update();
+ 
++	// display BigMeter if need
++	if (theApp.cmdline.GetShowBigmeter())
++		m_pPageDisplay-&gt;ShowBigMeter(0);
++
+ 	// Display the current test status.
+ 	UpdateTestStatus();
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000056.html">[Iometer-svn] r287 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+	<LI>Next message: <A HREF="000058.html">[Iometer-svn] r289 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#57">[ date ]</a>
+              <a href="thread.html#57">[ thread ]</a>
+              <a href="subject.html#57">[ subject ]</a>
+              <a href="author.html#57">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

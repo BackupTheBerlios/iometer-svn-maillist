@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r310 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r310%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200610270048.k9R0mijF008807%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000080.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r310 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r310%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200610270048.k9R0mijF008807%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r310 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 27 02:48:44 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000080.html">[Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#79">[ date ]</a>
+              <a href="thread.html#79">[ thread ]</a>
+              <a href="subject.html#79">[ subject ]</a>
+              <a href="author.html#79">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-10-27 02:48:42 +0200 (Fri, 27 Oct 2006)
+New Revision: 310
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+Log:
+should used _SC_NPROCESSORS_ONLN for cpu count.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-09-29 20:59:14 UTC (rev 309)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-27 00:48:42 UTC (rev 310)
+@@ -159,7 +159,7 @@
+ int Performance::Get_Processor_Count()
+ {
+ 	/* glib will do all parsing work for us from /proc/stat */
+-	return (sysconf(_SC_NPROCESSORS_CONF));
++	return (sysconf(_SC_NPROCESSORS_ONLN));
+ }
+ 
+ //
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000080.html">[Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#79">[ date ]</a>
+              <a href="thread.html#79">[ thread ]</a>
+              <a href="subject.html#79">[ subject ]</a>
+              <a href="author.html#79">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

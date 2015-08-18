@@ -1,0 +1,1207 @@
+From cheungming at berlios.de  Tue May  2 01:12:36 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 2 May 2006 01:12:36 +0200
+Subject: [Iometer-svn] r256 - branches/IOMETER-restruct/iometer/src/iomtr_kstat
+Message-ID: <200605012312.k41NCaa0004268@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-02 01:11:59 +0200 (Tue, 02 May 2006)
+New Revision: 256
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c
+Log:
+Minor fix by Wolstenholme, Daniel E <daniel.e.wolstenholme AT intel.com>
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c	2006-04-27 21:20:39 UTC (rev 255)
++++ branches/IOMETER-restruct/iometer/src/iomtr_kstat/iomtr_kstat.c	2006-05-01 23:11:59 UTC (rev 256)
+@@ -271,7 +271,8 @@
+ 			t.retranssegs += tcp_statistics[ 2 * cpu_logical_map(i)].TcpRetransSegs;
+ 			t.retranssegs += tcp_statistics[ 2 * cpu_logical_map(i) + 1].TcpRetransSegs;
+ 		}
+-#elif IOMTR_OSVERSION_LINUX26
++#endif
++#ifdef IOMTR_OSVERSION_LINUX26
+ 		for (i = 0; i < NR_CPUS; i++) {
+ 			if (!cpu_possible(i))
+ 				continue;
+
+
+
+From cheungming at berlios.de  Tue May  9 20:37:44 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 9 May 2006 20:37:44 +0200
+Subject: [Iometer-svn] r257 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200605091837.k49Ibiwc013346@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-09 20:37:25 +0200 (Tue, 09 May 2006)
+New Revision: 257
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+if fail to detect the physical disk, then exclude the disk. otherwise a zero size disk will lead to weired performance results.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-05-01 23:11:59 UTC (rev 256)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-05-09 18:37:25 UTC (rev 257)
+@@ -505,7 +505,7 @@
+ 		if (!Open(NULL)) {
+ #ifdef _DEBUG
+ 			cout << __FUNCTION__ << ": Open on \"" << file_name <<
+-			    "\" failed (error " << strerror(errno) << ").\n";
++			    "\" failed (error " << strerror(errno) << ")." << endl;
+ #endif
+ 			return (FALSE);
+ 		}
+@@ -525,7 +525,7 @@
+ 			statResult = statfs(filesysName, &fsInfo);
+ 		}
+ 		if (statResult < 0) {
+-			cerr << __FUNCTION__ << ": Couldn't statfs logical disk file!\n";
++			cerr << __FUNCTION__ << ": Couldn't statfs logical disk file!" << endl;
+ 			if (open_disk) {
+ 				Close(NULL);
+ 			}
+@@ -540,7 +540,7 @@
+ 			statResult = stat(file_name, &fileInfo);
+ 		}
+ 		if (statResult < 0) {
+-			cerr << __FUNCTION__ << ": Error " << strerror(errno) << "statting file " << file_name << "\n";
++			cerr << __FUNCTION__ << ": Error " << strerror(errno) << "statting file " << file_name << endl;
+ 			if (open_disk) {
+ 				Close(NULL);
+ 			}
+@@ -564,13 +564,19 @@
+ 	} else {
+ 		spec.disk_info.sector_size = getSectorSizeOfPhysDisk(file_name);
+ 		if (spec.disk_info.sector_size == 0) {
+-			cerr << __FUNCTION__ << ": Failed to get sector size. Aborting " << "target.\n";
++			cerr << __FUNCTION__ << ": Failed to get sector size for " << file_name << ". Skip it." << endl;
+ 			if (open_disk) {
+ 				Close(NULL);
+ 			}
+ 			return (FALSE);
+ 		}
+ 		size = getSizeOfPhysDisk(file_name);
++		if (size == 0) {
++			cerr << __FUNCTION__ << ": Failed to get device size for " << file_name << ". Skip it." << endl;
++			if (open_disk)
++				Close(NULL);
++			return (FALSE);
++		}
+ 		alignment = 0;
+ 		sector_align_mask = ~((DWORDLONG) spec.disk_info.sector_size - 1);
+ 		ending_position = size;
+@@ -601,7 +607,7 @@
+ 		if (!Open(NULL)) {
+ #ifdef _DEBUG
+ 			cout << __FUNCTION__ << ": Open on \"" << file_name <<
+-			    "\" failed (error " << strerror(errno) << ").\n";
++			    "\" failed (error " << strerror(errno) << ")." << endl;
+ #endif
+ 			return (FALSE);
+ 		}
+@@ -624,10 +630,9 @@
+ 		netware_vol_info(&spaceInfo, (int *)&fsInfo.st_dev);
+ 
+ 		if (statResult < 0) {
+-			printf("%s: Couldn't stat logical disk file!\n", __FUNCTION__);
+-			if (open_disk) {
++			cerr << __FUNCTION__ << ": Couldn't stat logical disk file!" << endl;
++			if (open_disk)
+ 				Close(NULL);
+-			}
+ 			return (FALSE);
+ 		}
+ 		spec.disk_info.sector_size = spaceInfo.SectorsPerCluster;
+@@ -639,7 +644,7 @@
+ 			statResult = stat(file_name, &fileInfo);
+ 		}
+ 		if (statResult < 0) {
+-			printf("%s: Error %s statting file %s\n", __FUNCTION__, strerror(errno), file_name);
++			cerr << __FUNCTION__ << ": Error " << strerror(errno) << " statting file " << file_name << endl;
+ 			if (open_disk) {
+ 				Close(NULL);
+ 			}
+@@ -1212,7 +1217,7 @@
+ 
+ 						if (bytes_written != bytes) {
+ 							cout << "***Error (eventually); wrote only " << bytes_written
+-							    << " of " << bytes << " bytes!\n";
++							    << " of " << bytes << " bytes!" << endl;
+ 							retval = FALSE;
+ 							write_ok = FALSE;
+ 							break;
+@@ -1283,7 +1288,7 @@
+ 		// nothing in the drive.
+ #if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
+ 		((struct File *)disk_file)->fd =
+-		    open(file_name, O_DIRECT| O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
++		    open(file_name, O_DIRECT | O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		NXFileOpen(0, (void *)file_name, (NXMode_t) (NX_O_RDWR | NX_O_CREAT | open_flag),
+ 			   &((struct File *)disk_file)->fd);
+@@ -1821,11 +1826,14 @@
+ 		return 0;
+ 	}
+ 	if (ioctl(fd, BLKGETSIZE64, &sz64) < 0) {
++#ifdef _DEBUG
+ 		cerr << "Fail to get size for " << fullDevName << " by BLKGETSIZE64" << endl;
++#endif
+ 		if (ioctl(fd, BLKGETSIZE, &sz32) < 0) {
++#ifdef _DEBUG
+ 			cerr << "Fail to get size for " << fullDevName << "by BLKGETSIZE" << endl;
+-			close(fd);
+-			return 0;
++#endif
++			sz64 = 0;
+ 		} else {
+ 			sz64 = sz32;
+ 			sz64 <<= 9;
+
+
+
+From cheungming at berlios.de  Tue May 16 16:18:59 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 16 May 2006 16:18:59 +0200
+Subject: [Iometer-svn] r258 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200605161418.k4GEIxZo008181@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-16 16:18:57 +0200 (Tue, 16 May 2006)
+New Revision: 258
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+Log:
+previous indent wrongly format the embedded asm code and break windows build. fixed.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-05-09 18:37:25 UTC (rev 257)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-05-16 14:18:57 UTC (rev 258)
+@@ -270,9 +270,10 @@
+ extern DWORDLONG rdtsc()
+ {
+ 	_asm {
+-		_emit 0F h	// Store low  32-bits of counter in EAX.
+-		    _emit 31 h	// Store high 32-bits of counter in EDX.
+-	ret}
++		_emit 0Fh	// Store low  32-bits of counter in EAX.
++		_emit 31h	// Store high 32-bits of counter in EDX.
++		ret
++	}
+ }
+ 
+ // ----------------------------------------------------------------------------
+
+
+
+From cheungming at berlios.de  Tue May 16 16:22:37 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 16 May 2006 16:22:37 +0200
+Subject: [Iometer-svn] r259 - in branches/IOMETER-restruct/iometer/src: . Debug
+Message-ID: <200605161422.k4GEMb6j009200@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-16 16:22:36 +0200 (Tue, 16 May 2006)
+New Revision: 259
+
+Added:
+   branches/IOMETER-restruct/iometer/src/Dynamo.vcproj
+   branches/IOMETER-restruct/iometer/src/Iometer.sln
+   branches/IOMETER-restruct/iometer/src/Iometer.suo
+   branches/IOMETER-restruct/iometer/src/Iometer.vcproj
+Modified:
+   branches/IOMETER-restruct/iometer/src/Debug/
+Log:
+added some VS.net project management files.
+
+
+Property changes on: branches/IOMETER-restruct/iometer/src/Debug
+___________________________________________________________________
+Name: svn:ignore
+   - *.sbr
+*.pch
+*.ilk
+*.res
+*.pdb
+*.idb
+   + *.sbr
+*.pch
+*.ilk
+*.res
+*.pdb
+*.idb
+BuildLog.htm
+
+
+Added: branches/IOMETER-restruct/iometer/src/Dynamo.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Dynamo.vcproj	2006-05-16 14:18:57 UTC (rev 258)
++++ branches/IOMETER-restruct/iometer/src/Dynamo.vcproj	2006-05-16 14:22:36 UTC (rev 259)
+@@ -0,0 +1,205 @@
++<?xml version="1.0" encoding = "gb2312"?>
++<VisualStudioProject
++	ProjectType="Visual C++"
++	Version="7.00"
++	Name="Dynamo"
++	SccProjectName=""
++	SccLocalPath="">
++	<Platforms>
++		<Platform
++			Name="Win32"/>
++	</Platforms>
++	<Configurations>
++		<Configuration
++			Name="Debug|Win32"
++			OutputDirectory=".\Debug"
++			IntermediateDirectory=".\Debug"
++			ConfigurationType="1"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="FALSE"
++			CharacterSet="2">
++			<Tool
++				Name="VCCLCompilerTool"
++				Optimization="0"
++				PreprocessorDefinitions="IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_DEBUG,_CONSOLE"
++				BasicRuntimeChecks="3"
++				RuntimeLibrary="1"
++				PrecompiledHeaderFile=".\Debug/Dynamo.pch"
++				AssemblerListingLocation=".\Debug/"
++				ObjectFile=".\Debug/"
++				ProgramDataBaseFileName=".\Debug/"
++				BrowseInformation="1"
++				WarningLevel="3"
++				SuppressStartupBanner="TRUE"
++				DebugInformationFormat="4"/>
++			<Tool
++				Name="VCCustomBuildTool"/>
++			<Tool
++				Name="VCLinkerTool"
++				AdditionalOptions="/MACHINE:I386"
++				AdditionalDependencies="ws2_32.lib mswsock.lib version.lib"
++				OutputFile=".\Debug/Dynamo.exe"
++				LinkIncremental="1"
++				SuppressStartupBanner="TRUE"
++				GenerateDebugInformation="TRUE"
++				ProgramDatabaseFile=".\Debug/Dynamo.pdb"
++				SubSystem="1"/>
++			<Tool
++				Name="VCMIDLTool"
++				TypeLibraryName=".\Debug/Dynamo.tlb"/>
++			<Tool
++				Name="VCPostBuildEventTool"/>
++			<Tool
++				Name="VCPreBuildEventTool"/>
++			<Tool
++				Name="VCPreLinkEventTool"/>
++			<Tool
++				Name="VCResourceCompilerTool"
++				PreprocessorDefinitions="_DEBUG,_PULSAR_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386"
++				Culture="1033"/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"/>
++			<Tool
++				Name="VCWebDeploymentTool"/>
++		</Configuration>
++		<Configuration
++			Name="Release|Win32"
++			OutputDirectory=".\Release"
++			IntermediateDirectory=".\Release"
++			ConfigurationType="1"
++			UseOfMFC="0"
++			ATLMinimizesCRunTimeLibraryUsage="FALSE"
++			CharacterSet="2">
++			<Tool
++				Name="VCCLCompilerTool"
++				InlineFunctionExpansion="1"
++				PreprocessorDefinitions="IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_CONSOLE"
++				StringPooling="TRUE"
++				RuntimeLibrary="0"
++				EnableFunctionLevelLinking="TRUE"
++				UsePrecompiledHeader="2"
++				PrecompiledHeaderFile=".\Release/Dynamo.pch"
++				AssemblerListingLocation=".\Release/"
++				ObjectFile=".\Release/"
++				ProgramDataBaseFileName=".\Release/"
++				WarningLevel="3"
++				SuppressStartupBanner="TRUE"/>
++			<Tool
++				Name="VCCustomBuildTool"/>
++			<Tool
++				Name="VCLinkerTool"
++				AdditionalOptions="/MACHINE:I386"
++				AdditionalDependencies="ws2_32.lib mswsock.lib version.lib"
++				OutputFile=".\Release/Dynamo.exe"
++				LinkIncremental="1"
++				SuppressStartupBanner="TRUE"
++				ProgramDatabaseFile=".\Release/Dynamo.pdb"
++				SubSystem="1"/>
++			<Tool
++				Name="VCMIDLTool"
++				TypeLibraryName=".\Release/Dynamo.tlb"/>
++			<Tool
++				Name="VCPostBuildEventTool"/>
++			<Tool
++				Name="VCPreBuildEventTool"/>
++			<Tool
++				Name="VCPreLinkEventTool"/>
++			<Tool
++				Name="VCResourceCompilerTool"
++				PreprocessorDefinitions="_PULSAR_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386"
++				Culture="1033"/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"/>
++			<Tool
++				Name="VCWebDeploymentTool"/>
++		</Configuration>
++	</Configurations>
++	<Files>
++		<Filter
++			Name="Source Files"
++			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
++			<File
++				RelativePath=".\ByteOrder.cpp">
++			</File>
++			<File
++				RelativePath=".\IOAccess.cpp">
++			</File>
++			<File
++				RelativePath=".\IOCQAIO.cpp">
++			</File>
++			<File
++				RelativePath=".\IOCQVI.cpp">
++			</File>
++			<File
++				RelativePath=".\IOCompletionQ.cpp">
++			</File>
++			<File
++				RelativePath=".\IOGlobals.cpp">
++			</File>
++			<File
++				RelativePath=".\IOGrunt.cpp">
++			</File>
++			<File
++				RelativePath=".\IOManager.cpp">
++			</File>
++			<File
++				RelativePath=".\IOManagerWin.cpp">
++			</File>
++			<File
++				RelativePath=".\IOPerformance.cpp">
++			</File>
++			<File
++				RelativePath=".\IOPort.cpp">
++			</File>
++			<File
++				RelativePath=".\IOPortTCP.cpp">
++			</File>
++			<File
++				RelativePath=".\IOTarget.cpp">
++			</File>
++			<File
++				RelativePath=".\IOTargetDisk.cpp">
++			</File>
++			<File
++				RelativePath=".\IOTargetTCP.cpp">
++			</File>
++			<File
++				RelativePath=".\IOTargetVI.cpp">
++			</File>
++			<File
++				RelativePath=".\IOTime.cpp">
++			</File>
++			<File
++				RelativePath=".\IOVIPL.cpp">
++			</File>
++			<File
++				RelativePath=".\NetTCP.cpp">
++			</File>
++			<File
++				RelativePath=".\NetVI.cpp">
++			</File>
++			<File
++				RelativePath=".\Network.cpp">
++			</File>
++			<File
++				RelativePath=".\Pulsar.cpp">
++			</File>
++			<File
++				RelativePath=".\Pulsar.rc">
++			</File>
++			<File
++				RelativePath=".\VINic.cpp">
++			</File>
++		</Filter>
++		<Filter
++			Name="Header Files"
++			Filter="h;hpp;hxx;hm;inl">
++		</Filter>
++		<Filter
++			Name="Resource Files"
++			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
++		</Filter>
++	</Files>
++	<Globals>
++	</Globals>
++</VisualStudioProject>
+
+Added: branches/IOMETER-restruct/iometer/src/Iometer.sln
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Iometer.sln	2006-05-16 14:18:57 UTC (rev 258)
++++ branches/IOMETER-restruct/iometer/src/Iometer.sln	2006-05-16 14:22:36 UTC (rev 259)
+@@ -0,0 +1,27 @@
++Microsoft Visual Studio Solution File, Format Version 7.00
++Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dynamo", "Dynamo.vcproj", "{4C1D1FAE-5490-4D9C-9877-38B54E798468}"
++EndProject
++Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Iometer", "Iometer.vcproj", "{C9557683-0F9B-4A51-86C1-6107E8A345B3}"
++EndProject
++Global
++	GlobalSection(SolutionConfiguration) = preSolution
++		ConfigName.0 = Debug
++		ConfigName.1 = Release
++	EndGlobalSection
++	GlobalSection(ProjectDependencies) = postSolution
++	EndGlobalSection
++	GlobalSection(ProjectConfiguration) = postSolution
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Debug.ActiveCfg = Debug|Win32
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Debug.Build.0 = Debug|Win32
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Release.ActiveCfg = Release|Win32
++		{4C1D1FAE-5490-4D9C-9877-38B54E798468}.Release.Build.0 = Release|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Debug.ActiveCfg = Debug|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Debug.Build.0 = Debug|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Release.ActiveCfg = Release|Win32
++		{C9557683-0F9B-4A51-86C1-6107E8A345B3}.Release.Build.0 = Release|Win32
++	EndGlobalSection
++	GlobalSection(ExtensibilityGlobals) = postSolution
++	EndGlobalSection
++	GlobalSection(ExtensibilityAddIns) = postSolution
++	EndGlobalSection
++EndGlobal
+
+Added: branches/IOMETER-restruct/iometer/src/Iometer.suo
+===================================================================
+(Binary files differ)
+
+
+Property changes on: branches/IOMETER-restruct/iometer/src/Iometer.suo
+___________________________________________________________________
+Name: svn:mime-type
+   + application/octet-stream
+
+Added: branches/IOMETER-restruct/iometer/src/Iometer.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Iometer.vcproj	2006-05-16 14:18:57 UTC (rev 258)
++++ branches/IOMETER-restruct/iometer/src/Iometer.vcproj	2006-05-16 14:22:36 UTC (rev 259)
+@@ -0,0 +1,382 @@
++<?xml version="1.0" encoding = "gb2312"?>
++<VisualStudioProject
++	ProjectType="Visual C++"
++	Version="7.00"
++	Name="Iometer"
++	SccProjectName=""
++	SccLocalPath=""
++	Keyword="MFCProj">
++	<Platforms>
++		<Platform
++			Name="Win32"/>
++	</Platforms>
++	<Configurations>
++		<Configuration
++			Name="Release|Win32"
++			OutputDirectory=".\Release"
++			IntermediateDirectory=".\Release"
++			ConfigurationType="1"
++			UseOfMFC="1"
++			ATLMinimizesCRunTimeLibraryUsage="FALSE"
++			CharacterSet="2">
++			<Tool
++				Name="VCCLCompilerTool"
++				InlineFunctionExpansion="1"
++				PreprocessorDefinitions="IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_GALILEO_"
++				StringPooling="TRUE"
++				RuntimeLibrary="0"
++				EnableFunctionLevelLinking="TRUE"
++				UsePrecompiledHeader="2"
++				PrecompiledHeaderFile=".\Release/Iometer.pch"
++				AssemblerListingLocation=".\Release/"
++				ObjectFile=".\Release/"
++				ProgramDataBaseFileName=".\Release/"
++				WarningLevel="3"
++				SuppressStartupBanner="TRUE"/>
++			<Tool
++				Name="VCCustomBuildTool"/>
++			<Tool
++				Name="VCLinkerTool"
++				AdditionalOptions="/MACHINE:I386"
++				AdditionalDependencies="Ws2_32.lib Mswsock.lib Version.lib"
++				OutputFile=".\Release/Iometer.exe"
++				LinkIncremental="1"
++				SuppressStartupBanner="TRUE"
++				IgnoreDefaultLibraryNames="msvcrt.lib"
++				ProgramDatabaseFile=".\Release/Iometer.pdb"
++				SubSystem="2"/>
++			<Tool
++				Name="VCMIDLTool"
++				MkTypLibCompatible="TRUE"
++				SuppressStartupBanner="TRUE"
++				TargetEnvironment="1"
++				TypeLibraryName=".\Release/Iometer.tlb"/>
++			<Tool
++				Name="VCPostBuildEventTool"/>
++			<Tool
++				Name="VCPreBuildEventTool"/>
++			<Tool
++				Name="VCPreLinkEventTool"/>
++			<Tool
++				Name="VCResourceCompilerTool"
++				PreprocessorDefinitions="_GALILEO_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386"
++				Culture="1033"/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"/>
++			<Tool
++				Name="VCWebDeploymentTool"/>
++		</Configuration>
++		<Configuration
++			Name="Debug|Win32"
++			OutputDirectory=".\Debug"
++			IntermediateDirectory=".\Debug"
++			ConfigurationType="1"
++			UseOfMFC="1"
++			ATLMinimizesCRunTimeLibraryUsage="FALSE"
++			CharacterSet="2">
++			<Tool
++				Name="VCCLCompilerTool"
++				Optimization="0"
++				PreprocessorDefinitions="_DEBUG,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386,_DETAILS,_GALILEO_"
++				BasicRuntimeChecks="3"
++				RuntimeLibrary="1"
++				PrecompiledHeaderFile=".\Debug/Iometer.pch"
++				AssemblerListingLocation=".\Debug/"
++				ObjectFile=".\Debug/"
++				ProgramDataBaseFileName=".\Debug/"
++				BrowseInformation="1"
++				WarningLevel="3"
++				SuppressStartupBanner="TRUE"
++				DebugInformationFormat="4"/>
++			<Tool
++				Name="VCCustomBuildTool"/>
++			<Tool
++				Name="VCLinkerTool"
++				AdditionalOptions="/MACHINE:I386"
++				AdditionalDependencies="Ws2_32.lib Mswsock.lib Version.lib"
++				OutputFile=".\Debug/Iometer.exe"
++				LinkIncremental="1"
++				SuppressStartupBanner="TRUE"
++				GenerateDebugInformation="TRUE"
++				ProgramDatabaseFile=".\Debug/Iometer.pdb"
++				SubSystem="2"/>
++			<Tool
++				Name="VCMIDLTool"
++				PreprocessorDefinitions="_DEBUG"
++				MkTypLibCompatible="TRUE"
++				SuppressStartupBanner="TRUE"
++				TargetEnvironment="1"
++				TypeLibraryName=".\Debug/Iometer.tlb"/>
++			<Tool
++				Name="VCPostBuildEventTool"/>
++			<Tool
++				Name="VCPreBuildEventTool"/>
++			<Tool
++				Name="VCPreLinkEventTool"/>
++			<Tool
++				Name="VCResourceCompilerTool"
++				PreprocessorDefinitions="_DEBUG,_GALILEO_,IOMTR_OSFAMILY_WINDOWS,IOMTR_OS_WIN32,IOMTR_CPU_I386"
++				Culture="1033"/>
++			<Tool
++				Name="VCWebServiceProxyGeneratorTool"/>
++			<Tool
++				Name="VCWebDeploymentTool"/>
++		</Configuration>
++	</Configurations>
++	<Files>
++		<Filter
++			Name="Source Files"
++			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
++			<File
++				RelativePath=".\AccessDialog.cpp">
++			</File>
++			<File
++				RelativePath=".\AccessSpecList.cpp">
++			</File>
++			<File
++				RelativePath=".\BigMeter.cpp">
++			</File>
++			<File
++				RelativePath=".\GalileoApp.cpp">
++			</File>
++			<File
++				RelativePath=".\GalileoCmdLine.cpp">
++			</File>
++			<File
++				RelativePath=".\GalileoDoc.cpp">
++			</File>
++			<File
++				RelativePath=".\GalileoGlobals.cpp">
++			</File>
++			<File
++				RelativePath=".\GalileoView.cpp">
++			</File>
++			<File
++				RelativePath=".\ICFOpenDialog.cpp">
++			</File>
++			<File
++				RelativePath=".\ICFSaveDialog.cpp">
++			</File>
++			<File
++				RelativePath=".\ICF_ifstream.cpp">
++			</File>
++			<File
++				RelativePath=".\IOAccess.cpp">
++			</File>
++			<File
++				RelativePath=".\IOGlobals.cpp">
++			</File>
++			<File
++				RelativePath=".\IOPort.cpp">
++			</File>
++			<File
++				RelativePath=".\IOPortTCP.cpp">
++			</File>
++			<File
++				RelativePath=".\IOTime.cpp">
++			</File>
++			<File
++				RelativePath=".\LegalBox.cpp">
++			</File>
++			<File
++				RelativePath=".\MainFrm.cpp">
++			</File>
++			<File
++				RelativePath=".\Manager.cpp">
++			</File>
++			<File
++				RelativePath=".\ManagerList.cpp">
++			</File>
++			<File
++				RelativePath=".\ManagerMap.cpp">
++			</File>
++			<File
++				RelativePath=".\MeterCtrl.cpp">
++			</File>
++			<File
++				RelativePath=".\PageAccess.cpp">
++			</File>
++			<File
++				RelativePath=".\PageDisk.cpp">
++			</File>
++			<File
++				RelativePath=".\PageDisplay.cpp">
++			</File>
++			<File
++				RelativePath=".\PageNetwork.cpp">
++			</File>
++			<File
++				RelativePath=".\PageSetup.cpp">
++			</File>
++			<File
++				RelativePath=".\StdAfx.cpp">
++			</File>
++			<File
++				RelativePath=".\TextDisplay.cpp">
++			</File>
++			<File
++				RelativePath=".\WaitingForManagers.cpp">
++			</File>
++			<File
++				RelativePath=".\Worker.cpp">
++			</File>
++			<File
++				RelativePath=".\WorkerView.cpp">
++			</File>
++		</Filter>
++		<Filter
++			Name="Header Files"
++			Filter="h;hpp;hxx;hm;inl">
++			<File
++				RelativePath=".\AccessDialog.h">
++			</File>
++			<File
++				RelativePath=".\AccessSpecList.h">
++			</File>
++			<File
++				RelativePath=".\BigMeter.h">
++			</File>
++			<File
++				RelativePath=".\GalileoApp.h">
++			</File>
++			<File
++				RelativePath=".\GalileoCmdLine.h">
++			</File>
++			<File
++				RelativePath=".\GalileoDefs.h">
++			</File>
++			<File
++				RelativePath=".\GalileoDoc.h">
++			</File>
++			<File
++				RelativePath=".\GalileoView.h">
++			</File>
++			<File
++				RelativePath=".\ICFOpenDialog.h">
++			</File>
++			<File
++				RelativePath=".\ICFSaveDialog.h">
++			</File>
++			<File
++				RelativePath=".\ICF_ifstream.h">
++			</File>
++			<File
++				RelativePath=".\IOAccess.h">
++			</File>
++			<File
++				RelativePath=".\IOCommon.h">
++			</File>
++			<File
++				RelativePath=".\IOPort.h">
++			</File>
++			<File
++				RelativePath=".\IOPortTCP.h">
++			</File>
++			<File
++				RelativePath=".\IOSTREAM">
++			</File>
++			<File
++				RelativePath=".\IOTest.h">
++			</File>
++			<File
++				RelativePath=".\IOTransfers.h">
++			</File>
++			<File
++				RelativePath=".\IOVersion.h">
++			</File>
++			<File
++				RelativePath=".\ISTREAM">
++			</File>
++			<File
++				RelativePath=".\LegalBox.h">
++			</File>
++			<File
++				RelativePath=".\MainFrm.h">
++			</File>
++			<File
++				RelativePath=".\Manager.h">
++			</File>
++			<File
++				RelativePath=".\ManagerList.h">
++			</File>
++			<File
++				RelativePath=".\ManagerMap.h">
++			</File>
++			<File
++				RelativePath=".\MeterCtrl.h">
++			</File>
++			<File
++				RelativePath=".\OSTREAM">
++			</File>
++			<File
++				RelativePath=".\PageAccess.h">
++			</File>
++			<File
++				RelativePath=".\PageDisk.h">
++			</File>
++			<File
++				RelativePath=".\PageDisplay.h">
++			</File>
++			<File
++				RelativePath=".\PageNetwork.h">
++			</File>
++			<File
++				RelativePath=".\PageSetup.h">
++			</File>
++			<File
++				RelativePath=".\PageTarget.h">
++			</File>
++			<File
++				RelativePath=".\StdAfx.h">
++			</File>
++			<File
++				RelativePath=".\TextDisplay.h">
++			</File>
++			<File
++				RelativePath=".\WaitingForManagers.h">
++			</File>
++			<File
++				RelativePath=".\Worker.h">
++			</File>
++			<File
++				RelativePath=".\WorkerView.h">
++			</File>
++			<File
++				RelativePath=".\vipl.h">
++			</File>
++		</Filter>
++		<Filter
++			Name="Resource Files"
++			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
++			<File
++				RelativePath=".\res\Galileo.ico">
++			</File>
++			<File
++				RelativePath=".\Galileo.rc">
++			</File>
++			<File
++				RelativePath=".\res\GalileoDoc.ico">
++			</File>
++			<File
++				RelativePath=".\res\Iometer.rc2">
++			</File>
++			<File
++				RelativePath=".\res\LED.bmp">
++			</File>
++			<File
++				RelativePath=".\res\access.bmp">
++			</File>
++			<File
++				RelativePath=".\resource.h">
++			</File>
++			<File
++				RelativePath=".\res\ticons.bmp">
++			</File>
++			<File
++				RelativePath=".\res\wicons.bmp">
++			</File>
++		</Filter>
++	</Files>
++	<Globals>
++	</Globals>
++</VisualStudioProject>
+
+
+
+From cheungming at berlios.de  Tue May 16 16:31:42 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 16 May 2006 16:31:42 +0200
+Subject: [Iometer-svn] r260 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200605161431.k4GEVgNk010700@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-16 16:31:32 +0200 (Tue, 16 May 2006)
+New Revision: 260
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/GalileoDoc.cpp
+   branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+   branches/IOMETER-restruct/iometer/src/MainFrm.cpp
+Log:
+still, fix some error introduced by indent. No idea why indent will introduce an extra "const" in some code pieces.
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoDoc.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoDoc.cpp	2006-05-16 14:22:36 UTC (rev 259)
++++ branches/IOMETER-restruct/iometer/src/GalileoDoc.cpp	2006-05-16 14:31:32 UTC (rev 260)
+@@ -130,12 +130,12 @@
+ // CGalileoDoc diagnostics
+ 
+ #ifdef _DEBUG
+-void CGalileoDoc::AssertValid() const const
++void CGalileoDoc::AssertValid() const
+ {
+ 	CDocument::AssertValid();
+ }
+ 
+-void CGalileoDoc::Dump(CDumpContext & dc) const const
++void CGalileoDoc::Dump(CDumpContext & dc) const
+ {
+ 	CDocument::Dump(dc);
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/GalileoView.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-05-16 14:22:36 UTC (rev 259)
++++ branches/IOMETER-restruct/iometer/src/GalileoView.cpp	2006-05-16 14:31:32 UTC (rev 260)
+@@ -293,12 +293,12 @@
+ // CGalileoView diagnostics
+ 
+ #ifdef _DEBUG
+-void CGalileoView::AssertValid() const const
++void CGalileoView::AssertValid() const
+ {
+ 	CView::AssertValid();
+ }
+ 
+-void CGalileoView::Dump(CDumpContext & dc) const const
++void CGalileoView::Dump(CDumpContext & dc) const
+ {
+ 	CView::Dump(dc);
+ }
+
+Modified: branches/IOMETER-restruct/iometer/src/MainFrm.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/MainFrm.cpp	2006-05-16 14:22:36 UTC (rev 259)
++++ branches/IOMETER-restruct/iometer/src/MainFrm.cpp	2006-05-16 14:31:32 UTC (rev 260)
+@@ -153,12 +153,12 @@
+ // CMainFrame diagnostics
+ 
+ #ifdef _DEBUG
+-void CMainFrame::AssertValid() const const
++void CMainFrame::AssertValid() const
+ {
+ 	CFrameWnd::AssertValid();
+ }
+ 
+-void CMainFrame::Dump(CDumpContext & dc) const const
++void CMainFrame::Dump(CDumpContext & dc) const
+ {
+ 	CFrameWnd::Dump(dc);
+ }
+
+
+
+From cheungming at berlios.de  Tue May 16 16:39:16 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 16 May 2006 16:39:16 +0200
+Subject: [Iometer-svn] r261 - in branches/IOMETER-restruct/iometer: misc/Installer src/Release
+Message-ID: <200605161439.k4GEdGt5011866@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-16 16:39:14 +0200 (Tue, 16 May 2006)
+New Revision: 261
+
+Modified:
+   branches/IOMETER-restruct/iometer/misc/Installer/
+   branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+   branches/IOMETER-restruct/iometer/src/Release/
+Log:
+update the installer script with new date information.
+
+
+Property changes on: branches/IOMETER-restruct/iometer/misc/Installer
+___________________________________________________________________
+Name: svn:ignore
+   + *.exe
+
+
+Modified: branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+===================================================================
+--- branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-05-16 14:31:32 UTC (rev 260)
++++ branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-05-16 14:39:14 UTC (rev 261)
+@@ -49,10 +49,10 @@
+ 
+ ##### Global settings
+ #------------------------------------------------------------------------------
+-Name "Iometer 2004.07.30"
++Name "Iometer 2006.05"
+ 
+-OutFile "iometer-2004.07.30.win32.i386-setup.exe"
+-InstallDir "$PROGRAMFILES\Iometer.org\Iometer 2004.07.30"
++OutFile "iometer-2006.05.win32.i386-setup.exe"
++InstallDir "$PROGRAMFILES\Iometer.org\Iometer 2006.05"
+ 
+ CRCCheck on
+ XPStyle on
+@@ -126,19 +126,19 @@
+ #------------------------------------------------------------------------------
+ Section "Start Menu Shortcuts" SectionStartMenu
+ 
+-	CreateDirectory "$SMPROGRAMS\Iometer 2004.07.30"
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2004.07.30\Iometer.lnk"                     "$INSTDIR\iometer.exe"   "" "$INSTDIR\iometer.exe"   0
++	CreateDirectory "$SMPROGRAMS\Iometer 2006.05"
++	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05\Iometer.lnk"                     "$INSTDIR\iometer.exe"   "" "$INSTDIR\iometer.exe"   0
+         IfFileExists "$INSTDIR\iometer.pdf"   "" +2
+-		CreateShortCut "$SMPROGRAMS\Iometer 2004.07.30\Iometer Users Guide.lnk"  "$INSTDIR\iometer.pdf"   "" "$INSTDIR\iometer.pdf"   0
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2004.07.30\Import Wizard for MS Access.lnk" "$INSTDIR\Wizard.mdb"    "" "$INSTDIR\Wizard.mdb"    0
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2004.07.30\Uninstall Iometer.lnk"           "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
++		CreateShortCut "$SMPROGRAMS\Iometer 2006.05\Iometer Users Guide.lnk"  "$INSTDIR\iometer.pdf"   "" "$INSTDIR\iometer.pdf"   0
++	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05\Import Wizard for MS Access.lnk" "$INSTDIR\Wizard.mdb"    "" "$INSTDIR\Wizard.mdb"    0
++	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05\Uninstall Iometer.lnk"           "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+ 
+ SectionEnd
+ #------------------------------------------------------------------------------
+ Section "Uninstall"
+   
+-	Delete "$SMPROGRAMS\Iometer 2004.07.30\*.*"
+-	RMDir  "$SMPROGRAMS\Iometer 2004.07.30"
++	Delete "$SMPROGRAMS\Iometer 2006.05\*.*"
++	RMDir  "$SMPROGRAMS\Iometer 2006.05"
+ 
+ 	Delete "$INSTDIR\Iometer.exe"
+ 	Delete "$INSTDIR\Dynamo.exe"
+
+
+Property changes on: branches/IOMETER-restruct/iometer/src/Release
+___________________________________________________________________
+Name: svn:ignore
+   - *.sbr
+*.pch
+*.ilk
+*.res
+*.pdb
+*.idb
+   + *.sbr
+*.pch
+*.ilk
+*.res
+*.pdb
+*.idb
+BuildLog.htm
+
+
+
+
+From cheungming at berlios.de  Tue May 16 16:59:35 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 16 May 2006 16:59:35 +0200
+Subject: [Iometer-svn] r262 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200605161459.k4GExZtq022504@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-16 16:59:27 +0200 (Tue, 16 May 2006)
+New Revision: 262
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo.rc
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+   branches/IOMETER-restruct/iometer/src/Iometer.suo
+Log:
+update the version information.
+also no idea how people enter that special copyright mark into text file. now replace it with much simpler (c)
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo.rc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-05-16 14:39:14 UTC (rev 261)
++++ branches/IOMETER-restruct/iometer/src/Galileo.rc	2006-05-16 14:59:27 UTC (rev 262)
+@@ -336,7 +336,7 @@
+ BEGIN
+     ICON            IDR_MAINFRAME,IDC_STATIC,15,15,20,20
+     CTEXT           "Iometer ",TVersion,54,10,145,8,SS_NOPREFIX
+-    CTEXT           "Copyright ? 1996-1999 Intel Corporation\nEnterprise Server Group\nSean Hefty, David Levine, and Fab Tillier\n\nOpen Source since 2001\nHosted at iometer.org and\nsourceforge.net/projects/iometer",
++    CTEXT           "Copyright (c) 1996-1999 Intel Corporation\nEnterprise Server Group\nSean Hefty, David Levine, and Fab Tillier\n\nOpen Source since 2001\nHosted at iometer.org and\nsourceforge.net/projects/iometer",
+                     IDC_STATIC,44,23,164,60
+     DEFPUSHBUTTON   "OK",IDOK,21,132,35,14
+     PUSHBUTTON      "Intel Open Source License",BViewEULA,116,132,116,14,
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-05-16 14:39:14 UTC (rev 261)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-05-16 14:59:27 UTC (rev 262)
+@@ -116,14 +116,14 @@
+ //#define IOVER_FILEVERSION				"2004.07.30\0"
+ //#define IOVER_FILEVERSION				"2003.12.16-post\0"
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+-#define IOVER_FILEVERSION				"2004.07.30-post\0"
++//#define IOVER_FILEVERSION				"2004.07.30-post\0"
++#define IOVER_FILEVERSION				"2006.05\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+-
+ #if defined(IOMTR_OSFAMILY_WINDOWS)
+ 
+-#define IOVER_LEGALCOPYRIGHT			"Copyright ? 1996-2001 Intel Corporation\0"
++#define IOVER_LEGALCOPYRIGHT			"Copyright (c) 1996-2001 Intel Corporation\0"
+ #define IOVER_LEGALTRADEMARKS			"\0"
+ #define IOVER_COMPANYNAME			"Intel Corporation\0"
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Iometer.suo
+===================================================================
+(Binary files differ)
+
+
+
+From cheungming at berlios.de  Tue May 16 17:17:40 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Tue, 16 May 2006 17:17:40 +0200
+Subject: [Iometer-svn] r263 - in branches/IOMETER-restruct/iometer: misc/Installer src
+Message-ID: <200605161517.k4GFHepB024450@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-05-16 17:17:39 +0200 (Tue, 16 May 2006)
+New Revision: 263
+
+Removed:
+   branches/IOMETER-restruct/iometer/src/Iometer.suo
+Modified:
+   branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+Log:
+still use year.month.day for iometer release.
+also remove the annoying .suo file from svn version control. that file will be changed by VS.net from time to time.
+
+Modified: branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+===================================================================
+--- branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-05-16 14:59:27 UTC (rev 262)
++++ branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-05-16 15:17:39 UTC (rev 263)
+@@ -49,10 +49,10 @@
+ 
+ ##### Global settings
+ #------------------------------------------------------------------------------
+-Name "Iometer 2006.05"
++Name "Iometer 2006.05.31"
+ 
+-OutFile "iometer-2006.05.win32.i386-setup.exe"
+-InstallDir "$PROGRAMFILES\Iometer.org\Iometer 2006.05"
++OutFile "iometer-2006.05.31.win32.i386-setup.exe"
++InstallDir "$PROGRAMFILES\Iometer.org\Iometer 2006.05.31"
+ 
+ CRCCheck on
+ XPStyle on
+@@ -126,19 +126,19 @@
+ #------------------------------------------------------------------------------
+ Section "Start Menu Shortcuts" SectionStartMenu
+ 
+-	CreateDirectory "$SMPROGRAMS\Iometer 2006.05"
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05\Iometer.lnk"                     "$INSTDIR\iometer.exe"   "" "$INSTDIR\iometer.exe"   0
++	CreateDirectory "$SMPROGRAMS\Iometer 2006.05.31"
++	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05.31\Iometer.lnk"                     "$INSTDIR\iometer.exe"   "" "$INSTDIR\iometer.exe"   0
+         IfFileExists "$INSTDIR\iometer.pdf"   "" +2
+-		CreateShortCut "$SMPROGRAMS\Iometer 2006.05\Iometer Users Guide.lnk"  "$INSTDIR\iometer.pdf"   "" "$INSTDIR\iometer.pdf"   0
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05\Import Wizard for MS Access.lnk" "$INSTDIR\Wizard.mdb"    "" "$INSTDIR\Wizard.mdb"    0
+-	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05\Uninstall Iometer.lnk"           "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
++		CreateShortCut "$SMPROGRAMS\Iometer 2006.05.31\Iometer Users Guide.lnk"  "$INSTDIR\iometer.pdf"   "" "$INSTDIR\iometer.pdf"   0
++	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05.31\Import Wizard for MS Access.lnk" "$INSTDIR\Wizard.mdb"    "" "$INSTDIR\Wizard.mdb"    0
++	CreateShortCut  "$SMPROGRAMS\Iometer 2006.05.31\Uninstall Iometer.lnk"           "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
+ 
+ SectionEnd
+ #------------------------------------------------------------------------------
+ Section "Uninstall"
+   
+-	Delete "$SMPROGRAMS\Iometer 2006.05\*.*"
+-	RMDir  "$SMPROGRAMS\Iometer 2006.05"
++	Delete "$SMPROGRAMS\Iometer 2006.05.31\*.*"
++	RMDir  "$SMPROGRAMS\Iometer 2006.05.31"
+ 
+ 	Delete "$INSTDIR\Iometer.exe"
+ 	Delete "$INSTDIR\Dynamo.exe"
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-05-16 14:59:27 UTC (rev 262)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2006-05-16 15:17:39 UTC (rev 263)
+@@ -117,7 +117,7 @@
+ //#define IOVER_FILEVERSION				"2003.12.16-post\0"
+ //#define IOVER_FILEVERSION				"2004.07.30\0"   // => Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				"2004.07.30-post\0"
+-#define IOVER_FILEVERSION				"2006.05\0"
++#define IOVER_FILEVERSION				"2006.05.31\0"
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+Deleted: branches/IOMETER-restruct/iometer/src/Iometer.suo
+===================================================================
+(Binary files differ)
+
+
+

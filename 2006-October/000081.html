@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r312 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r312%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200610281904.k9SJ4Bws017093%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000080.html">
+   <LINK REL="Next"  HREF="000082.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r312 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r312%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200610281904.k9SJ4Bws017093%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r312 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Sat Oct 28 21:04:11 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000080.html">[Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000082.html">[Iometer-svn] r313 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-10-28 21:04:10 +0200 (Sat, 28 Oct 2006)
+New Revision: 312
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+Log:
+minor fix. added a return value check.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-27 00:49:24 UTC (rev 311)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-28 19:04:10 UTC (rev 312)
+@@ -194,6 +194,11 @@
+ 	}
+ 
+ 	cpuInfo = fopen(&quot;/proc/cpuinfo&quot;, &quot;r&quot;);
++	if (!cpuInfo) {
++		cerr &lt;&lt; &quot;Error determining CPU speed.\n&quot;;
++		return (0.0);
++	}
++
+ 	do {
+ 		fscanf(cpuInfo, &quot;%7c&quot;, label);
+ 		if (!strncmp(label, &quot;cpu MHz&quot;, 7)) {
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000080.html">[Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000082.html">[Iometer-svn] r313 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#81">[ date ]</a>
+              <a href="thread.html#81">[ thread ]</a>
+              <a href="subject.html#81">[ subject ]</a>
+              <a href="author.html#81">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

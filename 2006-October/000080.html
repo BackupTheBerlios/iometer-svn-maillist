@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-October/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r311%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200610270049.k9R0nPru008882%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000079.html">
+   <LINK REL="Next"  HREF="000081.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r311%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200610270049.k9R0nPru008882%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Oct 27 02:49:25 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000079.html">[Iometer-svn] r310 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000081.html">[Iometer-svn] r312 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-10-27 02:49:24 +0200 (Fri, 27 Oct 2006)
+New Revision: 311
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+Log:
+cosmetic indent and typo fixes
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-10-27 00:48:42 UTC (rev 310)
++++ branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-10-27 00:49:24 UTC (rev 311)
+@@ -371,7 +371,7 @@
+ 	//#ifdef WIN64_COUNTER_WORKAROUND
+ 	// *** Removed ***
+ 	//
+-	//currently Win64 uses GetTickCOunt whose units are in milliseconds.
++	//currently Win64 uses GetTickCount whose units are in milliseconds.
+ 	//
+ 	//return (double) MILLISECOND;
+ 	//
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-10-27 00:48:42 UTC (rev 310)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-10-27 00:49:24 UTC (rev 311)
+@@ -329,7 +329,17 @@
+ #ifdef __cplusplus
+ }
+ #endif
+- //#endif //!USING_DDK//////////////////////////////////////////////////////////////////////////////////////  Name:       readITC//  Purpose:    To read the IA64 Itanium's Interval Time Counter (ITC, AR-44).  The//              ITC is equivalent to the IA32 Time Stamp Counter (TSC).  The IA32//              TSC can be read using the IA32 RDTSC instruction (opcode 0F 31h) but//              there is no equivalent IA64 instruction to read the ITC.//  Returns:    The value of the ITC//  Parameters: None./////////////////////////////////////////////////////////////////////////////////////
++ //#endif //!USING_DDK
++
++////////////////////////////////////////////////////////////////////////////////////
++//  Name:       readITC
++//  Purpose:    To read the IA64 Itanium's Interval Time Counter (ITC, AR-44).  The
++//              ITC is equivalent to the IA32 Time Stamp Counter (TSC).  The IA32
++//              TSC can be read using the IA32 RDTSC instruction (opcode 0F 31h) but
++//              there is no equivalent IA64 instruction to read the ITC.
++//  Returns:    The value of the ITC
++//  Parameters: None.
++/////////////////////////////////////////////////////////////////////////////////////
+     DWORDLONG rdtsc()
+ {
+ 	// *** Removed ***
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000079.html">[Iometer-svn] r310 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000081.html">[Iometer-svn] r312 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#80">[ date ]</a>
+              <a href="thread.html#80">[ thread ]</a>
+              <a href="subject.html#80">[ subject ]</a>
+              <a href="author.html#80">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

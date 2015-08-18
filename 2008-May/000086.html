@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r318 - branches/IOMETER-restruct/iometer/src/Galileo
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-May/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r318%20-%20branches/IOMETER-restruct/iometer/src/Galileo&In-Reply-To=%3C200805030033.m430XBY6017585%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000087.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r318 - branches/IOMETER-restruct/iometer/src/Galileo</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r318%20-%20branches/IOMETER-restruct/iometer/src/Galileo&In-Reply-To=%3C200805030033.m430XBY6017585%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r318 - branches/IOMETER-restruct/iometer/src/Galileo">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Sat May  3 02:33:11 CEST 2008</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000087.html">[Iometer-svn] r319 - branches/IOMETER-restruct/iometer/src/Pulsar
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-05-03 02:32:32 +0200 (Sat, 03 May 2008)
+New Revision: 318
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Galileo/sources
+Log:
+Updated for Vista WLK
+
+Modified: branches/IOMETER-restruct/iometer/src/Galileo/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-04-15 17:48:26 UTC (rev 317)
++++ branches/IOMETER-restruct/iometer/src/Galileo/sources	2008-05-03 00:32:32 UTC (rev 318)
+@@ -2,29 +2,37 @@
+ TARGETPATH=OBJ
+ TARGETTYPE=PROGRAM
+ 
+-MSC_WARNING_LEVEL=/W3 /WX
+ USE_MFC=1
++USE_STL=1 		# requires to use revision stl70 unless using nolibs
+ USE_NATIVE_EH=1
+-BROWSER_INFO=1
+-
++USE_LIBCMT=1
+ UMTYPE=windows
+ 
+-INCLUDES=$(SDK_INC_PATH); $(MSSDK)\INCLUDE; ..
+-C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -DUSING_DDK -DUSE_NEW_DISKS  
+-#-D_DETAILS -DDEBUG -D_DEBUG
+- 
++MSC_WARNING_LEVEL=/W2
++#/W3 /WX
+ 
+-TARGETLIBS= $(SDK_LIB_PATH)\KERNEL32.LIB \
+-    $(SDK_LIB_PATH)\USER32.LIB		\
+-    $(SDK_LIB_PATH)\WSOCK32.LIB		\
+-    $(SDK_LIB_PATH)\WS2_32.LIB		\
+-    $(SDK_LIB_PATH)\COMCTL32.LIB	\
+-    $(SDK_LIB_PATH)\VERSION.LIB		\
+-#	$(SDK_LIB_PATH)\MSVCPRTD.LIB	\
+-#	$(SDK_LIB_PATH)\MFC42D.LIB		\
+-    $(CRT_LIB_PATH)\MSVCPRT.LIB		\
+-	$(MFC_LIB_PATH)\MFCS42.LIB
++#        newer DDKS have some SDK components
++#        |                new for Vista DDK, ok to use stl70
++#        |                |                          still requires headers from the real SDK
++#        |                |                          |
++INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE; ..
+ 
++C_DEFINES=$(C_DEFINES) -D_GALILEO_ -D_WINDOWS -DDOSWIN32 -D_DETAILS -DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN 
++# -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
++# -DFORCE_STRUCT_ALIGN (structure member alignment)
++# -D_DETAILS (for more verbosity)
++# -D_DEBUG (for normal debug)
++# -DDEBUG (for DEBUG_NEW only)
++# -DUSING_DDK (not needed with vista ddk)
++
++
++TARGETLIBS=$(SDK_LIB_PATH)\COMCTL32.LIB	\
++	$(SDK_LIB_PATH)\VERSION.LIB	\
++	$(SDK_LIB_PATH)\WSOCK32.LIB	\
++	$(SDK_LIB_PATH)\WS2_32.LIB
++
++LINKER_STACKSIZE=-stack:0x80000,0x4000
++
+ SOURCES=..\AccessDialog.cpp		\
+ 	..\AccessSpecList.cpp		\
+ 	..\BigMeter.cpp			\
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000087.html">[Iometer-svn] r319 - branches/IOMETER-restruct/iometer/src/Pulsar
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#86">[ date ]</a>
+              <a href="thread.html#86">[ thread ]</a>
+              <a href="subject.html#86">[ subject ]</a>
+              <a href="author.html#86">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

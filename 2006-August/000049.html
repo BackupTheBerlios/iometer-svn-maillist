@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r280%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608160102.k7G124fe003205%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000048.html">
+   <LINK REL="Next"  HREF="000050.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r280%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200608160102.k7G124fe003205%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r280 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Wed Aug 16 03:02:04 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000048.html">[Iometer-svn] r279 - in branches/IOMETER-restruct/iometer/src:	Galileo Pulsar
+</A></li>
+        <LI>Next message: <A HREF="000050.html">[Iometer-svn] r281 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#49">[ date ]</a>
+              <a href="thread.html#49">[ thread ]</a>
+              <a href="subject.html#49">[ subject ]</a>
+              <a href="author.html#49">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-08-16 03:01:52 +0200 (Wed, 16 Aug 2006)
+New Revision: 280
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+Log:
+cosmetic fixes to reduce some warnings.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-16 00:57:29 UTC (rev 279)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-16 01:01:52 UTC (rev 280)
+@@ -112,6 +112,8 @@
+      (bundles the changes contributed by Lamont Cranston - it introduces
+      the new IOManagerWin.cpp file).
+ - Cleanup:
++   - Renamed Dynamo and Iometer subdirectories to solve the name conflict
++     under case insensitive file system.
+    - Adjusted some variable types to fit 64bit OS and compiler.
+    - Recovered all corrupted binary files.
+    - Added new VS project management file for VS.net.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-16 00:57:29 UTC (rev 279)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-08-16 01:01:52 UTC (rev 280)
+@@ -764,14 +764,14 @@
+ 	size_t iIndex = 0;
+ 	size_t iPos1, iPos2;
+ 
+-	for (iPos1 = 0; ((iPos1 &lt; (int)uiLength) &amp;&amp; (pcString[iPos1] == (int)' ')); iPos1++) {
++	for (iPos1 = 0; ((iPos1 &lt; uiLength) &amp;&amp; (pcString[iPos1] == (int)' ')); iPos1++) {
+ 		/* NOP */
+ 	}
+ 	for (iPos2 = uiLength - 1; ((iPos2 &gt;= 0) &amp;&amp; (pcString[iPos2] == (int)' ')); iPos2--) {
+ 		/* NOP */
+ 	}
+ 
+-	if ((iPos1 != 0) || (iPos2 != ((int)uiLength - 1))) {
++	if ((iPos1 != 0) || (iPos2 != (uiLength - 1))) {
+ 		for (I = iPos1; I &lt;= iPos2; I++) {
+ 			pcString[iIndex] = pcString[I];
+ 			iIndex++;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-16 00:57:29 UTC (rev 279)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2006-08-16 01:01:52 UTC (rev 280)
+@@ -605,7 +605,7 @@
+ 	 * rate at which the processor can do crc calculations
+ 	 */
+ 	write_ptr = (char *)write_data;
+-	while ((unsigned long)write_ptr &lt; ((unsigned long)write_data + data_size)) {
++	while ((ULONG_PTR)write_ptr &lt; ((ULONG_PTR)write_data + data_size)) {
+ 		*write_ptr++ = (char)Rand(0xff);
+ 	}
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000048.html">[Iometer-svn] r279 - in branches/IOMETER-restruct/iometer/src:	Galileo Pulsar
+</A></li>
+	<LI>Next message: <A HREF="000050.html">[Iometer-svn] r281 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#49">[ date ]</a>
+              <a href="thread.html#49">[ thread ]</a>
+              <a href="subject.html#49">[ subject ]</a>
+              <a href="author.html#49">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

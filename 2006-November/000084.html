@@ -1,0 +1,454 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r315 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r315%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200611030121.kA31LhZE016489%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000083.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r315 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r315%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200611030121.kA31LhZE016489%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r315 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Nov  3 02:21:43 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000083.html">[Iometer-svn] r314 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#84">[ date ]</a>
+              <a href="thread.html#84">[ thread ]</a>
+              <a href="subject.html#84">[ subject ]</a>
+              <a href="author.html#84">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-11-03 02:21:39 +0100 (Fri, 03 Nov 2006)
+New Revision: 315
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+fixed way to gather CPU utilization statistics under Linux.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-11-01 20:23:04 UTC (rev 314)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-11-03 01:21:39 UTC (rev 315)
+@@ -12,6 +12,8 @@
+      various platforms.
+ 
+ - Bug fixes:
++   - Patch by Ming Zhang to fix the way to get CPU utilization statistics under
++     Linux.
+    - Patch by Ming Zhang to get CPU count from /proc/cpuinfo under Linux. Old
+      glibc way is buggy for 64bit Linux and XEN.
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-11-01 20:23:04 UTC (rev 314)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2006-11-03 01:21:39 UTC (rev 315)
+@@ -488,6 +488,9 @@
+ 
+ #define SEND   1
+ #define RECV   2
++
++#define SMLBUFSIZE 512 
++
+ // ----------------------------------------------------------------------------
+ #if defined(IOMTR_OSFAMILY_NETWARE) || defined(IOMTR_OSFAMILY_UNIX)
+  //param does not contain a valid internet address
+@@ -519,13 +522,6 @@
+   #define AIO_NOTCANCELED	1
+  #endif
+ 
+- #if defined(IOMTR_OS_LINUX)
+-  // different Linux kernel has different /proc/stat style.
+-  // Currently we only support vanilla 2.4 and 2.6 alike
+-  #define PROCSTATUNKNOWN	0x00
+-  #define PROCSTAT24STYLE	0x01
+-  #define PROCSTAT26STYLE	0x02
+- #endif
+ #endif
+ // ----------------------------------------------------------------------------
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-11-01 20:23:04 UTC (rev 314)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-11-03 01:21:39 UTC (rev 315)
+@@ -115,7 +115,6 @@
+ #include &quot;iomtr_kstat/iomtr_kstat.h&quot;
+ 
+ extern int kstatfd;
+-extern int procstatstyle;
+ 
+ //
+ // Initializing system performance data.
+@@ -309,9 +308,10 @@
+ 
+ void Performance::Get_CPU_Counters(int snapshot)
+ {
+-	int numScans, c, i;
+-	char tmpBuf[100];
+-	__int64 jiffiesCpuNiceUtilization, jiffiesCpuidle, jiffiesCpuiowait, jiffiesCpuirq, jiffiesCpusoftirq;
++	int numScans, i;
++	char tmpBuf[SMLBUFSIZE], *b;
++	__int64 jiffiesCpuNiceUtilization, jiffiesCpuidle, jiffiesCpuiowait;
++	__int64 jiffiesCpuirq, jiffiesCpusoftirq, jiffiesCpusteal;
+ 	FILE *cpuStat;
+ 	struct cpu_data_type raw_cpu;
+ 
+@@ -328,91 +328,71 @@
+ 	}
+ 
+ 	cpuStat = fopen(&quot;/proc/stat&quot;, &quot;r&quot;);
+-	assert(cpuStat != NULL);
+-	switch (procstatstyle) {
+-	case PROCSTAT24STYLE:
+-		// First few rows of the /proc/stat output in 2.4 style.
+-		// --------------------------------------------------------------------
+-		// cpu  20969 2260 50042 1069377
+-		// cpu0 20969 2260 50042 1069377
+-		// page 1279455 540189
+-		// swap 30 483
+-		// intr 1896409 1142648 2 0 0 128558 0 0 0 2 0 34836 465132 4 0 91210 34017 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+-		// ...
+-		// --------------------------------------------------------------------
+-		fscanf(cpuStat, &quot;cpu %*s %*s %*s %*s\n&quot;);
+-		for (i = 0; i &lt; processor_count; i++) {
+-			numScans = fscanf(cpuStat, &quot;%s&quot;, tmpBuf);
+-			if ((numScans == 1) &amp;&amp; (strlen(tmpBuf) &gt;= 3) &amp;&amp; (strncmp(tmpBuf, &quot;cpu&quot;, 3) == 0)) {
+-				fscanf(cpuStat, &quot; %lld %lld %lld %*s\n&quot;,
+-				       &amp;raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot], &amp;jiffiesCpuNiceUtilization,
+-				       &amp;raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot]);
+-				raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot] += jiffiesCpuNiceUtilization;
+-				raw_cpu_data[i][CPU_TOTAL_UTILIZATION][snapshot] =
+-				    raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot] +
+-				    raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot];
+-				continue;
+-			}
+-			do {
+-				c = getc(cpuStat);
+-			} while ((c != '\n') &amp;&amp; (c != EOF));
+-			break;
+-		}
+-		for (;;) {
+-			numScans = fscanf(cpuStat, &quot;%s&quot;, tmpBuf);
+-			if ((numScans == 1) &amp;&amp; (strlen(tmpBuf) == 4) &amp;&amp; (strncmp(tmpBuf, &quot;intr&quot;, 4) == 0)) {
+-				fscanf(cpuStat, &quot; %lld &quot;, &amp;raw_cpu_data[0][CPU_IRQ][snapshot]);
+-				break;
+-			}
+-			do {
+-				c = getc(cpuStat);
+-			} while ((c != '\n') &amp;&amp; (c != EOF));
+-			if (c == EOF) {
+-				break;
+-			}
+-		}
+-		break;
+-	case PROCSTAT26STYLE:
+-		// First feww rows of the /proc/stat output in 2.6 style
+-		// cpu  31483 0 87972 461075 9775 1319 200
+-		// cpu0 31483 0 87972 461075 9775 1319 200
+-		// intr 6473496 5918277 10963 0 0 0 0 0 7 1 2 0 365055 154381 0 24810 0 0 
+-		//...
+-		fscanf(cpuStat, &quot;cpu %*s %*s %*s %*s %*s %*s %*s\n&quot;);
+-		for (i = 0; i &lt; processor_count; i++) {
+-			numScans = fscanf(cpuStat, &quot;%s&quot;, tmpBuf);
+-			if ((numScans == 1) &amp;&amp; (strlen(tmpBuf) &gt;= 3) &amp;&amp; (strncmp(tmpBuf, &quot;cpu&quot;, 3) == 0)) {
+-				fscanf(cpuStat, &quot; %lld %lld %lld %lld %lld %lld %lld\n&quot;,
+-				       &amp;raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot],
+-				       &amp;jiffiesCpuNiceUtilization,
+-				       &amp;raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot],
+-				       &amp;jiffiesCpuidle, &amp;jiffiesCpuiowait, &amp;jiffiesCpuirq, &amp;jiffiesCpusoftirq);
+-				raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot] += jiffiesCpuNiceUtilization;
+-				raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot] +=
+-				    jiffiesCpuirq + jiffiesCpusoftirq;
+-				raw_cpu_data[i][CPU_TOTAL_UTILIZATION][snapshot] =
+-				    raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot] +
+-				    raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot];
+-			}
+-		}
+-		for (;;) {
+-			numScans = fscanf(cpuStat, &quot;%s&quot;, tmpBuf);
+-			if ((numScans == 1) &amp;&amp; (strlen(tmpBuf) == 4) &amp;&amp; (strncmp(tmpBuf, &quot;intr&quot;, 4) == 0)) {
+-				fscanf(cpuStat, &quot; %lld &quot;, &amp;raw_cpu_data[0][CPU_IRQ][snapshot]);
+-				break;
+-			}
+-			do {
+-				c = getc(cpuStat);
+-			} while ((c != '\n') &amp;&amp; (c != EOF));
+-			if (c == EOF) {
+-				break;
+-			}
+-		}
+-		break;
+-	default:
+-		// should never be here
+-		cerr &lt;&lt; &quot;Can not get CPU performance data&quot; &lt;&lt; endl;
++	if (!cpuStat)
++		goto err_out;
++
++	// different kernel has quite different /proc/stat output. 
++	// First few rows of the /proc/stat output in 2.4 style.
++	// --------------------------------------------------------------------
++	// cpu  20969 2260 50042 1069377
++	// cpu0 20969 2260 50042 1069377
++	// page 1279455 540189
++	// swap 30 483
++	// intr 1896409 1142648 2 0 0 ...
++	// ...
++	// --------------------------------------------------------------------
++	// First few rows of the /proc/stat output in early 2.6 style
++	// cpu  31483 0 87972 461075 9775 1319 200
++	// cpu0 31483 0 87972 461075 9775 1319 200
++	// intr 6473496 5918277 10963 0 0 0 0 0 7 1 2 0 365055 154381 0 24810 0 0 
++	//...
++	// --------------------------------------------------------------------
++	// First few rows of the /proc/stat output in 2.6.11 or later style
++	// cpu  152192 5922 18433 1509327 67908 3064 5273 0
++	// cpu0 152192 5922 18433 1509327 67908 3064 5273 0
++	// intr 644038....
++	//
++	// followed code gain idea from procps package.
++
++	memset(tmpBuf, 0, SMLBUFSIZE);
++	b = fgets(tmpBuf, SMLBUFSIZE, cpuStat);
++	if (!b)
++		goto err_out;
++	
++	for (i = 0; i &lt; processor_count; i++) {
++		int cpuid;
++
++		b = fgets(tmpBuf, SMLBUFSIZE, cpuStat);
++		if (!b)
++			goto err_out;
++		jiffiesCpuiowait = jiffiesCpuirq = jiffiesCpusoftirq = jiffiesCpusteal = 0;
++		numScans = sscanf(tmpBuf, &quot;cpu%d %lld %lld %lld %lld %lld %lld %lld %lld\n&quot;,
++					&amp;cpuid,
++					&amp;raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot],
++					&amp;jiffiesCpuNiceUtilization,
++					&amp;raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot],
++					&amp;jiffiesCpuidle, &amp;jiffiesCpuiowait, &amp;jiffiesCpuirq, 
++					&amp;jiffiesCpusoftirq, &amp;jiffiesCpusteal);
++		if (numScans &lt; 4)
++			goto err_out;
++
++		raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot] += jiffiesCpuNiceUtilization;
++		raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot] +=
++			jiffiesCpuirq + jiffiesCpusoftirq;
++		raw_cpu_data[i][CPU_TOTAL_UTILIZATION][snapshot] =
++			raw_cpu_data[i][CPU_USER_UTILIZATION][snapshot] +
++			raw_cpu_data[i][CPU_PRIVILEGED_UTILIZATION][snapshot];
++		
+ 	}
++	fread(tmpBuf, sizeof(char), SMLBUFSIZE, cpuStat);
++	b = strstr(tmpBuf, &quot;intr&quot;);
++	if (b)
++		sscanf(b,  &quot;intr %Lu&quot;, &amp;raw_cpu_data[0][CPU_IRQ][snapshot]);
++
++	goto out;
++err_out:
++	cerr &lt;&lt; &quot;Can not get CPU performance data&quot; &lt;&lt; endl;
++out:
+ 	fclose(cpuStat);
+ }
+ 
+@@ -421,20 +401,17 @@
+ 	FILE *fp;
+ 	__int64 insegs, outsegs, retranssegs;
+ 	struct tcp_data_type raw_tcp;
++	char tmpBuf[SMLBUFSIZE];
++	int i;
+ 
+ 	if (kstatfd &gt; 0 &amp;&amp; ioctl(kstatfd, IM_IOC_GETTCPDATA, &amp;raw_tcp) &gt;= 0) {
+ 		raw_tcp_data[TCP_SEGMENTS_RESENT][snapshot] = raw_tcp.retranssegs;
+ 		return;
+ 	}
+-	// DF: a kind of stupid workable solution. :)
+ 	fp = fopen(&quot;/proc/net/snmp&quot;, &quot;r&quot;);
+-	fscanf(fp, &quot;Ip: %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s\n&quot;);
+-	fscanf(fp, &quot;Ip: %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s\n&quot;);
+-	fscanf(fp,
+-	       &quot;Icmp: %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s\n&quot;);
+-	fscanf(fp,
+-	       &quot;Icmp: %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s\n&quot;);
+-	fscanf(fp, &quot;Tcp: %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s\n&quot;);
++	for (i = 0; i &lt; 5; i++)
++		fgets(tmpBuf, SMLBUFSIZE, fp);
++	retranssegs = 0;
+ 	fscanf(fp, &quot;Tcp: %*s %*s %*s %*s %*s %*s %*s %*s %*s %lld %lld %lld %*s %*s\n&quot;, &amp;insegs, &amp;outsegs,
+ 	       &amp;retranssegs);
+ 	raw_tcp_data[TCP_SEGMENTS_RESENT][snapshot] = retranssegs;
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-11-01 20:23:04 UTC (rev 314)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-11-03 01:21:39 UTC (rev 315)
+@@ -89,55 +89,38 @@
+ /* ##                                                                     ## */
+ /* ######################################################################### */
+ 
+-// Include our central headerfile
+ #include &quot;IOCommon.h&quot;
+ 
+ #if defined(IOMTR_OS_LINUX)
+ #include &quot;iomtr_kstat/iomtr_kstat.h&quot;
+ 
+ extern int kstatfd;
+-extern int procstatstyle;
+ #endif
+ 
+-#if defined(IOMTR_CPU_PPC)
+-#endif
+-
+-// Implements the time measurment functions
+-// for / in the different plattforms
+-// ----------------------------------------------------------------------------
+ #if defined(IOMTR_OS_LINUX)
+ DWORDLONG jiffies(void)
+ {
+-	DWORDLONG jiffies_user, jiffies_nice, jiffies_system, jiffies_idle, jiffies_iowait, jiffies_irq,
+-	    jiffies_softirq;
++	DWORDLONG j[8], jf;
+ 	FILE *fp;
+-	unsigned long long jf;
++	char tmpBuf[SMLBUFSIZE];
++	int i;
+ 
+-	if (kstatfd &gt; 0 &amp;&amp; ioctl(kstatfd, IM_IOC_GETCURJIFFIES, &amp;jf) &gt;= 0) {
+-		//printf(&quot;JIFFIE: %llu\n&quot;, jf);
+-		return (DWORDLONG) jf;
++	if (kstatfd &gt; 0 &amp;&amp; ioctl(kstatfd, IM_IOC_GETCURJIFFIES, (unsigned long long*)&amp;jf) &gt;= 0) {
++		return jf;
+ 	}
+ 
+-	switch (procstatstyle) {
+-	case PROCSTAT24STYLE:
+-		fp = fopen(&quot;/proc/stat&quot;, &quot;r&quot;);
+-		fscanf(fp, &quot;cpu %*s %*s %*s %*s\n&quot;);
+-		fscanf(fp, &quot;cpu0 %lld %lld %lld %lld\n&quot;, &amp;jiffies_user, &amp;jiffies_nice, &amp;jiffies_system, &amp;jiffies_idle);
+-		fclose(fp);
+-		return (jiffies_user + jiffies_nice + jiffies_system + jiffies_idle);
+-	case PROCSTAT26STYLE:
+-		fp = fopen(&quot;/proc/stat&quot;, &quot;r&quot;);
+-		fscanf(fp, &quot;cpu %*s %*s %*s %*s %*s %*s %*s\n&quot;);
+-		fscanf(fp, &quot;cpu0 %lld %lld %lld %lld %lld %lld %lld\n&quot;, &amp;jiffies_user, &amp;jiffies_nice, &amp;jiffies_system,
+-		       &amp;jiffies_idle, &amp;jiffies_iowait, &amp;jiffies_irq, &amp;jiffies_softirq);
+-		fclose(fp);
+-		return (jiffies_user + jiffies_nice + jiffies_system + jiffies_idle + jiffies_iowait + jiffies_irq +
+-			jiffies_softirq);
+-	default:
+-		// should never be here
+-		cerr &lt;&lt; &quot;Can not get jiffies value!&quot; &lt;&lt; endl;
+-	}
+-	return 0;
++	for (i = 0; i &lt; 8; i++)
++		j[i] = 0;
++	fp = fopen(&quot;/proc/stat&quot;, &quot;r&quot;);
++	fgets(tmpBuf, SMLBUFSIZE, fp);
++	fgets(tmpBuf, SMLBUFSIZE, fp);
++	sscanf(tmpBuf, &quot;cpu0 %lld %lld %lld %lld %lld %lld %lld %lld\n&quot;, 
++			j, j + 1, j + 2, j + 3, j + 4, j + 5, j + 6, j + 7);
++	fclose(fp);
++	jf = 0;
++	for (i = 0; i &lt; 8; i++)
++		jf += j[i];
++	return jf;
+ }
+ 
+ #if defined(IOMTR_CPU_I386) || defined(IOMTR_CPU_X86_64)
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2006-11-01 20:23:04 UTC (rev 314)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2006-11-03 01:21:39 UTC (rev 315)
+@@ -141,7 +141,6 @@
+ #include &lt;synch.h&gt;
+ #elif defined(IOMTR_OS_LINUX)
+ int kstatfd;
+-int procstatstyle = PROCSTATUNKNOWN;
+ #elif defined(IOMTR_OS_OSX)
+   // nop
+ #else
+@@ -199,24 +198,6 @@
+ 		close(fd);
+ }
+ 
+-int DetectProcStatStyle(void)
+-{
+-	FILE *fp;
+-	unsigned long long x1, x2, x3, x4, x5, x6, x7;
+-	int res;
+-
+-	// a simple work around to detect stat style. should check more customized kernels.
+-	fp = fopen(&quot;/proc/stat&quot;, &quot;r&quot;);
+-	res = fscanf(fp, &quot;cpu %lld %lld %lld %lld %lld %lld %lld\n&quot;, &amp;x1, &amp;x2, &amp;x3, &amp;x4, &amp;x5, &amp;x6, &amp;x7);
+-	if (res == 4)
+-		return PROCSTAT24STYLE;
+-	else if (res == 7)
+-		return PROCSTAT26STYLE;
+-	else
+-		cerr &lt;&lt; &quot;Fail to detect the style of /proc/stat output.&quot; &lt;&lt; endl;
+-	return PROCSTATUNKNOWN;
+-}
+-
+ #if defined(IOMTR_CPU_XSCALE)
+ 
+ int ccntfd;
+@@ -355,11 +336,6 @@
+ 	aioDefaults.aio_threads = 2;
+ 	aio_init(&amp;aioDefaults);
+ 	kstatfd = InitIoctlInterface();
+-	procstatstyle = DetectProcStatStyle();
+-	if (kstatfd &lt; 0 &amp;&amp; procstatstyle == -1) {
+-		cerr &lt;&lt; &quot;IoMeter can not get correct status information&quot; &lt;&lt; endl;
+-		exit(1);
+-	}
+ #if defined(IOMTR_CPU_XSCALE)
+ 	if ((ccntfd = InitCCNTInterface()) &lt; 0) {
+ 		exit(1);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000083.html">[Iometer-svn] r314 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#84">[ date ]</a>
+              <a href="thread.html#84">[ thread ]</a>
+              <a href="subject.html#84">[ subject ]</a>
+              <a href="author.html#84">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

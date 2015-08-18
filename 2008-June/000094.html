@@ -1,0 +1,766 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r328 - branches/IOMETER-restruct/iometer/src/msvc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r328%20-%20branches/IOMETER-restruct/iometer/src/msvc&In-Reply-To=%3C200806190644.m5J6ipEu007932%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000093.html">
+   <LINK REL="Next"  HREF="000095.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r328 - branches/IOMETER-restruct/iometer/src/msvc</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r328%20-%20branches/IOMETER-restruct/iometer/src/msvc&In-Reply-To=%3C200806190644.m5J6ipEu007932%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r328 - branches/IOMETER-restruct/iometer/src/msvc">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 19 08:44:51 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000093.html">[Iometer-svn] r327 - branches/IOMETER-restruct/iometer/src/Pulsar
+</A></li>
+        <LI>Next message: <A HREF="000095.html">[Iometer-svn] r329 - branches/IOMETER-restruct/iometer/src/Galileo
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-06-19 08:44:48 +0200 (Thu, 19 Jun 2008)
+New Revision: 328
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj
+   branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj
+Log:
+Added compile time flags for structure alignment and cleaned up the environment some more.
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj	2008-06-19 06:43:59 UTC (rev 327)
++++ branches/IOMETER-restruct/iometer/src/msvc/Dynamo.vcproj	2008-06-19 06:44:48 UTC (rev 328)
+@@ -50,7 +50,7 @@
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				Optimization=&quot;0&quot;
+ 				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
+-				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS&quot;
+ 				BasicRuntimeChecks=&quot;3&quot;
+ 				RuntimeLibrary=&quot;1&quot;
+ 				PrecompiledHeaderFile=&quot;$(IntDir)/Dynamo.pch&quot;
+@@ -140,7 +140,7 @@
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				Optimization=&quot;0&quot;
+ 				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
+-				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS&quot;
+ 				BasicRuntimeChecks=&quot;3&quot;
+ 				RuntimeLibrary=&quot;1&quot;
+ 				PrecompiledHeaderFile=&quot;$(IntDir)/Dynamo.pch&quot;
+@@ -231,7 +231,7 @@
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				Optimization=&quot;0&quot;
+ 				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
+-				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;_DETAILS&quot;
+ 				BasicRuntimeChecks=&quot;3&quot;
+ 				RuntimeLibrary=&quot;1&quot;
+ 				PrecompiledHeaderFile=&quot;$(IntDir)/Dynamo.pch&quot;
+@@ -322,7 +322,7 @@
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+ 				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
+-				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -415,7 +415,7 @@
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+ 				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
+-				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -507,7 +507,7 @@
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+ 				AdditionalIncludeDirectories=&quot;..\..\..\..\..\..\bin\ddk\6000.rtm\inc\api&quot;
+-				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
++				PreprocessorDefinitions=&quot;_PULSAR_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;IOMTR_SETTING_CPU_AFFINITY;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_CONSOLE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -674,138 +674,6 @@
+ 			Filter=&quot;h;hpp;hxx;hm;inl&quot;
+ 			&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\AccessDialog.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\AccessSpecList.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\BigMeter.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\GalileoApp.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\GalileoCmdLine.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\GalileoDefs.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\GalileoDoc.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\GalileoView.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\ICF_ifstream.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\ICFOpenDialog.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\ICFSaveDialog.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\IOAccess.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -882,30 +750,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\LegalBox.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\MainFrm.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\Manager.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -950,114 +794,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\PageAccess.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\PageDisk.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\PageDisplay.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\PageNetwork.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\PageSetup.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\PageTarget.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\resource.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\StdAfx.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\TextDisplay.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\unpack8.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -1070,33 +806,9 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\WaitingForManagers.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\Worker.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\WorkerView.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+ 		&lt;/Filter&gt;
+ 		&lt;Filter
+ 			Name=&quot;Resource Files&quot;
+
+Modified: branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj	2008-06-19 06:43:59 UTC (rev 327)
++++ branches/IOMETER-restruct/iometer/src/msvc/Iometer.vcproj	2008-06-19 06:44:48 UTC (rev 328)
+@@ -53,7 +53,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+-				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -147,7 +147,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+-				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -241,7 +241,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				InlineFunctionExpansion=&quot;1&quot;
+-				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE&quot;
+ 				StringPooling=&quot;true&quot;
+ 				RuntimeLibrary=&quot;0&quot;
+ 				EnableFunctionLevelLinking=&quot;true&quot;
+@@ -336,7 +336,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				Optimization=&quot;0&quot;
+-				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN32;IOMTR_CPU_I386;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG&quot;
+ 				BasicRuntimeChecks=&quot;3&quot;
+ 				RuntimeLibrary=&quot;1&quot;
+ 				PrecompiledHeaderFile=&quot;.\$(ConfigurationName)\obj\$(PlatformName)/IOmeter.pch&quot;
+@@ -428,7 +428,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				Optimization=&quot;0&quot;
+-				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_IA64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG&quot;
+ 				BasicRuntimeChecks=&quot;3&quot;
+ 				RuntimeLibrary=&quot;1&quot;
+ 				PrecompiledHeaderFile=&quot;.\$(ConfigurationName)\obj\$(PlatformName)/IOmeter.pch&quot;
+@@ -521,7 +521,7 @@
+ 			&lt;Tool
+ 				Name=&quot;VCCLCompilerTool&quot;
+ 				Optimization=&quot;0&quot;
+-				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;_CRT_SECURE_NO_DEPRECATE;_DEBUG&quot;
++				PreprocessorDefinitions=&quot;_GALILEO_;IOMTR_OSFAMILY_WINDOWS;IOMTR_OS_WIN64;IOMTR_CPU_X86_64;WINVER=0x0502;USE_NEW_DISCOVERY_MECHANISM;FORCE_STRUCT_ALIGN;_CRT_SECURE_NO_DEPRECATE;_DEBUG&quot;
+ 				BasicRuntimeChecks=&quot;3&quot;
+ 				RuntimeLibrary=&quot;1&quot;
+ 				PrecompiledHeaderFile=&quot;.\$(ConfigurationName)\obj\$(PlatformName)/IOmeter.pch&quot;
+@@ -775,90 +775,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\IOCQ.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOCQAIO.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOCQVI.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOGrunt.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOManager.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOMessage.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOPerformance.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\IOPort.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -867,54 +783,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\IOTarget.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOTargetDisk.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOTargetTCP.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\IOTargetVI.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\IOTest.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -927,18 +795,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\IOVIPL.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\LegalBox.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -963,42 +819,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\NetTCP.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\NetVI.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\Network.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\ostream64.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -1031,18 +851,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\PulsarRC.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\StdAfx.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+@@ -1055,30 +863,6 @@
+ 				&gt;
+ 			&lt;/File&gt;
+ 			&lt;File
+-				RelativePath=&quot;..\VINic.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+-				RelativePath=&quot;..\vipl.h&quot;
+-				&gt;
+-				&lt;FileConfiguration
+-					Name=&quot;Release|Win32&quot;
+-					ExcludedFromBuild=&quot;true&quot;
+-					&gt;
+-					&lt;Tool
+-						Name=&quot;VCCustomBuildTool&quot;
+-					/&gt;
+-				&lt;/FileConfiguration&gt;
+-			&lt;/File&gt;
+-			&lt;File
+ 				RelativePath=&quot;..\WaitingForManagers.h&quot;
+ 				&gt;
+ 			&lt;/File&gt;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000093.html">[Iometer-svn] r327 - branches/IOMETER-restruct/iometer/src/Pulsar
+</A></li>
+	<LI>Next message: <A HREF="000095.html">[Iometer-svn] r329 - branches/IOMETER-restruct/iometer/src/Galileo
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#94">[ date ]</a>
+              <a href="thread.html#94">[ thread ]</a>
+              <a href="subject.html#94">[ subject ]</a>
+              <a href="author.html#94">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r330 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r330%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200806190648.m5J6mp7p008111%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000095.html">
+   <LINK REL="Next"  HREF="000097.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r330 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r330%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200806190648.m5J6mp7p008111%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r330 - branches/IOMETER-restruct/iometer/src">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 19 08:48:51 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000095.html">[Iometer-svn] r329 - branches/IOMETER-restruct/iometer/src/Galileo
+</A></li>
+        <LI>Next message: <A HREF="000097.html">[Iometer-svn] r331 - branches/IOMETER-restruct/iometer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#96">[ date ]</a>
+              <a href="thread.html#96">[ thread ]</a>
+              <a href="subject.html#96">[ subject ]</a>
+              <a href="author.html#96">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-06-19 08:48:45 +0200 (Thu, 19 Jun 2008)
+New Revision: 330
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+   branches/IOMETER-restruct/iometer/src/IOTest.h
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+   branches/IOMETER-restruct/iometer/src/IOVersion.h
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+Final touches for 2008.06.18 release.
+-comment updates and ifdefs for other OSes
+
+Modified: branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOGrunt.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -670,8 +670,9 @@
+ 			// We have a match for our index, so set the affinity for the thread
+ #if defined(IOMTR_OSFAMILY_WINDOWS)
+ 			SetThreadAffinityMask(GetCurrentThread(), effective_affinity);
+-//#else if
+-			// must do something here
++#else
++#error ===&gt; ERROR: You have to add affinity code here
++
+ #endif
+ 
+ #ifdef _DETAILS
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -52,6 +52,7 @@
+ /* ##               - Rewrote adding support for volume mount point       ## */
+ /* ##                 better raw disk and network share detection         ## */
+ /* ##               - Added new TargetType for chaining disks in Iometer  ## */
++/* ##                 see comments in iotest.h                            ## */
+ /* ##               2004-04-15 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">lamontcranston41 at yahoo.com</A>)               ## */
+ /* ##               - Moved Report_Disks() from IOManager.cpp to here.    ## */
+ /* ##               - Initial drop.                                       ## */
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTest.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTest.h	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOTest.h	2008-06-19 06:48:45 UTC (rev 330)
+@@ -107,14 +107,18 @@
+ 
+ #ifdef USE_NEW_DISCOVERY_MECHANISM
+ 	// 
+-	// By tagging the raw disk with this type tells iometer to chain
++	// Optional TODO for other OSes.
++	//
++
++	// By tagging the raw disk with this type tells iometer GUI to chain
+ 	// it under the preceding logical disk. This means, that following
+ 	// a logical disk you would insert a physical disk with this type
+-	// if you wanted iometer to display it. For a software raid, you 
+-	// would insert all of the disks belonging to that logical disk.
++	// if you wanted iometer to associate them. For a software raid, you 
++	// would insert all of the disks belonging to that logical disk with this
++	// type.
+ 	//
+ 	// If you have multiple striped partitions over the same group of 
+-	// physical disks, it is up to you if you duplicate the physical
++	// physical disks, it is up to you if you duplicate the same physical
+ 	// disks after every logical disk, or just show them once.
+ 	//
+ 	PhysicalDiskTypeHasPartitions = 0x8C100000, 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -48,7 +48,10 @@
+ /* ##                                                                     ## */
+ /* ## ------------------------------------------------------------------- ## */
+ /* ##                                                                     ## */
+-/* ##  Changes ...: 2005-04-18 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">raltherr at apple.com</A>)                       ## */
++/* ##  Changes ...: 2008-06-18 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">vedrand at yahoo.com</A>)                        ## */
++/* ##               -redesigned the code to support multiple timers       ## */
++/* ##                for Windows - needs work for others (comments below) ## */
++/* ##               2005-04-18 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">raltherr at apple.com</A>)                       ## */
+ /* ##               - Support for MacOS X                                 ## */
+ /* ##               2005-01-12 (<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">henryx.w.tieman at intel.com</A>)                ## */
+ /* ##               - Added code for Linux on Intel Itanium (ia64).       ## */
+@@ -333,7 +336,7 @@
+ //
+ 
+ // Abstract the OS high perf counter/frequency, so other OSs can use the 
+-// rdtsc_freq and timer_* code. These 2 are just wrappers around 
++// rdtsc_freq and timer_* code below. These 2 are just wrappers around 
+ // QueryPerfCounter/Frequency
+ 
+ LONGLONG oshpc()
+@@ -402,25 +405,40 @@
+ //
+ // COMMON TIMER CODE
+ //
+-// Assumes the timer conventions as defined by the above windows section.
++
++// !!!!Delete/modify this ifdef once other OSes have implemented similar fuctionality!!!
++#if defined(IOMTR_OSFAMILY_WINDOWS)
++// !!!!Delete/modify this ifdef once other OSes have implemented similar fuctionality!!!
++
++//
++// Please follow the timer conventions as defined by the above windows section.
++//
+ // Summary:
+ // 1. TimerType controls the runtime type of the timer. Each OS needs to instantiate 
+ //    a TimerType of type timer_type and set its default. 
+-// 2. timer_value and timer_frequency() (below) are top level routines that mind TimerType
++// 2. timer_value and timer_frequency() (below) then become the top level routines 
++//    that mind TimerType global.
+ // 3. timer_type enum in iocommon.h and timer_value()/timer_frequeny() need to be 
+-//    modified for any new timer added. 
++//    in sync for any new timer(s) defined
+ // 4. Define a {timer_name}() and {timer_name}_freq() functions for a desired timer 
+-// 5. oshpc() and oshpc_freq() are minimum no matter what counter they really expose
+-// 6. rdtsc() becomes an optional timer, and rdtsc_freq (below) would use it 
++//    e.g. rtc() rtc_freq(), rdtsc_freq is the only exception -- see below
++// 5. oshpc() and oshpc_freq() are the minimum ones that need be defined, however they should
++//    not rely on rdtsc. i.e. use another type of timer. If rdtsc is not really using the real
++//    rdtsc, do not even define rdtsc and set the default timer_type accordingly
++// 6. rdtsc() becomes an optional timer, and rdtsc_freq (below) would calculate its frequency 
+ //
++// Note, the function naming convention move to timer_value was done because some
++// implementations did not really use rdtsc, which was the original function name. So if your OS
++// defines timer_value, it really needs to be renamed to reflects its behavior. And for all 
++// timers besides rdtsc, you also need to define a corresponding frequency function.
+ 
+-#if defined(IOMTR_OSFAMILY_WINDOWS)
+ 
+-// __int64 rdtsc_freq()
++
++// LONGLONG rdtsc_freq()
+ //
+ // The main problem is that TSC/ITC frequency may not match the internal 
+ // processor clock, so we derive it here based on another known counter--
+-// oshpc() in this case. 
++// oshpc() in this case. The default counter required for all this to work.
+ // While ding that, we can also detect speed stepping but not 100% reliably.
+ //
+ // Note: -assumes we are running on one processor; caller should affinitize. 
+
+Modified: branches/IOMETER-restruct/iometer/src/IOVersion.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOVersion.h	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/IOVersion.h	2008-06-19 06:48:45 UTC (rev 330)
+@@ -117,7 +117,8 @@
+ //#define IOVER_FILEVERSION				&quot;2004.07.30\0&quot;   // =&gt; Has never been active; see IOMETER1 branch!
+ //#define IOVER_FILEVERSION				&quot;2004.07.30-post\0&quot;
+ //#define IOVER_FILEVERSION				&quot;2006.07.27\0&quot;
+-#define IOVER_FILEVERSION				&quot;2008.03.06\0&quot;
++//#define IOVER_FILEVERSION				&quot;2008.03.06\0&quot;
++#define IOVER_FILEVERSION				&quot;2008.06.18\0&quot;
+ #define IOVER_PRODUCTVERSION				IOVER_FILEVERSION
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-06-19 06:45:11 UTC (rev 329)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-06-19 06:48:45 UTC (rev 330)
+@@ -289,7 +289,6 @@
+ 	if (!affinity_mask) {
+ 		affinity_mask = 1;
+ 	}
+-	// not &amp;affinity_mask, MSDN API Doc error.
+ 	res = SetProcessAffinityMask(GetCurrentProcess(), affinity_mask);
+ 	if (!res) {
+ 		res = GetLastError();
+@@ -361,7 +360,7 @@
+ #else
+ #error ===&gt; ERROR: You have to set default affinity values here
+ 	// TODO for non-Windows
+-	param.cpu_affinity = 1; // get the current affinity value
++	param.cpu_affinity = 1; // get the current process affinity mask
+ #endif
+ #endif // IOMTR_SETTING_CPU_AFFINITY
+ 
+@@ -787,10 +786,10 @@
+ 				else
+ 					sscanf(argv[I],&quot;%I64d&quot;, &amp;tempMask);
+ 
+-#if defined(IOMTR_OSFAMILY_WINDOWS)
++#if defined (IOMTR_SETTING_CPU_AFFINITY)
++
+ 				// TODO for non-Windows
+-				// Until someone initializes the param.cpu_affinity (above) to the 
+-				// current affinity mask for other OSs, this stays for Windows only
++				// This will not work if you ignored initializing cpu_affinity above
+ 				if ((tempMask &amp; param-&gt;cpu_affinity) != tempMask)
+ 				{
+ 					cerr &lt;&lt; &quot;Warning: Invalid cpu_affinity mask specified, ignoring.&quot; &lt;&lt; endl;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000095.html">[Iometer-svn] r329 - branches/IOMETER-restruct/iometer/src/Galileo
+</A></li>
+	<LI>Next message: <A HREF="000097.html">[Iometer-svn] r331 - branches/IOMETER-restruct/iometer
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#96">[ date ]</a>
+              <a href="thread.html#96">[ thread ]</a>
+              <a href="subject.html#96">[ subject ]</a>
+              <a href="author.html#96">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

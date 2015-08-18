@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r264 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-July/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r264%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200607190134.k6J1YfXS030184%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000035.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r264 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r264%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200607190134.k6J1YfXS030184%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r264 - branches/IOMETER-restruct/iometer/src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Wed Jul 19 03:34:41 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000035.html">[Iometer-svn] r265 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-07-19 03:34:26 +0200 (Wed, 19 Jul 2006)
+New Revision: 264
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+Solaris does not support O_DIRECT yet. So need to be separated from Linux on open().
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-05-16 15:17:39 UTC (rev 263)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-07-19 01:34:26 UTC (rev 264)
+@@ -1286,8 +1286,11 @@
+ 	if (IsType(spec.type, LogicalDiskType)) {
+ 		// Ignore errors that occur if trying to open a floppy or CD-ROM with
+ 		// nothing in the drive.
+-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS)
+ 		((struct File *)disk_file)-&gt;fd =
++		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
++#elif defined(IOMTR_OS_LINUX)
++		((struct File *)disk_file)-&gt;fd =
+ 		    open(file_name, O_DIRECT | O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		NXFileOpen(0, (void *)file_name, (NXMode_t) (NX_O_RDWR | NX_O_CREAT | open_flag),
+@@ -1305,7 +1308,9 @@
+ #warning ===&gt; WARNING: You have to do some coding here to get the port done!
+ #endif
+ 	} else if (IsType(spec.type, PhysicalDiskType)) {
+-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
++#if defined(IOMTR_OS_SOLARIS)
++		((struct File *)disk_file)-&gt;fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
++#elif defined(IOMTR_OS_LINUX)
+ 		((struct File *)disk_file)-&gt;fd = open(file_name, O_DIRECT | O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		((struct File *)disk_file)-&gt;fd = NWOpenDevice(atoi(file_name), 0);
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000035.html">[Iometer-svn] r265 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#34">[ date ]</a>
+              <a href="thread.html#34">[ thread ]</a>
+              <a href="subject.html#34">[ subject ]</a>
+              <a href="author.html#34">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

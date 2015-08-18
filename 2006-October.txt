@@ -1,0 +1,192 @@
+From cheungming at mail.berlios.de  Fri Oct 27 02:48:44 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 27 Oct 2006 02:48:44 +0200
+Subject: [Iometer-svn] r310 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200610270048.k9R0mijF008807@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-10-27 02:48:42 +0200 (Fri, 27 Oct 2006)
+New Revision: 310
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+Log:
+should used _SC_NPROCESSORS_ONLN for cpu count.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-09-29 20:59:14 UTC (rev 309)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-27 00:48:42 UTC (rev 310)
+@@ -159,7 +159,7 @@
+ int Performance::Get_Processor_Count()
+ {
+ 	/* glib will do all parsing work for us from /proc/stat */
+-	return (sysconf(_SC_NPROCESSORS_CONF));
++	return (sysconf(_SC_NPROCESSORS_ONLN));
+ }
+ 
+ //
+
+
+
+From cheungming at mail.berlios.de  Fri Oct 27 02:49:25 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Fri, 27 Oct 2006 02:49:25 +0200
+Subject: [Iometer-svn] r311 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200610270049.k9R0nPru008882@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-10-27 02:49:24 +0200 (Fri, 27 Oct 2006)
+New Revision: 311
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+Log:
+cosmetic indent and typo fixes
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformance.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-10-27 00:48:42 UTC (rev 310)
++++ branches/IOMETER-restruct/iometer/src/IOPerformance.cpp	2006-10-27 00:49:24 UTC (rev 311)
+@@ -371,7 +371,7 @@
+ 	//#ifdef WIN64_COUNTER_WORKAROUND
+ 	// *** Removed ***
+ 	//
+-	//currently Win64 uses GetTickCOunt whose units are in milliseconds.
++	//currently Win64 uses GetTickCount whose units are in milliseconds.
+ 	//
+ 	//return (double) MILLISECOND;
+ 	//
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-10-27 00:48:42 UTC (rev 310)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2006-10-27 00:49:24 UTC (rev 311)
+@@ -329,7 +329,17 @@
+ #ifdef __cplusplus
+ }
+ #endif
+- //#endif //!USING_DDK//////////////////////////////////////////////////////////////////////////////////////  Name:       readITC//  Purpose:    To read the IA64 Itanium's Interval Time Counter (ITC, AR-44).  The//              ITC is equivalent to the IA32 Time Stamp Counter (TSC).  The IA32//              TSC can be read using the IA32 RDTSC instruction (opcode 0F 31h) but//              there is no equivalent IA64 instruction to read the ITC.//  Returns:    The value of the ITC//  Parameters: None./////////////////////////////////////////////////////////////////////////////////////
++ //#endif //!USING_DDK
++
++////////////////////////////////////////////////////////////////////////////////////
++//  Name:       readITC
++//  Purpose:    To read the IA64 Itanium's Interval Time Counter (ITC, AR-44).  The
++//              ITC is equivalent to the IA32 Time Stamp Counter (TSC).  The IA32
++//              TSC can be read using the IA32 RDTSC instruction (opcode 0F 31h) but
++//              there is no equivalent IA64 instruction to read the ITC.
++//  Returns:    The value of the ITC
++//  Parameters: None.
++/////////////////////////////////////////////////////////////////////////////////////
+     DWORDLONG rdtsc()
+ {
+ 	// *** Removed ***
+
+
+
+From cheungming at mail.berlios.de  Sat Oct 28 21:04:11 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Sat, 28 Oct 2006 21:04:11 +0200
+Subject: [Iometer-svn] r312 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200610281904.k9SJ4Bws017093@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-10-28 21:04:10 +0200 (Sat, 28 Oct 2006)
+New Revision: 312
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+Log:
+minor fix. added a return value check.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-27 00:49:24 UTC (rev 311)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-28 19:04:10 UTC (rev 312)
+@@ -194,6 +194,11 @@
+ 	}
+ 
+ 	cpuInfo = fopen("/proc/cpuinfo", "r");
++	if (!cpuInfo) {
++		cerr << "Error determining CPU speed.\n";
++		return (0.0);
++	}
++
+ 	do {
+ 		fscanf(cpuInfo, "%7c", label);
+ 		if (!strncmp(label, "cpu MHz", 7)) {
+
+
+
+From cheungming at mail.berlios.de  Tue Oct 31 15:53:27 2006
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 31 Oct 2006 15:53:27 +0100
+Subject: [Iometer-svn] r313 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200610311453.k9VErR25010650@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-10-31 15:53:26 +0100 (Tue, 31 Oct 2006)
+New Revision: 313
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+Log:
+used /proc/cpuinfo to get online CPU count since glibc way is buggy.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-28 19:04:10 UTC (rev 312)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-10-31 14:53:26 UTC (rev 313)
+@@ -156,10 +156,37 @@
+ {
+ }
+ 
+-int Performance::Get_Processor_Count()
++int Performance::Get_Processor_Count(void)
+ {
+-	/* glib will do all parsing work for us from /proc/stat */
+-	return (sysconf(_SC_NPROCESSORS_ONLN));
++	char buf[4096];
++	char *p = "processor\t:";
++	int i = 0;
++	size_t res, j;
++	FILE *cpuinfo;
++
++	cpuinfo = fopen("/proc/cpuinfo", "r");
++	if (cpuinfo) {
++		j = strlen(p);
++	
++		do {
++			memset(buf, 0, 4096);
++			res = fread(buf, 1, 4095, cpuinfo);
++			if (res >= j) {
++				char *c = buf;
++				while ((c = strstr(c, p))) {
++					i++;
++					c += j;
++				};
++				(void)fseek(cpuinfo, -j + 1, SEEK_CUR);
++			}
++		} while (res >= j);
++		(void)fclose(cpuinfo);
++	}
++	if (!i) {
++		/* fall through to the glib way, though sometime it is buggy. */
++		return sysconf(_SC_NPROCESSORS_ONLN);
++	}
++	return i;
+ }
+ 
+ //
+
+
+

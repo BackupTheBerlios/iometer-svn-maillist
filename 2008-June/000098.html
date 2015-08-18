@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r332 - branches/IOMETER-restruct/iometer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r332%20-%20branches/IOMETER-restruct/iometer&In-Reply-To=%3C200806302158.m5ULwHW6022728%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000097.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r332 - branches/IOMETER-restruct/iometer</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r332%20-%20branches/IOMETER-restruct/iometer&In-Reply-To=%3C200806302158.m5ULwHW6022728%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r332 - branches/IOMETER-restruct/iometer">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Mon Jun 30 23:58:17 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000097.html">[Iometer-svn] r331 - branches/IOMETER-restruct/iometer
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2008-06-30 23:58:16 +0200 (Mon, 30 Jun 2008)
+New Revision: 332
+
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/CREDITS
+Log:
+updated CHANGELOG and CREDITS
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-27 01:13:38 UTC (rev 331)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2008-06-30 21:58:16 UTC (rev 332)
+@@ -54,7 +54,11 @@
+ - New features:
+    - Added a simple INSTALL file about how to install iometer and dynamo on 
+      various platforms.
+-
++   - Patch by Kris Murray and Allen Wayne from Intel on randomizing the written
++     data. The previous implementation of writing 0's causes an un-desired side-effect 
++     on some media, especially flash-based devices. The writing of random data 
++     creates a realistic workload for these new devices. (Also data patten will have impact
++     on protocol like iSCSI as well).
+ - Bug fixes:
+    - Patch by Ming Zhang to fix the way to get CPU utilization statistics under
+      Linux.
+
+Modified: branches/IOMETER-restruct/iometer/CREDITS
+===================================================================
+--- branches/IOMETER-restruct/iometer/CREDITS	2008-06-27 01:13:38 UTC (rev 331)
++++ branches/IOMETER-restruct/iometer/CREDITS	2008-06-30 21:58:16 UTC (rev 332)
+@@ -93,3 +93,8 @@
+ E: <A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">ian at zestysoft.com</A>
+ D: Provided a perl script to generate graphs.
+ 
++N: Kris Murray and Allen Wayne
++C: INTEL
++D: Added code to randomize the written data. Also initial drop
++   of the new timer code on Windows platform.
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000097.html">[Iometer-svn] r331 - branches/IOMETER-restruct/iometer
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#98">[ date ]</a>
+              <a href="thread.html#98">[ thread ]</a>
+              <a href="subject.html#98">[ subject ]</a>
+              <a href="author.html#98">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

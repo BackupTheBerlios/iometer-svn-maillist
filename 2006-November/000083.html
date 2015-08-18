@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r314 - in branches/IOMETER-restruct/iometer: . src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-November/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r314%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200611012023.kA1KN5aa013693%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000084.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r314 - in branches/IOMETER-restruct/iometer: . src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r314%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20src&In-Reply-To=%3C200611012023.kA1KN5aa013693%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r314 - in branches/IOMETER-restruct/iometer: . src">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Wed Nov  1 21:23:05 CET 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000084.html">[Iometer-svn] r315 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#83">[ date ]</a>
+              <a href="thread.html#83">[ thread ]</a>
+              <a href="subject.html#83">[ subject ]</a>
+              <a href="author.html#83">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-11-01 21:23:04 +0100 (Wed, 01 Nov 2006)
+New Revision: 314
+
+Added:
+   branches/IOMETER-restruct/iometer/INSTALL
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+added INSTALL file, update CHANGELOG to reflect the changes, and cosmetic changes.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-10-31 14:53:26 UTC (rev 313)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-11-01 20:23:04 UTC (rev 314)
+@@ -4,6 +4,20 @@
+ 
+ 
+ 
++ChangeLog (IOMETER2 - 200X.XX.XX):
++==================================
++
++- New features:
++   - Added a simple INSTALL file about how to install iometer and dynamo on 
++     various platforms.
++
++- Bug fixes:
++   - Patch by Ming Zhang to get CPU count from /proc/cpuinfo under Linux. Old
++     glibc way is buggy for 64bit Linux and XEN.
++
++- Cleanup:
++   -
++
+ ChangeLog (IOMETER2 - 2006.07.27):
+ ==================================
+ 
+
+Added: branches/IOMETER-restruct/iometer/INSTALL
+===================================================================
+--- branches/IOMETER-restruct/iometer/INSTALL	2006-10-31 14:53:26 UTC (rev 313)
++++ branches/IOMETER-restruct/iometer/INSTALL	2006-11-01 20:23:04 UTC (rev 314)
+@@ -0,0 +1,64 @@
++Installation notes
++==================
++
++You can install IoMeter from pre-compiled binaries or from source files. 
++Because IoMeter contains two major components, IoMeter and dynamo, both 
++components need to be installed properly.
++
++IoMeter can only be installed in a Windows environment like Windows 2000,
++Windows XP, Windows 2003. Dynamo can be installed on a wide range of OS
++including Windows, Linux, Solaris, Mac OS X, and Netware.
++
++IoMeter.exe Installation From Pre-compiled Binaries
++===================================================
++
++   The easiest way to install IoMeter.exe is from the installer package 
++like iometer-200X.XX.XX.win32.i386-setup.exe. Simply run the setup program
++and follow the instruction in each page will finish the installation process.
++
++IoMeter.exe Installation From Source Files
++==========================================
++
++   You have to compile the IoMeter.exe from source files. There are two ways
++to do so. One is using the Visual C++ and another is to use DDK. For Visual 
++C++, version 6.0 and 2002 is known to work. Newer Visual C++ should be OK as well.
++Open the IoMeter project file with Visual C++ and compile the binaries. For DDK users,
++I assumed you are proficient enough to know how to compile.
++
++Dynamo Installation From Pre-compiled Binaries
++==============================================
++
++   For Windows, dynamo.exe is contained in same installer like 
++iometer-200X.XX.XX.win32.i386-setup.exe as IoMeter.exe. Follow same instruction
++as IoMeter.exe
++
++   For other platforms, simply uncompress the binary archive. For example, for Linux
++on X86 platform, download the file iometer-200X_XX_XX.linux.i386-bin.tgz to a local directory,
++uncompress it with command &quot;tar zxvf iometer-200X_XX_XX.linux.i386-bin.tgz&quot;. It will
++generate an iometer-200X_XX_XX.linux.i386-bin dir, and src/dynamo is the binary.
++
++Note: because of different glibc and Linux distribution like Debian or Redhat, it is quite
++possible that the pre-compiled dynamo binary cannot run on a certain Linux environment. Then
++you have to install dynamo from source files.
++
++Dynamo Installation From Source Files
++=====================================
++
++   For Windows, follow the same instruction as IoMeter, using Visual C++ or DDK.
++
++   For other platforms, try to use followed steps:
++   * Find out the OS and CPU architecture of the box you want to run dynamo on.
++     For example, Linux OS with a X86 CPU, or Solaris with a SPARC CPU;
++   * Check if file &quot;Makefile-&lt;OS&gt;.&lt;cpu&gt;&quot; available in source directory. If so, then
++     dynamo can run on such platform. For OS+CPU platform that is not available, report
++     to IoMeter mailing list to see if developer can provide the port for this OS+CPU
++     platform.
++   * Run &quot;make -f Makefile-&lt;OS&gt;.&lt;cpu&gt; all&quot; to build dynamo.
++
++Report a Problem
++================
++
++If you meet any problem during installation and compilation, you can post your question
++to &lt;<A HREF="https://lists.berlios.de/mailman/listinfo/iometer-svn">iometer-user at lists.sourceforge.net</A>&gt;. You need to provide information like OS type,
++version, Visual C++ version if used, gcc version if used, detailed error message, and etc.
++
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-10-31 14:53:26 UTC (rev 313)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-11-01 20:23:04 UTC (rev 314)
+@@ -1283,8 +1283,6 @@
+ {
+ 	// open_flag is a 
+ 	if (IsType(spec.type, LogicalDiskType)) {
+-		// Ignore errors that occur if trying to open a floppy or CD-ROM with
+-		// nothing in the drive.
+ #if defined(IOMTR_OS_SOLARIS)
+ 		((struct File *)disk_file)-&gt;fd =
+ 		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+@@ -1296,6 +1294,8 @@
+ 			   &amp;((struct File *)disk_file)-&gt;fd);
+ 		((struct File *)disk_file)-&gt;type = LogicalDiskType;
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
++		// Ignore errors that occur if trying to open a floppy or CD-ROM with
++		// nothing in the drive.
+ 		SetErrorMode(SEM_FAILCRITICALERRORS);
+ 		disk_file = CreateFile(file_name, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ |
+ 				       FILE_SHARE_WRITE, NULL, OPEN_ALWAYS,
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000084.html">[Iometer-svn] r315 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#83">[ date ]</a>
+              <a href="thread.html#83">[ thread ]</a>
+              <a href="subject.html#83">[ subject ]</a>
+              <a href="author.html#83">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

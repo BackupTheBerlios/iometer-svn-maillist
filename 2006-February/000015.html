@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r249 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-February/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r249%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200602212144.k1LLiWrn017545%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000014.html">
+   
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r249 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r249%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200602212144.k1LLiWrn017545%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r249 - branches/IOMETER-restruct/iometer/src">cheungming at berlios.de
+       </A><BR>
+    <I>Tue Feb 21 22:44:32 CET 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000014.html">[Iometer-svn] r248 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-02-21 22:44:32 +0100 (Tue, 21 Feb 2006)
+New Revision: 249
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+Log:
+use sysconf to get processor count for Linux.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-02-21 20:53:45 UTC (rev 248)
++++ branches/IOMETER-restruct/iometer/src/IOPerformanceLinux.cpp	2006-02-21 21:44:32 UTC (rev 249)
+@@ -156,65 +156,10 @@
+ {
+ }
+ 
+-//
+-// Getting the number of processors in the system.
+-//
+ int Performance::Get_Processor_Count()
+ {
+-	// The file &quot;/proc/stat&quot; enumerates the CPUs, one per line, each line starting
+-	// with the string &quot;cpu&quot;. I prepend a '\n' to the file, then search for the
+-	// string &quot;\ncpu&quot;; that way, I will find every time that &quot;cpu&quot; appears as the
+-	// first thing in a line.
+-	//
+-	// Example /proc/stat file: (Note: On a two CPU system, you will see two
+-	// cpu lines, beginning &quot;cpu0 ...&quot; and &quot;cpu1 ...&quot;)
+-	//////////////////////////////////////////////////////////////////////
+-	// cpu  1847686 355419 509281 14738354
+-	// disk 69683 0 22232 0
+-	// disk_rio 18236 0 302 0
+-	// disk_wio 51447 0 21930 0
+-	// disk_rblk 145876 0 2374 0
+-	// disk_wblk 411576 0 173352 0
+-	// page 76934 442943
+-	// swap 1410 2465
+-	// intr 21377391 17450740 101201 0 2 2 0 3 0 1 0 0 69197 724623 1 340233 2691388 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+-	// ctxt 175242460
+-	// btime 942875987
+-	//////////////////////////////////////////////////////////////////////
+-	char stats[16 * 1024 + 1], *search;
+-	int fd, byteCount, cpuCount;
+-
+-	int nr_cpu = 0;
+-
+-	if (kstatfd &gt; 0 &amp;&amp; ioctl(kstatfd, IM_IOC_GETCPUNUM, &amp;nr_cpu) &gt;= 0) {
+-		cout &lt;&lt; &quot;# CPU: &quot; &lt;&lt; nr_cpu &lt;&lt; endl;
+-		return nr_cpu;
+-	}
+-
+-	fd = open(&quot;/proc/stat&quot;, O_RDONLY);
+-	if (fd &lt; 0) {
+-		cout &lt;&lt; &quot;*** Unable to determine number of processors in system.&quot;;
+-		return 0;
+-	}
+-	byteCount = read(fd, stats + 1, sizeof(stats) - 1);
+-	close(fd);
+-	if ((byteCount &lt; 0) || (byteCount == sizeof(stats) - 1)) {
+-		cout &lt;&lt; &quot;*** Unable to determine number of processors in system.&quot;;
+-		return 0;
+-	}
+-	stats[0] = '\n';	// Make the first line begin with a \n, like the others.
+-	stats[byteCount + 1] = '\0';
+-	search = stats;
+-	cpuCount = 0;
+-	while ((search = strstr(search, &quot;\ncpu&quot;)) != NULL) {
+-		++cpuCount;
+-		++search;	// Make sure we don't find the same CPU again!
+-	}
+-
+-	// Decrease result by one, because on a single processor
+-	// machine, the code above counts &quot;cpu&quot; and &quot;cpu0&quot;!
+-	cpuCount--;
+-	return (cpuCount);
++	/* glib will do all parsing work for us from /proc/stat */
++	return (sysconf(_SC_NPROCESSORS_CONF));
+ }
+ 
+ //
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000014.html">[Iometer-svn] r248 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#15">[ date ]</a>
+              <a href="thread.html#15">[ thread ]</a>
+              <a href="subject.html#15">[ subject ]</a>
+              <a href="author.html#15">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

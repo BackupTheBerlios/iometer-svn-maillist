@@ -1,0 +1,517 @@
+From vedrand at mail.berlios.de  Fri Aug  1 07:19:06 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 1 Aug 2008 07:19:06 +0200
+Subject: [Iometer-svn] r333 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808010519.m715J6bP026542@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-08-01 07:18:55 +0200 (Fri, 01 Aug 2008)
+New Revision: 333
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+Log:
+Fixed QueryDosDevice input buffer handling.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-06-30 21:58:16 UTC (rev 332)
++++ branches/IOMETER-restruct/iometer/src/IOManagerWin.cpp	2008-08-01 05:18:55 UTC (rev 333)
+@@ -1705,6 +1705,7 @@
+ int GetDosDevices(LPSTR search, LPSTR *source)
+ {
+ 	int srcSize = 0, bufSize = 65536;
++	DWORD errCode;
+ 	LPSTR dest;
+ 
+ 	while (TRUE)
+@@ -1719,16 +1720,18 @@
+ 
+         srcSize = QueryDosDevice(search, dest, bufSize);
+ 
+-		if (GetLastError() == ERROR_INSUFFICIENT_BUFFER)
++		errCode = GetLastError();
++
++		if (errCode == ERROR_INSUFFICIENT_BUFFER || errCode == ERROR_MORE_DATA)
+ 		{
+ 			delete [] dest;
+-        	bufSize = NULL;
++        	dest = NULL;
+         	bufSize *= 2;
+         	continue;
+ 		}
+         else if (srcSize == 0) 
+ 		{
+-			cerr << "Error querying dos devices, error=" << GetLastError() << endl;
++			cerr << "Error querying dos devices, error=" << errCode << endl;
+ 			return 0;
+         }
+ 		else
+
+
+
+From vedrand at mail.berlios.de  Fri Aug  1 10:20:29 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 1 Aug 2008 10:20:29 +0200
+Subject: [Iometer-svn] r334 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808010820.m718KTG9026568@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-08-01 10:20:20 +0200 (Fri, 01 Aug 2008)
+New Revision: 334
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/PageDisk.cpp
+   branches/IOMETER-restruct/iometer/src/PageDisk.h
+Log:
+Minor cleanup to support compatibility modes.
+
+Modified: branches/IOMETER-restruct/iometer/src/PageDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageDisk.cpp	2008-08-01 05:18:55 UTC (rev 333)
++++ branches/IOMETER-restruct/iometer/src/PageDisk.cpp	2008-08-01 08:20:20 UTC (rev 334)
+@@ -326,6 +326,7 @@
+ 
+ 		// set the icon associated with the disk
+ 		switch (disk->type) {
++#ifdef USE_NEW_DISCOVERY_MECHANISM
+ 		case PhysicalDiskTypeHasPartitions:
+ 			// If we know the physical disk has partitions, and the checkbox has not been
+ 			// selected, exclude this disk.
+@@ -333,7 +334,7 @@
+ 			//	continue;
+ 
+ 			tvstruct.hParent = hLastLogicalParent; // continue on
+-
++#endif
+ 		case PhysicalDiskType:
+ 			// If this is an orphaned disk, we can still have valueable data on
+ 			// unrecognized partitions, so check the checkbox here again.
+@@ -350,11 +351,11 @@
+ 				ErrorMessage("InsertItem() failed in CPageDisk::ShowTargets() for physical disk");
+ 				return;
+ 			}
+-
++#ifdef USE_NEW_DISCOVERY_MECHANISM
+ 			// Expand the items rooted at the prior
+ 			if (disk->type == PhysicalDiskTypeHasPartitions)
+ 				m_TTargets.Expand(hLastLogicalParent, TVE_EXPAND);
+-
++#endif
+ 			break;
+ 
+ 		case LogicalDiskType:
+@@ -1238,7 +1239,6 @@
+ 	*pResult = 1;
+ }
+ 
+-#ifdef USE_NEW_DISCOVERY_MECHANISM
+ HTREEITEM CPageDisk::GetNextTreeObject(HTREEITEM hnode)
+ {
+ 	HTREEITEM htemp;
+@@ -1263,8 +1263,8 @@
+ 
+ 	return htemp;
+ }
+-#endif
+ 
++
+ DWORDLONG CPageDisk::GetDlgItemInt64(int nID, BOOL* lpTrans, BOOL bSigned, int *lpRadix )
+ {
+ 	CString dlgCString;
+
+Modified: branches/IOMETER-restruct/iometer/src/PageDisk.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/PageDisk.h	2008-08-01 05:18:55 UTC (rev 333)
++++ branches/IOMETER-restruct/iometer/src/PageDisk.h	2008-08-01 08:20:20 UTC (rev 334)
+@@ -117,9 +117,7 @@
+ 
+ 	void EditSetfocus(CEdit * edit);
+ 
+-#ifdef USE_NEW_DISCOVERY_MECHANISM
+ 	HTREEITEM GetNextTreeObject(HTREEITEM hnode);
+-#endif
+ 
+ 	// These do not exist in the mfc...
+ 	DWORDLONG GetDlgItemInt64(int nID, BOOL* lpTrans = NULL, BOOL bSigned = TRUE, int* lpRadix = NULL);
+
+
+
+From vedrand at mail.berlios.de  Mon Aug  4 00:09:57 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Mon, 4 Aug 2008 00:09:57 +0200
+Subject: [Iometer-svn] r335 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808032209.m73M9vBo014987@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-08-04 00:09:54 +0200 (Mon, 04 Aug 2008)
+New Revision: 335
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTime.cpp
+   branches/IOMETER-restruct/iometer/src/pack8.h
+Log:
+New line at end of file.
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTime.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTime.cpp	2008-08-01 08:20:20 UTC (rev 334)
++++ branches/IOMETER-restruct/iometer/src/IOTime.cpp	2008-08-03 22:09:54 UTC (rev 335)
+@@ -581,4 +581,4 @@
+ 	return timerFreq;
+ }
+ 
+-#endif
+\ No newline at end of file
++#endif
+
+Modified: branches/IOMETER-restruct/iometer/src/pack8.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/pack8.h	2008-08-01 08:20:20 UTC (rev 334)
++++ branches/IOMETER-restruct/iometer/src/pack8.h	2008-08-03 22:09:54 UTC (rev 335)
+@@ -57,4 +57,4 @@
+ #pragma pack(push, 8)
+ #else
+ #error ===> You must include an 8-byte structure packing/alignment directive.
+-#endif
+\ No newline at end of file
++#endif
+
+
+
+From vedrand at mail.berlios.de  Fri Aug  8 05:59:47 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 8 Aug 2008 05:59:47 +0200
+Subject: [Iometer-svn] r336 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808080359.m783xlFI022506@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-08-08 05:59:43 +0200 (Fri, 08 Aug 2008)
+New Revision: 336
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+Abstracted the sscanf format specifier in affinity code.
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-08-03 22:09:54 UTC (rev 335)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-08-08 03:59:43 UTC (rev 336)
+@@ -774,17 +774,13 @@
+ 			if (argv[I])
+ 			{
+ 				// Lets use sscanf below to support hex input
+-				//param->cpu_affinity = (unsigned long)atol(argv[I]);
+ 				ULONG_PTR tempMask;
+ 				
+-				//
+-				// Always deposit to a 64bit variable. We will just truncate 
+-				// in case of 32bit OS. Handle both hex and decimal values.
+-				//
++				// Handle both hex and decimal values. Abstract format spec syntax (in iocommon.h)
+ 				if (argv[I][0] == '0' && argv[I][1] == 'x')
+-					sscanf(argv[I],"0x%I64x", &tempMask);
++					sscanf(argv[I],"0x%" IOMTR_FORMAT_SPEC_64BIT "x", &tempMask);
+ 				else
+-					sscanf(argv[I],"%I64d", &tempMask);
++					sscanf(argv[I],"%" IOMTR_FORMAT_SPEC_64BIT "d", &tempMask);
+ 
+ #if defined (IOMTR_SETTING_CPU_AFFINITY)
+ 
+
+
+
+From vedrand at mail.berlios.de  Fri Aug  8 06:01:12 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 8 Aug 2008 06:01:12 +0200
+Subject: [Iometer-svn] r337 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808080401.m7841CTX022685@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-08-08 06:01:09 +0200 (Fri, 08 Aug 2008)
+New Revision: 337
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOCommon.h
+Log:
+-sscanf abstraction definition
+-proper definitions for xLONG_PTR for the unixes and netware
+
+Modified: branches/IOMETER-restruct/iometer/src/IOCommon.h
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOCommon.h	2008-08-08 03:59:43 UTC (rev 336)
++++ branches/IOMETER-restruct/iometer/src/IOCommon.h	2008-08-08 04:01:09 UTC (rev 337)
+@@ -338,8 +338,16 @@
+  #if defined(IOMTR_SETTING_GCC_M64)
+   // DWORD is supposed to be an unsigned 32 bit number.
+   typedef unsigned int	       DWORD;
+- #else
+-  typedef unsigned long	       DWORD;
++  typedef unsigned __int64     ULONG_PTR, *PULONG_PTR;
++  typedef ULONG_PTR            DWORD_PTR;
++  typedef __int64			   LONG_PTR;
++  #define IOMTR_FORMAT_SPEC_64BIT	"L" 
++#else
++  typedef unsigned long			DWORD;
++  typedef unsigned long			ULONG_PTR, *PULONG_PTR;
++  typedef ULONG_PTR				DWORD_PTR;
++  typedef int					LONG_PTR;
++  #define IOMTR_FORMAT_SPEC_64BIT	"l"
+  #endif
+  
+  typedef int		       INT;
+@@ -373,9 +381,7 @@
+  typedef BYTE		      *LPBYTE;
+  typedef LPCSTR		       LPCTSTR;
+ 
+- typedef unsigned long         ULONG_PTR, *PULONG_PTR;
+- typedef ULONG_PTR             DWORD_PTR;
+-#endif 
++ #endif 
+ // ----------------------------------------------------------------------------
+ #if defined(IOMTR_OSFAMILY_WINDOWS)
+ #ifndef LONG_PTR
+@@ -400,6 +406,8 @@
+  //  a new CONNECTION type allows me to separate the two different concepts
+  //  cleanly.
+  typedef ULONG_PTR CONNECTION;
++
++#define IOMTR_FORMAT_SPEC_64BIT	"I64"
+ #endif 
+ // ----------------------------------------------------------------------------
+ 
+
+
+
+From vedrand at mail.berlios.de  Fri Aug  8 06:20:48 2008
+From: vedrand at mail.berlios.de (vedrand at mail.berlios.de)
+Date: Fri, 8 Aug 2008 06:20:48 +0200
+Subject: [Iometer-svn] r338 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808080420.m784KmR0024788@sheep.berlios.de>
+
+Author: vedrand
+Date: 2008-08-08 06:20:36 +0200 (Fri, 08 Aug 2008)
+New Revision: 338
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Makefile-Linux.i386
+   branches/IOMETER-restruct/iometer/src/Makefile-Linux.ia64
+   branches/IOMETER-restruct/iometer/src/Makefile-Linux.ppc
+   branches/IOMETER-restruct/iometer/src/Makefile-Linux.x86_64
+   branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale
+   branches/IOMETER-restruct/iometer/src/Makefile-NetWare.i386
+   branches/IOMETER-restruct/iometer/src/Makefile-OSX.all
+   branches/IOMETER-restruct/iometer/src/Makefile-Solaris.i386
+   branches/IOMETER-restruct/iometer/src/Makefile-Solaris.sparc
+Log:
+Update Makefiles adding definitions for USE_NEW_DISCOVERY_MECHANISM and FORCE_STRUCT_ALIGN
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Linux.i386
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Linux.i386	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Linux.i386	2008-08-08 04:20:36 UTC (rev 338)
+@@ -113,7 +113,8 @@
+ 	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_LINUX \
+ 	-DIOMTR_CPU_I386 \
+ 	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+-	-D_REENTRANT -DNOMINMAX
++	-D_REENTRANT -DNOMINMAX \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ #	-ggdb
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Linux.ia64
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Linux.ia64	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Linux.ia64	2008-08-08 04:20:36 UTC (rev 338)
+@@ -78,6 +78,7 @@
+ 	-DIOMTR_SETTING_GCC_M64 \
+ 	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+ 	-D_REENTRANT \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN \
+ 	-ggdb
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Linux.ppc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Linux.ppc	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Linux.ppc	2008-08-08 04:20:36 UTC (rev 338)
+@@ -82,6 +82,7 @@
+ 	-DIOMTR_CPU_PPC \
+ 	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+ 	-D_REENTRANT \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ #	-ggdb
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Linux.x86_64
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Linux.x86_64	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Linux.x86_64	2008-08-08 04:20:36 UTC (rev 338)
+@@ -78,7 +78,8 @@
+ 	-DIOMTR_CPU_X86_64 \
+ 	-DIOMTR_SETTING_GCC_M64 \
+ 	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+-	-D_REENTRANT -DNOMINMAX
++	-D_REENTRANT -DNOMINMAX \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ #	-ggdb
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Linux.xscale	2008-08-08 04:20:36 UTC (rev 338)
+@@ -86,7 +86,8 @@
+ 	-DIOMTR_CPU_XSCALE \
+ 	-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 \
+ 	-D_REENTRANT -DNOMINMAX \
+- 	-static
++ 	-static \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ #	-ggdb
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-NetWare.i386
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-NetWare.i386	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-NetWare.i386	2008-08-08 04:20:36 UTC (rev 338)
+@@ -103,7 +103,8 @@
+         -DIOMTR_OSFAMILY_NETWARE -DIOMTR_OS_NETWARE\
+         -DIOMTR_CPU_I386\
+         -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64\
+-		-D_REENTRANT
++		-D_REENTRANT\
++	    -DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ 
+ # link flags for mwldnlm.exe
+ LDFLAGS=-nlmversion 1,0,0 \
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-OSX.all
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-OSX.all	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-OSX.all	2008-08-08 04:20:36 UTC (rev 338)
+@@ -78,7 +78,8 @@
+ 	-DIOMTR_CPU_PPC \
+ 	-DNO_DYNAMO_VI \
+         -D_REENTRANT \
+-        -DNOMINMAX
++        -DNOMINMAX \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ 
+ 
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Solaris.i386
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Solaris.i386	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Solaris.i386	2008-08-08 04:20:36 UTC (rev 338)
+@@ -87,7 +87,8 @@
+ 	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_SOLARIS \
+ 	-DIOMTR_CPU_I386 \
+         -D_LARGEFILE64_SOURCE \
+-        -D_REENTRANT
++        -D_REENTRANT \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ #-I/opt/SUNWspro/include/CC \
+ # CFLAGS=-compat=4
+ 
+
+Modified: branches/IOMETER-restruct/iometer/src/Makefile-Solaris.sparc
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Makefile-Solaris.sparc	2008-08-08 04:01:09 UTC (rev 337)
++++ branches/IOMETER-restruct/iometer/src/Makefile-Solaris.sparc	2008-08-08 04:20:36 UTC (rev 338)
+@@ -98,7 +98,8 @@
+ 	-DIOMTR_OSFAMILY_UNIX -DIOMTR_OS_SOLARIS \
+ 	-DIOMTR_CPU_SPARC \
+         -D_LARGEFILE64_SOURCE \
+-        -D_REENTRANT
++        -D_REENTRANT \
++	-DUSE_NEW_DISCOVERY_MECHANISM -DFORCE_STRUCT_ALIGN
+ #-I/opt/SUNWspro/include/CC \
+ # CFLAGS=-compat=4
+ 
+
+
+
+From cheungming at mail.berlios.de  Tue Aug 19 18:22:50 2008
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Tue, 19 Aug 2008 18:22:50 +0200
+Subject: [Iometer-svn] r341 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808191622.m7JGMoj4011443@sheep.berlios.de>
+
+Author: cheungming
+Date: 2008-08-19 18:22:49 +0200 (Tue, 19 Aug 2008)
+New Revision: 341
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOManager.cpp
+Log:
+try to fix OSX compile. no resouce to test at all...
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOManager.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOManager.cpp	2008-08-14 01:30:32 UTC (rev 340)
++++ branches/IOMETER-restruct/iometer/src/IOManager.cpp	2008-08-19 16:22:49 UTC (rev 341)
+@@ -276,7 +276,7 @@
+ #if defined(IOMTR_OS_SOLARIS)
+ 	// Calculate processor_speed_to_nsecs for use in rdtsc.c
+ 	// Note that this works only for MHz CPUs. For GHz CPUs the divisor will change.
+-	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].processor_speed / 1000000000;
++	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].timer_resolution / 1000000000;
+ #else
+ #warning ===> WARNING: You have to do some coding here to get the port done!
+ #endif
+@@ -286,7 +286,7 @@
+ 	// Calculate processor_speed_to_nsecs for use in rdtsc.c
+ 	// This is multiplied by the timestamp in nanosecs
+ 	// That gives (time in ns) * (proc speed in HZ) / 1000000000 = time in cpu cycles
+-	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].processor_speed / 1000000000;
++	processor_speed_to_nsecs = (double)perf_data[WHOLE_TEST_PERF].timer_resolution / 1000000000;
+ #elif defined(IOMTR_OS_LINUX)
+ 	// nop
+ #else
+
+
+
+From cheungming at mail.berlios.de  Wed Aug 27 16:09:27 2008
+From: cheungming at mail.berlios.de (cheungming at BerliOS)
+Date: Wed, 27 Aug 2008 16:09:27 +0200
+Subject: [Iometer-svn] r342 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200808271409.m7RE9RN9005999@sheep.berlios.de>
+
+Author: cheungming
+Date: 2008-08-27 16:09:27 +0200 (Wed, 27 Aug 2008)
+New Revision: 342
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+fixed the use of TIMER_MAX, a left over change from last commit
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-08-19 16:22:49 UTC (rev 341)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-08-27 14:09:27 UTC (rev 342)
+@@ -656,7 +656,7 @@
+ 				// directly access the TimerType global defines in IoTime.h. This should
+ 				// be cleaned up better.
+ 				//
+-				if (param->timer_type != TIMER_UNDEFINED && param->timer_type < TIMER_MAX)
++				if (param->timer_type != TIMER_UNDEFINED && param->timer_type < TIMER_TYPE_MAX)
+ 					TimerType = (timer_type) param->timer_type;
+ 
+ 				continue;
+
+
+

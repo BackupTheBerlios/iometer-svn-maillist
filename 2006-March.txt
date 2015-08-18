@@ -1,0 +1,112 @@
+From cheungming at berlios.de  Fri Mar 17 03:00:36 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Fri, 17 Mar 2006 03:00:36 +0100
+Subject: [Iometer-svn] r250 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200603170200.k2H20awF008147@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-03-17 03:00:22 +0100 (Fri, 17 Mar 2006)
+New Revision: 250
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+Christensen, ReedX K" <reedx.k.christensen at intel.com> suggest to add O_DIRECT when open a file.
+
+also many people report the caching effect because of without it.
+
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-02-21 21:44:32 UTC (rev 249)
++++ branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp	2006-03-17 02:00:22 UTC (rev 250)
+@@ -1283,7 +1283,7 @@
+ 		// nothing in the drive.
+ #if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
+ 		((struct File *)disk_file)->fd =
+-		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
++		    open(file_name, O_DIRECT| O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		NXFileOpen(0, (void *)file_name, (NXMode_t) (NX_O_RDWR | NX_O_CREAT | open_flag),
+ 			   &((struct File *)disk_file)->fd);
+@@ -1301,7 +1301,7 @@
+ #endif
+ 	} else if (IsType(spec.type, PhysicalDiskType)) {
+ #if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_SOLARIS)
+-		((struct File *)disk_file)->fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
++		((struct File *)disk_file)->fd = open(file_name, O_DIRECT | O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
+ #elif defined(IOMTR_OS_NETWARE)
+ 		((struct File *)disk_file)->fd = NWOpenDevice(atoi(file_name), 0);
+ #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
+
+
+
+From cheungming at berlios.de  Fri Mar 17 03:12:45 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Fri, 17 Mar 2006 03:12:45 +0100
+Subject: [Iometer-svn] r251 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200603170212.k2H2CjKI010408@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-03-17 03:12:12 +0100 (Fri, 17 Mar 2006)
+New Revision: 251
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+Log:
+"Christensen, ReedX K" <reedx.k.christensen at intel.com>
+
+Added a printf notice when a port connection is made.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-03-17 02:00:22 UTC (rev 250)
++++ branches/IOMETER-restruct/iometer/src/IOPortTCP.cpp	2006-03-17 02:12:12 UTC (rev 251)
+@@ -450,6 +450,8 @@
+ 	}
+ 	while (retval != 0);
+ 
++	printf("Successful PortTCP::Connect\n  - port name: %s\n", name);
++
+ 	return TRUE;
+ }
+ 
+
+
+
+From cheungming at berlios.de  Sat Mar 18 00:20:59 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Sat, 18 Mar 2006 00:20:59 +0100
+Subject: [Iometer-svn] r252 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200603172320.k2HNKxSC018483@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-03-18 00:20:58 +0100 (Sat, 18 Mar 2006)
+New Revision: 252
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+   branches/IOMETER-restruct/iometer/src/IOGrunt.h
+   branches/IOMETER-restruct/iometer/src/IOTarget.cpp
+   branches/IOMETER-restruct/iometer/src/IOTarget.h
+   branches/IOMETER-restruct/iometer/src/IOTargetDisk.cpp
+Log:
+
+From cheungming at berlios.de  Sat Mar 18 00:27:59 2006
+From: cheungming at berlios.de (cheungming at BerliOS)
+Date: Sat, 18 Mar 2006 00:27:59 +0100
+Subject: [Iometer-svn] r253 - branches/IOMETER-restruct/iometer/src
+Message-ID: <200603172327.k2HNRxp6018967@sheep.berlios.de>
+
+Author: cheungming
+Date: 2006-03-18 00:27:58 +0100 (Sat, 18 Mar 2006)
+New Revision: 253
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/IOGrunt.cpp
+Log:
+

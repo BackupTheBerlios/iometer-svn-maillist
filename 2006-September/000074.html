@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r305 -	branches/IOMETER-restruct/iometer/misc/Installer
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r305%20-%0A%09branches/IOMETER-restruct/iometer/misc/Installer&In-Reply-To=%3C200609291703.k8TH3GVr011166%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000073.html">
+   <LINK REL="Next"  HREF="000075.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r305 -	branches/IOMETER-restruct/iometer/misc/Installer</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r305%20-%0A%09branches/IOMETER-restruct/iometer/misc/Installer&In-Reply-To=%3C200609291703.k8TH3GVr011166%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r305 -	branches/IOMETER-restruct/iometer/misc/Installer">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Fri Sep 29 19:03:16 CEST 2006</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000073.html">[Iometer-svn] r304 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000075.html">[Iometer-svn] r306 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-09-29 19:03:15 +0200 (Fri, 29 Sep 2006)
+New Revision: 305
+
+Modified:
+   branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+Log:
+improved the .nsi install script a bit. used defines for const.
+
+Modified: branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi
+===================================================================
+--- branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-09-21 01:08:15 UTC (rev 304)
++++ branches/IOMETER-restruct/iometer/misc/Installer/Iometer.nsi	2006-09-29 17:03:15 UTC (rev 305)
+@@ -49,11 +49,16 @@
+ 
+ ##### Global settings
+ #------------------------------------------------------------------------------
+-Name &quot;Iometer 2006.05.31&quot;
+ 
+-OutFile &quot;iometer-2006.05.31.win32.i386-setup.exe&quot;
+-InstallDir &quot;$PROGRAMFILES\Iometer.org\Iometer 2006.05.31&quot;
++!define RELDATE &quot;2006.07.27&quot;
++!define PLATF &quot;win32&quot;
++!define ARCH &quot;i386&quot;
+ 
++Name &quot;Iometer ${RELDATE}&quot;
++
++OutFile &quot;iometer-${RELDATE}.${PLATF}.${ARCH}-setup.exe&quot;
++InstallDir &quot;$PROGRAMFILES\Iometer.org\Iometer ${RELDATE}&quot;
++
+ CRCCheck on
+ XPStyle on
+ 
+@@ -126,19 +131,19 @@
+ #------------------------------------------------------------------------------
+ Section &quot;Start Menu Shortcuts&quot; SectionStartMenu
+ 
+-	CreateDirectory &quot;$SMPROGRAMS\Iometer 2006.05.31&quot;
+-	CreateShortCut  &quot;$SMPROGRAMS\Iometer 2006.05.31\Iometer.lnk&quot;                     &quot;$INSTDIR\iometer.exe&quot;   &quot;&quot; &quot;$INSTDIR\iometer.exe&quot;   0
++	CreateDirectory &quot;$SMPROGRAMS\Iometer ${RELDATE}&quot;
++	CreateShortCut  &quot;$SMPROGRAMS\Iometer ${RELDATE}\Iometer.lnk&quot;                     &quot;$INSTDIR\iometer.exe&quot;   &quot;&quot; &quot;$INSTDIR\iometer.exe&quot;   0
+         IfFileExists &quot;$INSTDIR\iometer.pdf&quot;   &quot;&quot; +2
+-		CreateShortCut &quot;$SMPROGRAMS\Iometer 2006.05.31\Iometer Users Guide.lnk&quot;  &quot;$INSTDIR\iometer.pdf&quot;   &quot;&quot; &quot;$INSTDIR\iometer.pdf&quot;   0
+-	CreateShortCut  &quot;$SMPROGRAMS\Iometer 2006.05.31\Import Wizard for MS Access.lnk&quot; &quot;$INSTDIR\Wizard.mdb&quot;    &quot;&quot; &quot;$INSTDIR\Wizard.mdb&quot;    0
+-	CreateShortCut  &quot;$SMPROGRAMS\Iometer 2006.05.31\Uninstall Iometer.lnk&quot;           &quot;$INSTDIR\uninstall.exe&quot; &quot;&quot; &quot;$INSTDIR\uninstall.exe&quot; 0
++		CreateShortCut &quot;$SMPROGRAMS\Iometer ${RELDATE}\Iometer Users Guide.lnk&quot;  &quot;$INSTDIR\iometer.pdf&quot;   &quot;&quot; &quot;$INSTDIR\iometer.pdf&quot;   0
++	CreateShortCut  &quot;$SMPROGRAMS\Iometer ${RELDATE}\Import Wizard for MS Access.lnk&quot; &quot;$INSTDIR\Wizard.mdb&quot;    &quot;&quot; &quot;$INSTDIR\Wizard.mdb&quot;    0
++	CreateShortCut  &quot;$SMPROGRAMS\Iometer ${RELDATE}\Uninstall Iometer.lnk&quot;           &quot;$INSTDIR\uninstall.exe&quot; &quot;&quot; &quot;$INSTDIR\uninstall.exe&quot; 0
+ 
+ SectionEnd
+ #------------------------------------------------------------------------------
+ Section &quot;Uninstall&quot;
+   
+-	Delete &quot;$SMPROGRAMS\Iometer 2006.05.31\*.*&quot;
+-	RMDir  &quot;$SMPROGRAMS\Iometer 2006.05.31&quot;
++	Delete &quot;$SMPROGRAMS\Iometer ${RELDATE}\*.*&quot;
++	RMDir  &quot;$SMPROGRAMS\Iometer ${RELDATE}&quot;
+ 
+ 	Delete &quot;$INSTDIR\Iometer.exe&quot;
+ 	Delete &quot;$INSTDIR\Dynamo.exe&quot;
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000073.html">[Iometer-svn] r304 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000075.html">[Iometer-svn] r306 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#74">[ date ]</a>
+              <a href="thread.html#74">[ thread ]</a>
+              <a href="subject.html#74">[ subject ]</a>
+              <a href="author.html#74">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

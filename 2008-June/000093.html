@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r327 - branches/IOMETER-restruct/iometer/src/Pulsar
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-June/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r327%20-%20branches/IOMETER-restruct/iometer/src/Pulsar&In-Reply-To=%3C200806190644.m5J6i2pb007893%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000092.html">
+   <LINK REL="Next"  HREF="000094.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r327 - branches/IOMETER-restruct/iometer/src/Pulsar</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r327%20-%20branches/IOMETER-restruct/iometer/src/Pulsar&In-Reply-To=%3C200806190644.m5J6i2pb007893%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r327 - branches/IOMETER-restruct/iometer/src/Pulsar">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Thu Jun 19 08:44:02 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000092.html">[Iometer-svn] r325 - branches/IOMETER-restruct/iometer/src/Pulsar
+</A></li>
+        <LI>Next message: <A HREF="000094.html">[Iometer-svn] r328 - branches/IOMETER-restruct/iometer/src/msvc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-06-19 08:43:59 +0200 (Thu, 19 Jun 2008)
+New Revision: 327
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar/sources
+Log:
+Added compile time flags for structure alignment and cpu affinity
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar/sources
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-06-18 06:05:49 UTC (rev 326)
++++ branches/IOMETER-restruct/iometer/src/Pulsar/sources	2008-06-19 06:43:59 UTC (rev 327)
+@@ -19,9 +19,10 @@
+ #        |                |                          |
+ INCLUDES=$(SDK_INC_PATH); $(SDK_INC_PATH)\crt\stl70; $(MSSDK)\INCLUDE;..
+ 
+-C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM
++C_DEFINES=$(C_DEFINES) -D_PULSAR_ -DDOSWIN32 -DUSE_NEW_DISCOVERY_MECHANISM -DIOMTR_SETTING_CPU_AFFINITY -DFORCE_STRUCT_ALIGN 
+ # -DUSE_NEW_DISCOVERY_MECHANISM (for new disk detect)
+ # -DFORCE_STRUCT_ALIGN (structure member alignment)
++# -DIOMTR_SETTING_CPU_AFFINITY (turns on cpu affinity code
+ # -D_DETAILS (for more verbosity)
+ # -D_DEBUG (for normal debug)
+ # -DDEBUG (for DEBUG_NEW only)
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000092.html">[Iometer-svn] r325 - branches/IOMETER-restruct/iometer/src/Pulsar
+</A></li>
+	<LI>Next message: <A HREF="000094.html">[Iometer-svn] r328 - branches/IOMETER-restruct/iometer/src/msvc
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#93">[ date ]</a>
+              <a href="thread.html#93">[ thread ]</a>
+              <a href="subject.html#93">[ subject ]</a>
+              <a href="author.html#93">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

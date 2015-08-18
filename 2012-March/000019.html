@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> No subject
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2012-March/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20No%20subject&In-Reply-To=%3Cmailman.1.1331734067.3598.iometer-svn%40lists.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000011.html">
+   <LINK REL="Next"  HREF="000020.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>No subject</H1>
+    <B></B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20No%20subject&In-Reply-To=%3Cmailman.1.1331734067.3598.iometer-svn%40lists.berlios.de%3E"
+       TITLE="No subject">
+       </A><BR>
+    <I>Wed Mar 14 15:07:45 CET 2012</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000011.html">No subject
+</A></li>
+        <LI>Next message: <A HREF="000020.html">No subject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#19">[ date ]</a>
+              <a href="thread.html#19">[ thread ]</a>
+              <a href="subject.html#19">[ subject ]</a>
+              <a href="author.html#19">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>  Avoided use of modulo (%) operator by modifying Rand() function.
+Turning on random accesses in Iometer/dynamo was causing floating point
+exception faults very reliably.  Compiled dynamo with -g and set 'ulimit -c
+   unlimited' in order to get core file, and got some info from gdb:
+
+   (gdb) where
+   #0  0x00c8540b in __umoddi3 () from /lib/libgcc_s.so.1
+   #1  0x08050f0a in TargetDisk::Seek ()
+   #2  0x080501fe in Grunt::Do_IOs (this=0xb7f90008) at IOGrunt.cpp:1251
+   #3  0x08050534 in Grunt_Thread_Wrapper (grunt=0xb7f90008) at
+IOGrunt.cpp:992
+   #4  0x00b3eb80 in start_thread () from /lib/libpthread.so.0
+   #5  0x009c0dee in clone () from /lib/libc.so.6
+
+   I believe the __umoddi3() call is the &quot;%&quot; or modulo operator inside
+of this call function:
+         ((TargetDisk *) targets[target_id])-&gt;Seek( access_spec.Random(
+                 access_percent,
+                    (unsigned int)targets[target_id]-&gt;Rand() % 100 ),
+size,
+                 user_alignment, user_align_mask );
+
+  Found a mail thread on a postsql site that pointed out the tricky
+numeric nature of modulo operator:
+     <A HREF="http://archives.postgresql.org/pgsql-general/2005-05/msg01187.php">http://archives.postgresql.org/pgsql-general/2005-05/msg01187.php</A>
+
+And this link:
+     www.nabble.com/Re:-Remainder-(-)-operator-and-GCC-p1412329.html
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000011.html">No subject
+</A></li>
+	<LI>Next message: <A HREF="000020.html">No subject
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#19">[ date ]</a>
+              <a href="thread.html#19">[ thread ]</a>
+              <a href="subject.html#19">[ subject ]</a>
+              <a href="author.html#19">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

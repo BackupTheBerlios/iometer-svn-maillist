@@ -1,0 +1,376 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r301 - in branches/IOMETER-restruct/iometer: . misc
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2006-September/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r301%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20misc&In-Reply-To=%3C200609071355.k87DttrK006668%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   
+   <LINK REL="Next"  HREF="000071.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r301 - in branches/IOMETER-restruct/iometer: . misc</H1>
+    <B>cheungming at BerliOS</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r301%20-%20in%20branches/IOMETER-restruct/iometer%3A%20.%20misc&In-Reply-To=%3C200609071355.k87DttrK006668%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r301 - in branches/IOMETER-restruct/iometer: . misc">cheungming at mail.berlios.de
+       </A><BR>
+    <I>Thu Sep  7 15:55:55 CEST 2006</I>
+    <P><UL>
+        
+        <LI>Next message: <A HREF="000071.html">[Iometer-svn] r302 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: cheungming
+Date: 2006-09-07 15:55:54 +0200 (Thu, 07 Sep 2006)
+New Revision: 301
+
+Added:
+   branches/IOMETER-restruct/iometer/misc/graph.pl
+Modified:
+   branches/IOMETER-restruct/iometer/CHANGELOG
+Log:
+added a perl script to draw graph like what Wizard.mdb does. Contributed by Ian Brown.
+
+
+
+Modified: branches/IOMETER-restruct/iometer/CHANGELOG
+===================================================================
+--- branches/IOMETER-restruct/iometer/CHANGELOG	2006-08-26 23:18:57 UTC (rev 300)
++++ branches/IOMETER-restruct/iometer/CHANGELOG	2006-09-07 13:55:54 UTC (rev 301)
+@@ -141,6 +141,8 @@
+    - Added the initial drop of the DocBook sources of the first part of
+      the Iometer Users Guide (converted from OpenOffice - by James Rogers).
+ - Others:
++   - Added a perl script to draw simple graph like what Wizard.mdb does, a
++     free alternative solution.
+    - Changed the &quot;Help About...&quot; button of the Iometer Wizard to reflect
+      the current status (Open Source,...) of Iometer.
+    - Converted the Iometer Wizard to the file format of the 2000 version
+
+Added: branches/IOMETER-restruct/iometer/misc/graph.pl
+===================================================================
+--- branches/IOMETER-restruct/iometer/misc/graph.pl	2006-08-26 23:18:57 UTC (rev 300)
++++ branches/IOMETER-restruct/iometer/misc/graph.pl	2006-09-07 13:55:54 UTC (rev 301)
+@@ -0,0 +1,284 @@
++#!/usr/bin/perl
++
++# graphing script to use if Access isn't an option.  :)
++# written by Ian Brown for the iometer folks.
++# Version 1.0.0
++
++#if using windows (activestate perl), you must 'ppm install' these dependencies:
++# Time-Local
++# DBD-Chart
++# DBI
++# <A HREF="http://theoryx5.uwinnipeg.ca/ppms/GD.ppd">http://theoryx5.uwinnipeg.ca/ppms/GD.ppd</A>
++# <A HREF="http://theoryx5.uwinnipeg.ca/ppms/GDTextUtil.ppd">http://theoryx5.uwinnipeg.ca/ppms/GDTextUtil.ppd</A>
++
++#for the *nix folk:
++#perl -MCPAN -eshell
++#  install DBD::Chart
++# or find the rpm/package for your distro
++
++# todo:
++# write a config file that this script can parse instead of asking for user input
++
++use warnings;
++use strict;
++
++use DBI;
++use DBD::Chart;
++
++sub HarvestChoicesFromCSVFile($);
++sub HarvestDataFromCSVFile($$$);
++sub CreateTable($);
++sub InsertData($$);
++sub UpdateData($$$);
++sub GraphData($$$$);
++
++if (@ARGV &lt; 2)
++{
++   die(&quot;Usage: graph.pl file1.csv [file2.csv file3.csv] &quot; .
++       &quot;output_graphic_filename_without_extension\n&quot;);
++}
++if (@ARGV &gt; 29)
++{
++   die(&quot;Sorry, this program can only generate 28 lines per graph due to&quot; .
++       &quot; the limitation of color choices.\n&quot;);
++}
++
++my @filenames = @ARGV;
++my $graphicFilename = pop(@filenames);
++
++my @filenameTitles;
++
++for (my $i = 0; $i &lt; @filenames; $i++)
++{
++   if (! -f $filenames[$i])
++   {
++      die &quot;Filename: $filenames[$i] not found.\n&quot;;
++   }
++   else
++   {
++      print &quot;Enter in a title for $filenames[$i] (Default is name itself): &quot;;
++      $filenameTitles[$i] = &lt;STDIN&gt;;
++      chomp($filenameTitles[$i]);
++      if ($filenameTitles[$i] eq &quot;&quot;)
++      {
++         $filenameTitles[$i] = $filenames[$i];
++         $filenameTitles[$i] =~ s/.csv$//i;
++      }
++      $filenameTitles[$i] = uc($filenameTitles[$i]);
++      $filenameTitles[$i] =~ tr/[A-Z][0-9]/_/c;
++   }
++}
++
++unshift(@filenameTitles, &quot;placeholder&quot;);
++my @choices = @{HarvestChoicesFromCSVFile($filenames[0])};
++my $displacement = 2;
++for (my $i = 1 + $displacement; $i &lt; @choices; $i++)
++{
++   print $i - $displacement . &quot;: $choices[$i]\n&quot;;   
++}
++
++my $yColumn;
++
++do
++{
++   print &quot;Which # for the y (vertical) column: &quot;;
++   $yColumn = &lt;STDIN&gt;;
++   chomp $yColumn;
++} while ($yColumn !~ m/^\d+$/);
++
++my $xColumn;
++
++do
++{
++   print &quot;Which # for the x (horizontal) column: &quot;;
++   $xColumn = &lt;STDIN&gt;;
++   chomp $xColumn;
++} while ($xColumn !~ m/^\d+$/);
++
++$yColumn+=$displacement;
++$xColumn+=$displacement;
++
++print &quot;What would you like the y-axis to be titled? (Enter for default)\n&quot;;
++print &quot;[&quot; . $choices[$yColumn] . &quot;]: &quot;;
++my $yAxisTitle = &lt;STDIN&gt;;
++chomp $yAxisTitle;
++if ($yAxisTitle =~ m/^$/)
++{
++   $yAxisTitle = $choices[$yColumn];
++}
++
++print &quot;What would you like the x-axis to be titled? (Enter for default)\n&quot;;
++print &quot;[&quot; . $choices[$xColumn] . &quot;]: &quot;;
++my $xAxisTitle = &lt;STDIN&gt;;
++chomp $xAxisTitle;
++if ($xAxisTitle =~ m/^$/)
++{
++   $xAxisTitle = $choices[$xColumn];
++}
++
++print &quot;What would you like the title to say? (Enter for default)\n&quot;;
++print &quot;[&quot; . $yAxisTitle . &quot; vs. &quot; . $xAxisTitle . &quot;]: &quot;;
++my $title = &lt;STDIN&gt;;
++chomp $title;
++if ($title =~ m/^$/)
++{
++   $title = $yAxisTitle . &quot; vs. &quot; . $xAxisTitle;
++}
++
++CreateTable(\@filenameTitles);
++
++my $lineCount = @filenames;
++my $filename = shift(@filenames);
++my $hashRef = HarvestDataFromCSVFile($filename, $yColumn, $xColumn);
++InsertData($hashRef, $lineCount + 1);
++for (my $i = 0; $i &lt; @filenames; $i++)
++{
++   $hashRef = HarvestDataFromCSVFile($filenames[$i], $yColumn, $xColumn);
++   UpdateData($hashRef, $i+2, \@filenameTitles);
++}
++
++my $fileRef = GraphData($yAxisTitle, $xAxisTitle, $lineCount, $title);
++open FILE, &quot;&gt;&quot; . $graphicFilename . &quot;.png&quot;;
++binmode(FILE);
++print FILE $$fileRef;
++close FILE;
++
++
++sub HarvestChoicesFromCSVFile($)
++{
++   my $filename = shift;
++   my @choices;
++   open FILE, &quot;&lt;$filename&quot;;
++   while (&lt;FILE&gt;)
++   {
++      if ($_ =~ m/^'Results/)
++      {
++         my $choices = &lt;FILE&gt;;
++         @choices = split(/,/, $choices);
++         $choices[0] =~ s/\'//;
++         last;
++      }
++   }
++   close FILE;
++   return \@choices;
++}
++sub HarvestDataFromCSVFile($$$)
++{
++   my $filename = shift;
++   my $yColumn = shift;
++   my $xColumn = shift;
++   my %hash;
++   open FILE, &quot;&lt;$filename&quot;;
++   while (&lt;FILE&gt;)
++   {
++      if ($_ =~ m/^ALL/)
++      {
++         my @data = split(/,/, $_);
++         push (@{$hash{'xColumn'}}, $data[$yColumn]);
++         push (@{$hash{'yColumn'}}, $data[$xColumn]);
++      }
++   }
++   close FILE;
++   return \%hash;
++}
++
++BEGIN
++{
++   my $dbh = DBI-&gt;connect('dbi:Chart:');
++
++   sub CreateTable($)
++   {
++      my $filenameTitlesRef = shift;
++      
++      my @arrayOfFields;
++      foreach my $title (@{$filenameTitlesRef})
++      {
++         push(@arrayOfFields, &quot;$title DECIMAL&quot;);
++      }
++      my $listOfFields = join(&quot;, &quot;, @arrayOfFields);
++      my $createTableSql = &quot;CREATE TABLE line ($listOfFields)&quot;;
++      my $createTable = $dbh-&gt;prepare($createTableSql) or die
++         &quot;Couldn't prepare createTable.  This is almost certainly due to the filename title(s) given.\n&quot; .
++         &quot;SQL COMMAND: $createTableSql\n&quot;;   
++      $createTable-&gt;execute();
++   }
++   
++   sub InsertData($$)
++   {
++      my $hashRef = shift;
++      my $count = shift;
++      my $valuesQuery = &quot;?, ?&quot;;
++      for(my $i = 2; $i &lt; $count; $i++)
++      {
++         $valuesQuery .= &quot;, NULL&quot;
++      }
++      my @yColumn = @{$hashRef-&gt;{'xColumn'}};
++      my @xColumn = @{$hashRef-&gt;{'yColumn'}};
++      if (@yColumn != @xColumn)
++      {
++         die(&quot;xColumn doesn't have the same elements as yColumn.  Corrupt csv?\n&quot;);
++      }
++      my $sqlString = &quot;INSERT INTO line VALUES($valuesQuery)&quot;;
++      my $insertData = $dbh-&gt;prepare( $sqlString)
++         or die &quot;Couldn't prepare insertData.  This normally happens when there was a problem creating the table.\n&quot; .
++         &quot;SQL COMMAND: $sqlString\n&quot;;       
++      for (my $i = 0; $i &lt; @yColumn; $i++)
++      {
++         $insertData-&gt;execute($xColumn[$i], $yColumn[$i]);
++      }
++   }
++   
++   sub UpdateData($$$)
++   {
++      my $hashRef = shift;
++      my $placeHolder = shift;
++      my $filenameTitlesRef = shift;
++      my @titles = @{$filenameTitlesRef};
++      my @yColumn = @{$hashRef-&gt;{'xColumn'}};
++      my @xColumn = @{$hashRef-&gt;{'yColumn'}};
++      my $sqlQuery = &quot;UPDATE line set $titles[$placeHolder] = ? where $titles[0] = ?&quot;;
++      my $updateData = $dbh-&gt;prepare($sqlQuery)
++         or die &quot;Couldn't prepare updateData.  This normally happens when there was a problem creating the table.\n&quot; .
++         &quot;SQL COMMAND: $sqlQuery\n&quot;;
++      for (my $i = 0; $i &lt; @yColumn; $i++)
++      {
++         $updateData-&gt;execute($yColumn[$i], $xColumn[$i]);
++      }      
++   }
++   
++   sub GraphData($$$$)
++   {
++      my $yColumnName = shift;
++      my $xColumnName = shift;
++      my $numOfLines = shift;
++      my $title = shift;
++      my $buf;
++      my @colors = ('yellow', 'blue', 'red', 'gray', 'dgray', 'black', 
++                     'lblue', 'dblue', 'gold', 'lyellow', 'dyellow',
++                    'lgreen', 'green', 'dgreen', 'lred', 'dred', 'lgray',
++                    'lpurple', 'purple', 'dpurple', 'lorange', 'orange',
++                    'pink', 'dpink', 'marine', 'cyan', 'lbrown', 'dbrown');
++      
++      my $colors;
++      for (my $i = 0; $i &lt; $numOfLines; $i++)
++      {
++         $colors .= $colors[$i] . &quot;, &quot;;
++      }
++      chop($colors);
++      chop($colors);
++      my $graphSql =&quot;SELECT LINEGRAPH FROM line
++        WHERE WIDTH=800 AND HEIGHT=600 AND X_AXIS= ? AND
++        Y_AXIS= ? AND COLOR in ($colors) AND SHAPE='fillcircle' AND
++        SHOWGRID=1 AND SHOWVALUES=0 AND BACKGROUND='white' AND LINEWIDTH=3 AND
++        TITLE=?&quot;;
++     my $graphData = $dbh-&gt;prepare($graphSql)
++      or die (&quot;Couldn't prepare graphData.  This normally happens when there was a problem inserting the data.\n&quot; .
++              &quot;SQL COMMAND: $graphSql\n&quot;); 
++      $graphData-&gt;execute($xColumnName, $yColumnName, $title);
++      $graphData-&gt;bind_columns(\$buf);
++      $graphData-&gt;fetch();
++      return \$buf;
++   }
++}
++
++
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	
+	<LI>Next message: <A HREF="000071.html">[Iometer-svn] r302 - in branches/IOMETER-restruct/iometer: . src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#70">[ date ]</a>
+              <a href="thread.html#70">[ thread ]</a>
+              <a href="subject.html#70">[ subject ]</a>
+              <a href="author.html#70">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>

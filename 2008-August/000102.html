@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+ <HEAD>
+   <TITLE> [Iometer-svn] r336 - branches/IOMETER-restruct/iometer/src
+   </TITLE>
+   <LINK REL="Index" HREF="http://lists.berlios.de/pipermail/iometer-svn/2008-August/index.html" >
+   <LINK REL="made" HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r336%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200808080359.m783xlFI022506%40sheep.berlios.de%3E">
+   <META NAME="robots" CONTENT="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>
+   <META http-equiv="Content-Type" content="text/html; charset=us-ascii">
+   <LINK REL="Previous"  HREF="000101.html">
+   <LINK REL="Next"  HREF="000103.html">
+ </HEAD>
+ <BODY BGCOLOR="#ffffff">
+   <H1>[Iometer-svn] r336 - branches/IOMETER-restruct/iometer/src</H1>
+    <B>vedrand at mail.berlios.de</B> 
+    <A HREF="mailto:iometer-svn%40lists.berlios.de?Subject=Re%3A%20%5BIometer-svn%5D%20r336%20-%20branches/IOMETER-restruct/iometer/src&In-Reply-To=%3C200808080359.m783xlFI022506%40sheep.berlios.de%3E"
+       TITLE="[Iometer-svn] r336 - branches/IOMETER-restruct/iometer/src">vedrand at mail.berlios.de
+       </A><BR>
+    <I>Fri Aug  8 05:59:47 CEST 2008</I>
+    <P><UL>
+        <LI>Previous message: <A HREF="000101.html">[Iometer-svn] r335 - branches/IOMETER-restruct/iometer/src
+</A></li>
+        <LI>Next message: <A HREF="000103.html">[Iometer-svn] r337 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#102">[ date ]</a>
+              <a href="thread.html#102">[ thread ]</a>
+              <a href="subject.html#102">[ subject ]</a>
+              <a href="author.html#102">[ author ]</a>
+         </LI>
+       </UL>
+    <HR>  
+<!--beginarticle-->
+<PRE>Author: vedrand
+Date: 2008-08-08 05:59:43 +0200 (Fri, 08 Aug 2008)
+New Revision: 336
+
+Modified:
+   branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+Log:
+Abstracted the sscanf format specifier in affinity code.
+
+Modified: branches/IOMETER-restruct/iometer/src/Pulsar.cpp
+===================================================================
+--- branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-08-03 22:09:54 UTC (rev 335)
++++ branches/IOMETER-restruct/iometer/src/Pulsar.cpp	2008-08-08 03:59:43 UTC (rev 336)
+@@ -774,17 +774,13 @@
+ 			if (argv[I])
+ 			{
+ 				// Lets use sscanf below to support hex input
+-				//param-&gt;cpu_affinity = (unsigned long)atol(argv[I]);
+ 				ULONG_PTR tempMask;
+ 				
+-				//
+-				// Always deposit to a 64bit variable. We will just truncate 
+-				// in case of 32bit OS. Handle both hex and decimal values.
+-				//
++				// Handle both hex and decimal values. Abstract format spec syntax (in iocommon.h)
+ 				if (argv[I][0] == '0' &amp;&amp; argv[I][1] == 'x')
+-					sscanf(argv[I],&quot;0x%I64x&quot;, &amp;tempMask);
++					sscanf(argv[I],&quot;0x%&quot; IOMTR_FORMAT_SPEC_64BIT &quot;x&quot;, &amp;tempMask);
+ 				else
+-					sscanf(argv[I],&quot;%I64d&quot;, &amp;tempMask);
++					sscanf(argv[I],&quot;%&quot; IOMTR_FORMAT_SPEC_64BIT &quot;d&quot;, &amp;tempMask);
+ 
+ #if defined (IOMTR_SETTING_CPU_AFFINITY)
+ 
+
+
+</PRE>
+
+<!--endarticle-->
+    <HR>
+    <P><UL>
+        <!--threads-->
+	<LI>Previous message: <A HREF="000101.html">[Iometer-svn] r335 - branches/IOMETER-restruct/iometer/src
+</A></li>
+	<LI>Next message: <A HREF="000103.html">[Iometer-svn] r337 - branches/IOMETER-restruct/iometer/src
+</A></li>
+         <LI> <B>Messages sorted by:</B> 
+              <a href="date.html#102">[ date ]</a>
+              <a href="thread.html#102">[ thread ]</a>
+              <a href="subject.html#102">[ subject ]</a>
+              <a href="author.html#102">[ author ]</a>
+         </LI>
+       </UL>
+
+<hr>
+<a href="https://lists.berlios.de/mailman/listinfo/iometer-svn">More information about the Iometer-svn
+mailing list</a><br>
+</body></html>
